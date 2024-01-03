@@ -1,7 +1,8 @@
 import Nav from "./components/nav/Nav";
 
 export default function Home() {
-  return (
+  return (<>
     <Nav />
-  );
+    <span>test</span>
+  </>);
 };
