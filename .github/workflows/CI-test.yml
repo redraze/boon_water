@@ -14,4 +14,5 @@ jobs:
       - name: test
         env:
           TEST: ${{ secrets.TEST }}
-        run: echo "${TEST}"
+        if: env.TEST != ''
+        run: echo 'success'
