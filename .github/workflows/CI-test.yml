@@ -8,11 +8,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout repository
-      #   uses: actions/checkout@v3
-
       - name: test
         env:
-          TEST: ${{ secrets.TEST }}
-        if: env.TEST != ''
+          USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          PAT: ${{ secrets.DOCKERHUB_PAT }}
+
+        if: env.USER != '' && env.PAT != ''
         run: echo 'success'
