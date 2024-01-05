@@ -1,10 +1,11 @@
-name: CI
+name: CI and deploy to github pages
 
 on:
-  push:
-    branches: ["main", "dev"]
-  pull_request: 
-    branches: ["main", "dev"]
+  # now using a different workflow which builds with docker
+  # push:
+  #   branches: ["main", "dev"]
+  # pull_request: 
+  #   branches: ["main", "dev"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
