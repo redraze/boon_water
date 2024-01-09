@@ -1,8 +1,8 @@
 import Nav from "./components/nav/Nav";
 
-export default function Home() {
+export default function IndexPage() {
   return (<>
     <Nav />
-    <span>test</span>
+    <span>Boon Water</span>
   </>);
 };

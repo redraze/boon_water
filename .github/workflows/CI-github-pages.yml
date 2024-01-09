@@ -1,7 +1,6 @@
 name: CI and deploy to github pages
 
 on:
-  # now using a different workflow which builds with docker
   # push:
   #   branches: ["main", "dev"]
   # pull_request: 
