@@ -11,35 +11,64 @@ export default function Session({
 }: {
     children: React.ReactNode
 }) {
-    const pathname = usePathname();
-    const router = useRouter();
     const token = Cookies.get('token');
+    const pathname = usePathname();
     
-    const isValidToken = (token: string | undefined) => {
-        if (!token || token == '') {
-            return false;
-        };
+    const checkValidity = async (token: string | undefined) => {
+        if (token == undefined || token == '') { return false };
 
-        // TODO
-        // decode the token using JWT_SECRET, 
-        // then verify its validity and 
-        // check if the cookie has expired
-        
-        return true;
+        try {
+            const response = await fetch("/api/verifyToken", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    token,
+                    pathname
+                }),
+            });
+            
+            if (!response.ok) throw new Error("Token verification failed");
+
+            const { isValid } = await response.json();
+            return isValid;
+
+        } catch (error) {
+            console.error(error);
+        };
     };
     
-    // TODO: set this message as a server side prop instead of a client side prop
-    // const [msg, setMsg] = useState('');
+    // TODO: set this message as a server side prop instead of a 
+    // client side prop so it persists when page is rerouted
+    const [msg, setMsg] = useState('');
 
     const [loading, setLoading] = useState(true);
+    const [isValid, setIsValid] = useState(false);
+    const router = useRouter();
+
     useEffect(() => {
-        const valid = isValidToken(token); 
-        if (!valid && pathname !== '/login') {
+        // Note to self:
+        // An async function is defined and called here because using
+        // useEffect( async () => {
+        //     const isValid = await checkValidity(token);
+        //     ...
+        // });
+        // return a promise to the useEffect hook, which is illegal?
+        const fetchValidity = async (token: string | undefined) => {
+            const res = await checkValidity(token); 
+            setIsValid(res);
+        };
+        fetchValidity(token);
+
+        if (!isValid && pathname !== '/login') {
             // setMsg('Please log in to view that page.')
             router.push('/login');
-        } else if (valid && pathname == '/login') {
+
+        } else if (isValid && pathname == '/login') {
             // setMsg('already logged in')
             router.push('/')
+
         } else {
             // setMsg('')
             setLoading(false);
@@ -47,7 +76,7 @@ export default function Session({
     });
 
     return(<>
-        <Message text={''} />
+        <Message text={msg} />
         { loading ?  <Spinner /> : children }
     </>);
 };

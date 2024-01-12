@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
@@ -13,13 +13,17 @@ export default function LoginPage() {
       // TODO: hash password before checking against db
       // const hash = encrypt('sha512', password)
 
+      // TODO: sanitize email address
+      // is this necessary with JSON.stringify?
+      // const cleanEmail = sanitize(email)
+
       const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
+          email,
           // hash,
           password,
         }),
@@ -44,8 +48,8 @@ export default function LoginPage() {
           Username:
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </label>
