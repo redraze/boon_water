@@ -3,17 +3,12 @@
 import css from "./Nav.module.scss";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 
 export default function Nav() {
     const router = useRouter();
     const handleLogout = (e: any) => {
         e.preventDefault();
-        Cookies.set('token', '');
-
-        // TODO: revoke cookie
-        // await endSession();
-
+        document.cookie = "token=; SameSite=lax; secure";
         router.push('/login');
     };
 

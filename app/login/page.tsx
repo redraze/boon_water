@@ -2,25 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { hashPassword } from "../lib/functions";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const digestMessage = async (password: string) => {
-    const msgUint8 = new TextEncoder().encode(password); // encode as (utf-8) Uint8Array
-    const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // hash the message
-    const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-    const hashHex = hashArray
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join(""); // convert bytes to hex string
-    return hashHex;
-  };
-  
   const handleLogin = async () => {
     try {
-      const hash = await digestMessage(password);
+      const hash = await hashPassword(password);
 
       const response = await fetch("/api/login", {
         method: "POST",
@@ -33,10 +24,10 @@ export default function LoginPage() {
         }),
       });
 
-      const { token } = await response.json();
       if (!response.ok) throw new Error("Login failed");
       
-      document.cookie = `token=${token}; path=/`;
+      const { token } = await response.json();
+      document.cookie = `token=${token}; SameSite=lax; Secure`;
       router.push("/");
       
     } catch (error) {

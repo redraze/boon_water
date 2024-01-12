@@ -12,7 +12,7 @@ async function determineValidity(token: string) {
 };
 
 export async function POST(req: Request) {
-    const { token, path } = await req.json();
-    const isValid = await determineValidity(token);
-    return NextResponse.json({ isValid });
+    const { token, pathname } = await req.json();
+    const validity = await determineValidity(token);
+    return NextResponse.json({ validity });
 };
