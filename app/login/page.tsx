@@ -8,14 +8,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
+  const digestMessage = async (password: string) => {
+    const msgUint8 = new TextEncoder().encode(password); // encode as (utf-8) Uint8Array
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join(""); // convert bytes to hex string
+    return hashHex;
+  };
+  
   const handleLogin = async () => {
     try {
-      // TODO: hash password before checking against db
-      // const hash = encrypt('sha512', password)
-
-      // TODO: sanitize email address
-      // is this necessary with JSON.stringify?
-      // const cleanEmail = sanitize(email)
+      const hash = await digestMessage(password);
 
       const response = await fetch("/api/login", {
         method: "POST",
@@ -24,16 +29,14 @@ export default function LoginPage() {
         },
         body: JSON.stringify({
           email,
-          // hash,
-          password,
+          hash,
         }),
       });
 
-      if (!response.ok) throw new Error("Login failed");
-
       const { token } = await response.json();
-      document.cookie = `token=${token}; path=/`;
+      if (!response.ok) throw new Error("Login failed");
       
+      document.cookie = `token=${token}; path=/`;
       router.push("/");
       
     } catch (error) {
