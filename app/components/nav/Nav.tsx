@@ -9,7 +9,7 @@ export default function Nav() {
     const handleLogout = (e: any) => {
         e.preventDefault();
         document.cookie = "token=; SameSite=lax; secure";
-        router.push('/login');
+        router.push('/login' + '?forceVerify=true');
     };
 
     return (<>

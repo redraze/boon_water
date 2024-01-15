@@ -1,30 +1,30 @@
-export const verifyToken = async (token: string | undefined, pathname: string) => {
-    if (!token || token == undefined || token == '') { return false };
-
+export const checkLogin = async (password: string, email: string) => {
     try {
-        const response = await fetch("/api/verifyToken", {
+        const hash = await hashPassword(password);
+
+        const response = await fetch("/api/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                token,
-                pathname
+                email,
+                hash,
             }),
-            cache: 'no-cache',
         });
+
+        if (!response.ok) throw new Error("Login failed");
         
-        if (!response.ok) throw new Error("Token verification failed");
-
-        const { validity } = await response.json();
-        return validity;
-
+        const { token }: { token: string } = await response.json();
+        return token;
+      
     } catch (error) {
         console.error(error);
+        return undefined;
     };
 };
 
-export const hashPassword = async (password: string) => {
+const hashPassword = async (password: string) => {
     const msgUint8 = new TextEncoder().encode(password); // encode as (utf-8) Uint8Array
     const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // hash the message
     const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array

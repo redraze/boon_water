@@ -2,37 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { hashPassword } from "../lib/functions";
+import { checkLogin } from "../lib/checkLogin";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleLogin = async () => {
-    try {
-      const hash = await hashPassword(password);
-
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          hash,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Login failed");
-      
-      const { token } = await response.json();
-      document.cookie = `token=${token}; SameSite=lax; Secure`;
-      router.push("/");
-      
-    } catch (error) {
-      console.error(error);
-    }
+  const handleLogin = () => {
+    checkLogin(password, email).then((token: string | undefined) => {
+      if (token) {
+        document.cookie = `token=${token}; SameSite=lax; Secure`;
+        router.push('/' + '?forceVerify=true');
+      } else {
+        router.push('/login');
+        // TODO: display failed login message
+      };
+    });
   };
 
   return (
