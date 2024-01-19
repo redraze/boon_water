@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 // import jwt from "jsonwebtoken";
 
-async function determineValidity(token: string) {
+async function determineValidity(token: string | undefined, pathname: string) {
     // TODO
     // decode token using JWT_SECRET,
     // then make sure the token is valid and hasn't expired,
@@ -13,6 +13,6 @@ async function determineValidity(token: string) {
 
 export async function POST(req: Request) {
     const { token, pathname } = await req.json();
-    const validity = await determineValidity(token);
+    const validity = await determineValidity(token, pathname);
     return NextResponse.json({ validity });
 };

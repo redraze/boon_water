@@ -11,12 +11,11 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     checkLogin(password, email).then((token: string | undefined) => {
-      if (token) {
+      if (token == undefined) {
+        router.push('/login' + '?loginFailed=true');
+      } else {
         document.cookie = `token=${token}; SameSite=lax; Secure`;
         router.push('/' + '?forceVerify=true');
-      } else {
-        router.push('/login');
-        // TODO: display failed login message
       };
     });
   };

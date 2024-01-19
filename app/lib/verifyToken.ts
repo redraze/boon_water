@@ -14,12 +14,12 @@ export const verifyToken = async (token: string | undefined) => {
             cache: 'no-cache',
         });
         
-        if (!response.ok) throw new Error("Token verification failed (0)");
+        if (!response.ok) { 
+            // console.error('error logged from verifyToken.tsx function in lib folder');
+            return undefined;
+        };
 
         const { validity }: { validity: boolean } = await response.json();
-
-        if (validity == undefined) throw new Error("Token verification failed (1)");
-
         return validity;
 
     } catch (error) {

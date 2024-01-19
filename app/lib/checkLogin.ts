@@ -13,9 +13,12 @@ export const checkLogin = async (password: string, email: string) => {
             }),
         });
 
-        if (!response.ok) throw new Error("Login failed");
+        if (!response.ok) {
+            console.log('error logged from ckeck login lib function')
+            return undefined;
+        };
         
-        const { token }: { token: string } = await response.json();
+        const { token }: { token: string | undefined } = await response.json();
         return token;
       
     } catch (error) {

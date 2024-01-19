@@ -23,21 +23,36 @@ export default function Session({
     const [message, setMessage] = useState('');
 
     useEffect(() => {
+        // skip verification on failed login attempts
+        if (searchParams.get('loginFailed') == 'true' && pathname == '/login') {
+            setMessage('Login attempt failed.');
+            setLoading(false);
+
         // verifies token on window (re)loads or reroutes from users' login/logout
-        if (isValid == undefined || searchParams.get('forceVerify') == 'true') {
+        } else if (isValid == undefined || searchParams.get('forceVerify') == 'true') {
             verifyToken(token)
-                .then((validity: boolean) => {
+                .then((validity: boolean | undefined) => {
                     setIsValid(validity);
                     return validity;
                 })
-                .then((validity: boolean) => {
-                    if (validity == false && pathname !== '/login') {
+                .then((validity: boolean | undefined) => {
+                    if (validity == undefined) {
+                        setMessage(
+                            "Internal server error enountered while attempting to authenticate."
+                            + " Please contact your system administrator, or try again later."
+                        );
+                        router.push('/login');
+                        setIsValid(false);
+                        setLoading(false);
+                    }
+
+                    else if (validity == false && pathname !== '/login') {
                         setMessage('Please log in to view that page.');
                         router.push('/login');
 
                     } else if (validity && pathname == '/login') {
                         setMessage('You are already logged in.');
-                        router.back();
+                        router.push('/');
 
                     } else {
                         setMessage('')
@@ -49,16 +64,16 @@ export default function Session({
         // (minimized api requests)
         } else {
             if (!isValid && pathname !== '/login') {
-                router.push('/login')
+                router.push('/login');
             
             } else if (isValid && pathname == '/login') {
-                router.back()
+                router.push('/');
             
             } else {
-                setLoading(false)
-            }
+                setLoading(false);
+            };
         };
-    }, [pathname, token]);
+    }, [pathname, token, searchParams]);
 
     if (loading) {
         return (<Spinner />);
