@@ -14,9 +14,12 @@ export const verifyToken = async (token: string | undefined) => {
             cache: 'no-cache',
         });
         
-        if (!response.ok) throw new Error("Token verification failed");
+        if (!response.ok) throw new Error("Token verification failed (0)");
 
         const { validity }: { validity: boolean } = await response.json();
+
+        if (validity == undefined) throw new Error("Token verification failed (1)");
+
         return validity;
 
     } catch (error) {

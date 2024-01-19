@@ -30,7 +30,7 @@ export default function Session({
                     setIsValid(validity);
                     return validity;
                 })
-                .then((validity: boolean | undefined) => {
+                .then((validity: boolean) => {
                     if (validity == false && pathname !== '/login') {
                         setMessage('Please log in to view that page.');
                         router.push('/login');
