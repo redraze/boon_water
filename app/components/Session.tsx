@@ -60,13 +60,17 @@ export default function Session({
         };
     }, [pathname, token]);
 
-    return(<>
-        { loading ?  
-            <Spinner /> :
-            <>
-                <Message text={message} />
-                { children }
-            </>
-        }
-    </>);
+    if (loading) {
+        return (<Spinner />);
+    } else if (
+        (!isValid && pathname !== '/login')
+        || (isValid && pathname == '/login')
+    ) {
+        return (<></>);
+    } else {
+        return(<>
+            <Message text={message} />
+            { children }
+        </>);
+    };
 };
