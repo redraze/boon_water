@@ -8,26 +8,27 @@ async function authenticateUser(email: string, hash: string) {
   // const { id, username } = checkDB(email, hash);
 
   return {
-    // id: id,
+    id: '123',
     email: email,
-    // name: username
+    username: 'testUser'
   };
 };
 
 export async function POST(req: Request) {
-  const { username, hash } = await req.json();
+  const { email, hash } = await req.json();
 
-  const userInfo = await authenticateUser(username, hash);
+  const userInfo = await authenticateUser(email, hash);
 
   const token = jwt.sign(
     { 
-      // userId: userIngo.id,
+      userId: userInfo.id,
       userEmail: userInfo.email,
-      // username: userInfo.username
+      username: userInfo.username
     },
     process.env.JWT_SECRET!,
     // {
-    //   expiresIn: "1m"
+    //   expiresIn: "5000"    // expires in 5000ms
+    //   expiresIn: "1m"      // expires in 1 minute
     // }
   );
   return NextResponse.json({ token });

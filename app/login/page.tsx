@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleLogin = () => {
-    checkLogin(password, email).then((token: string | undefined) => {
+    checkLogin(email, password).then((token: string | undefined) => {
       if (token == undefined) {
         router.push('/login' + '?loginFailed=true');
       } else {
@@ -24,7 +24,7 @@ export default function LoginPage() {
     <div>
       <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
         <label>
-          Username:
+          Email Address:
           <input
             type="text"
             value={email}

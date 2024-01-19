@@ -1,4 +1,4 @@
-export const checkLogin = async (password: string, email: string) => {
+export const checkLogin = async (email: string, password: string) => {
     try {
         const hash = await hashPassword(password);
 
@@ -14,7 +14,7 @@ export const checkLogin = async (password: string, email: string) => {
         });
 
         if (!response.ok) {
-            console.log('error logged from ckeck login lib function')
+            console.log('error logged from checkLogin.tsx lib function')
             return undefined;
         };
         
