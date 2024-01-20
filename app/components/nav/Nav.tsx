@@ -16,6 +16,9 @@ export default function Nav() {
         <div className={ css.nav }>
             <ul>
                 <li>
+                    <Link href='/users'>Water Users</Link>
+                </li>
+                <li>
                     <Link href='/billing'>Billing</Link>
                 </li>
                 <li>

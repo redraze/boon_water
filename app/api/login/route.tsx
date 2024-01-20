@@ -19,6 +19,8 @@ export async function POST(req: Request) {
 
   const userInfo = await authenticateUser(email, hash);
 
+  const expiryOptions = process.env.NODE_ENV == 'production' ? { expiresIn: '60m' } : {}
+
   const token = jwt.sign(
     { 
       userId: userInfo.id,
@@ -26,10 +28,7 @@ export async function POST(req: Request) {
       username: userInfo.username
     },
     process.env.JWT_SECRET!,
-    // {
-    //   expiresIn: "5000"    // expires in 5000ms
-    //   expiresIn: "1m"      // expires in 1 minute
-    // }
+    expiryOptions
   );
   return NextResponse.json({ token });
 };
