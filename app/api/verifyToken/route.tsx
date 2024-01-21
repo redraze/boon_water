@@ -1,34 +1,35 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-async function determineValidity(token: string | undefined, pathname: string) {
-    if (!token || token == '') { 
-        console.error('verifyToken API route error: token not found');
-        return undefined;
-    };
+export async function POST(req: Request) {
+    try{
+        const { token, pathname } = await req.json();
+        
+        if (!token) { throw new Error('missing token') };
+        if (!process.env.JWT_SECRET) { throw new Error('missing env variable: JWT_SECRET') };
+        
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET,
+            { complete: true }
+        );
 
-    try {
-        jwt.verify(token, process.env.JWT_SECRET!);
-
+        const payload = decoded.payload;
+        
         // TODO:
-        // determine if the token provided has permission to access the 
-        // desired endpoint specified by the pathname variable
+        // determine if the token provided has permission to access the requested resource
         // 
         // (maybe cross-reference a global dictionary of [token, permissions] pairs?
         // store in a local db or just memory?
-        // when a user logs in that token and its permissions are stored in the dict,
+        // when a user logs in their token and its permissions are stored in the dict,
         // and when the user logs out that token is deleted)
-
-        return true;
+        //
+        // const validity = ...;
+        
+        return NextResponse.json({ validity: true });
 
     } catch (error) {
         console.error(error);
-        return false;
-    };
-};
-
-export async function POST(req: Request) {
-    const { token, pathname } = await req.json();
-    const validity = await determineValidity(token, pathname);
-    return NextResponse.json({ validity });
+        return undefined;
+    }
 };

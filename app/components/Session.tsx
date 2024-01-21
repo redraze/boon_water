@@ -30,7 +30,7 @@ export default function Session({
 
         // verifies token on window (re)loads or reroutes from users' login/logout
         } else if (isValid == undefined || searchParams.get('forceVerify') == 'true') {
-            verifyToken(token)
+            verifyToken(token, pathname)
                 .then((validity: boolean | undefined) => {
                     setIsValid(validity);
                     return validity;
