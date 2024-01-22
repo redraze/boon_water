@@ -1,13 +1,11 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { userInfo } from "../users/page";
 import Cookies from "js-cookie";
 
 /**
- * Requests user data from API endpoint.
- * @router a nextjs/navigation router instance
- * @returns an array containing users' info, or undefined if a server error is encountered
+ * Fetches user data from /api/users endpoint.
+ * @returns undefined if a server error is encountered, or an object containing: users, an array contianing various info about users; validity, a boolean indicating token validity
  */
-export const getUsers = async (router: AppRouterInstance) => {
+export const getUsers = async () => {
     try {
         const response = await fetch("/api/users", {
             method: "POST",
@@ -19,12 +17,13 @@ export const getUsers = async (router: AppRouterInstance) => {
             }),
         });
 
-        if (!response.ok) {
-            console.log('api fetch response not OK')
-        };
-        
-        const { users }: { users: userInfo[] } = await response.json();
-        return users;
+        if (!response.ok) { throw new Error('api fetch response not OK') };
+
+        // returning an object containing both usersInfo and a boolean indicating validity
+        // is neccessary here because an empty usersInfo array is falsey and therefor 
+        // indistinguishable from a simplified response only containing { false }
+        const res: { users: userInfo[], validity: boolean } = await response.json();
+        return res;
       
     } catch (error) {
         console.log('error thrown in [users.ts lib function]: ' + error);

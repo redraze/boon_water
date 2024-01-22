@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,23 +16,31 @@ export type userInfo = {
     balance: number
 };
 
-export default function users() {
+export default function Users() {
     const router = useRouter();
 
     const [message, setMessage] = useState('');
     const [users, setUsers] = useState<userInfo[]>([]);
 
     useEffect(() => {
-        getUsers(router).then((userData: userInfo[] | undefined) => {
-            if (userData == undefined) {
+        getUsers().then((ret) => {
+            if (ret == undefined) {
                 setMessage(
-                    'Internal server error encountered while fetching user info.'
+                    'Internal server error encountered while retrieving user info.'
                     + ' Please contact system administrator or try again later.'
                 );
-            } else if (userData.length == 0) {
-                setMessage('No user data available.');
+                // a user with any token (valid or tampered-with) that experiences
+                // a server error will arrive at this point. should those users 
+                // (both valid and malicious) be routed somewhere else?
+
+            } else if (!ret.validity) {
+                router.push('/login' + '?loginRequired=true')
+
             } else {
-                setUsers(userData);
+                setUsers(ret.users);
+                if (ret.users.length == 0) {
+                    setMessage('No user data available.');
+                };
             };
         });
     }, []);

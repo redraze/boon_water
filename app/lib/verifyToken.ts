@@ -69,19 +69,18 @@ const queryVerifyTokenApi = async (token: string | undefined, pathname: string) 
 };
 
 /**
- * Verifies provided JWT token and checks if token is permitted to access requested resource.
+ * Verifies provided JWT token and checks if token is permitted to access requested resource. This function should be called server side.
  * @param token - JWT string to verify
  * @param pathname - url endpoint being requested
  * @returns boolean indicating token validity, or undefined if an error is thrown
  */
 export const verifyToken = (token: string | undefined, pathname: string) => {
     try {
-        if (!token) {
-            console.log('missing token [verifyToken.ts -> serverSideTokenCheck]');
-            return false;
-        };
+        if (!token) { throw new Error('missing token [verifyToken.ts -> serverSideTokenCheck]') };
+
         if (!process.env.JWT_SECRET) {
-            throw new Error('missing env variable: JWT_SECRET')
+            console.log('missing env variable: JWT_SECRET');
+            return undefined;
         };
         
         jwt.verify(
@@ -94,6 +93,7 @@ export const verifyToken = (token: string | undefined, pathname: string) => {
 
     } catch (error) {
         console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]: ' + error);
+        return false;
     };
 
     // >>>             FOR FUTURE VERSION             <<<
