@@ -2,8 +2,8 @@
 
 import Cookies from "js-cookie";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { verifyToken } from "../lib/verifyToken";
+import { useState, type ReactNode, useEffect } from "react";
+import { fullTokenVerification, clientSideTokenCheck } from "../lib/verifyToken";
 import Spinner from "./spinner/Spinner";
 import Message from "./message/Message";
 
@@ -12,80 +12,116 @@ export default function Session({
 }: {
     children: React.ReactNode
 }) {
+    const token = Cookies.get('token');
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const token = Cookies.get('token');
-    const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
-    
-    const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const [body, setBody] = useState<ReactNode | JSX.Element>(<Spinner />);
 
     useEffect(() => {
-        // skip verification on failed login attempts
-        if (searchParams.get('loginFailed') == 'true' && pathname == '/login') {
-            setMessage('Login attempt failed.');
-            setLoading(false);
+        setMessage('');
 
-        // verifies token on window (re)loads or reroutes from users' login/logout
-        } else if (isValid == undefined || searchParams.get('forceVerify') == 'true') {
-            verifyToken(token, pathname)
-                .then((validity: boolean | undefined) => {
-                    setIsValid(validity);
-                    return validity;
-                })
-                .then((validity: boolean | undefined) => {
-                    if (validity == undefined) {
-                        setMessage(
-                            "Internal server error enountered while attempting to authenticate."
-                            + " Please contact your system administrator, or try again later."
-                        );
-                        router.push('/login');
-                        setIsValid(false);
-                        setLoading(false);
-                    }
-
-                    else if (validity == false && pathname !== '/login') {
-                        setMessage('Please log in to view that page.');
-                        router.push('/login');
-
-                    } else if (validity && pathname == '/login') {
-                        setMessage('You are already logged in.');
-                        router.push('/');
+        // index page
+        if (pathname == '/') {
+            fullTokenVerification(token, pathname)
+                .then((validity: boolean) => {
+                    if (!validity) {
+                        router.push('/login' + '?loginRequired=true');
 
                     } else {
-                        setMessage('')
-                        setLoading(false);
+                        setBody(children);
+
+                        // user was redirected to index page after successful login attempt
+                        if (searchParams.get('loginSuccessful') == 'true') {
+                            setMessage('You have been logged in.');
+                        };
+
+                        // authenticated user attmpted to navigate to the login page
+                        if (searchParams.get('haveToken') == 'true') {
+                            setMessage('You are already logged in.');
+                        };
+
+                        // authenticated user requested a resource that does not exist
+                        if (searchParams.get('404') == 'true') {
+                            setMessage('Page not found');
+                        };
                     };
             });
+        }
+            
+            
+        // login page
+        else if (pathname == '/login') {
+            // user was redirected to login page after logging out
+            if (searchParams.get('loggedOut') == 'true') {
+                setMessage('You have been logged out.');
+                setBody(children);
+            }
 
-        // token's validity has already been determined
-        // (minimized api requests)
-        } else {
-            if (!isValid && pathname !== '/login') {
-                router.push('/login');
+            // user was redirected to login page after failing token validation
+            else if (searchParams.get('loginRequired') == 'true') {
+                setMessage('You must be logged in to see that page.');
+                setBody(children);
+            }
+                
+            // user failed a login attempt
+            else if (searchParams.get('loginFalied') == 'true') {
+                setMessage('Login failed.');
+                setBody(children);
+            }
+
+            // unathenticated user requested a resource that does not exist
+            else if (searchParams.get('404') == 'true') {
+                setMessage('Page not found.');
+                setBody(children);
+            }
             
-            } else if (isValid && pathname == '/login') {
-                router.push('/');
+            else {
+                fullTokenVerification(token, pathname)
+                    .then((validity: boolean) => {
+                        if (validity) {
+                            router.push('/' + '?haveToken=true');
+                        } else {
+                            setBody(children);
+                        };
+                    });
+            };
+        }
             
+            
+        // users page
+        else if (pathname == '/users') {
+            // verify token on client side only. the associataed
+            // server side api route will verify the token afterwards
+            if (!clientSideTokenCheck(token)) {
+                router.push('/login' + '?loginRequired=true')
             } else {
-                setLoading(false);
+                setBody(children);
+            };
+        }
+
+
+        // // another page...
+        // else if (pathname = ...) {
+        //     ...
+        // }
+
+
+        // undefined endpoints
+        else {
+            if (!clientSideTokenCheck(token)) {
+                router.push('/login' +'?404=true');
+            } else {
+                router.push('/' + '?404=true');
             };
         };
-    }, [pathname, token, searchParams]);
 
-    if (loading) {
-        return (<Spinner />);
-    } else if (
-        (!isValid && pathname !== '/login')
-        || (isValid && pathname == '/login')
-    ) {
-        return (<></>);
-    } else {
-        return(<>
-            <Message text={message} />
-            { children }
-        </>);
-    };
+    }, [pathname]);
+
+    return (<>
+        <Message text={ message } />
+        { body }
+    </>)
 };

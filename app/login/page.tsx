@@ -15,7 +15,7 @@ export default function LoginPage() {
         router.push('/login' + '?loginFailed=true');
       } else {
         document.cookie = `token=${token}; SameSite=lax; Secure`;
-        router.push('/' + '?forceVerify=true');
+        router.push('/' + '?loginSuccessful=true');
       };
     });
   };

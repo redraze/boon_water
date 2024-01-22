@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 
 /**
- * Decodes token and checks expiration.
+ * Decodes jwt token and checks if it is expired.
  * @param token - JWT string to decode
- * @returns boolean
+ * @returns boolean indicating token validity
  */
-const clientSideTokenCheck = (token: string | undefined) => {
+export const clientSideTokenCheck = (token: string | undefined) => {
     try {
-        if (!token) { throw new Error('client side token check error: missing token') };
+        if (!token) { throw new Error('missing token') };
         
         const payload = jwt.decode(
             token,
@@ -16,21 +16,21 @@ const clientSideTokenCheck = (token: string | undefined) => {
 
         if (process.env.NODE_ENV == 'production'){
             if (!payload || !payload.exp) { 
-                throw new Error('client side token check error -- malformed token')
+                throw new Error('malformed token')
                 // TODO: log IP address where token originated
                 // ...and do some batman sec ops stuff?
             };
             
             const exp = payload.exp;
             if (Date.now() >= exp * 1000) {
-                throw new Error('client side token check error -- token expired');
+                throw new Error('token expired');
             };
         };
 
         return true;
 
     } catch (error) {
-        console.error(error);
+        console.log('error thrown in [verifyToken.ts -> clientSideTokenCheck]: ' + error);
         return false;
     };
 };
@@ -38,10 +38,12 @@ const clientSideTokenCheck = (token: string | undefined) => {
 /**
  * Sends token to a server side API route for verification and to ensure token has permission to access desired resource.
  * @param token - JTW string to verify
- * @param resource - pathname string
- * @returns boolean | undefined
+ * @param pathname - pathname string
+ * @returns boolean indicating access permission
  */
-const serverSideTokenCheck = async (token: string | undefined, resource: string) => {
+const queryVerifyTokenApi = async (token: string | undefined, pathname: string) => {
+    if (!token) { throw new Error('missing token') };
+
     try {
         const response = await fetch("/api/verifyToken", {
             method: "POST",
@@ -55,24 +57,74 @@ const serverSideTokenCheck = async (token: string | undefined, resource: string)
             cache: 'no-cache',
         });
         
-        if (!response.ok) { throw new Error('server side token check error -- response not OK') };
+        if (!response.ok) { throw new Error('API fetch response not OK') };
 
-        const { validity }: { validity: boolean } = await response.json();
+        const { validity } : { validity: boolean } = await response.json();
         return validity;
 
     } catch (error) {
-        console.error(error);
-        return undefined;
+        console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]' + error);
+        return false;
     };
+};
+
+/**
+ * Verifies provided JWT token and checks if token is permitted to access requested resource.
+ * @param token - JWT string to verify
+ * @param pathname - url endpoint being requested
+ * @returns boolean indicating token validity, or undefined if an error is thrown
+ */
+export const verifyToken = (token: string | undefined, pathname: string) => {
+    try {
+        if (!token) {
+            console.log('missing token [verifyToken.ts -> serverSideTokenCheck]');
+            return false;
+        };
+        if (!process.env.JWT_SECRET) {
+            throw new Error('missing env variable: JWT_SECRET')
+        };
+        
+        jwt.verify(
+            token,
+            process.env.JWT_SECRET,
+            { complete: true }
+        );
+        
+        return true;
+
+    } catch (error) {
+        console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]: ' + error);
+    };
+
+    // >>>             FOR FUTURE VERSION             <<<
+    // determine if the token provided has permission to access the requested resource
+    // 
+    // (maybe cross-reference a global dictionary of [token, permissions] pairs?
+    // store in a local db or just memory?
+    // when a user logs in their token and its permissions are stored in the dict,
+    // and when the user logs out that token is deleted)
+    //
+    // this way more than one kind of user can access the site. instead of just
+    // an admin user that unters data/generates bills for users, each user can
+    // access the site and view analyits about their water usage
+    // 
+    // const decoded = jwt.verify(
+    //     token,
+    //     process.env.JWT_SECRET,
+    //     { complete: true }
+    // );
+    // const payload = decoded.payload;
+    // const validity = hasPermission(payload, pathname);
+    // return validity;
 };
 
 /**
  * Verifies token on client machine, then sends token to server side API route for further verification.
  * @param token - JWT string to verify
  * @param pathname - url endpoint being requested
- * @returns boolean indicates verification, undefined indicates an internal server error 
+ * @returns boolean indicating token validity
  */
-export const verifyToken = async (token: string | undefined, pathname: string) => {
+export const fullTokenVerification = async (token: string | undefined, pathname: string) => {
     if (!clientSideTokenCheck(token)) { return false };
-    return await serverSideTokenCheck(token, pathname);
+    return await queryVerifyTokenApi(token, pathname);
 };

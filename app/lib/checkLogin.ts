@@ -1,3 +1,9 @@
+/**
+ * Sends credentials to server API route which then checks those credentials against a users database.
+ * @param email - string
+ * @param password - string
+ * @returns A signed JSON web token if provided credentials were authentic, undefined otherwise 
+ */
 export const checkLogin = async (email: string, password: string) => {
     try {
         const hash = await hashPassword(password);
@@ -22,11 +28,16 @@ export const checkLogin = async (email: string, password: string) => {
         return token;
       
     } catch (error) {
-        console.error(error);
+        console.log(error);
         return undefined;
     };
 };
 
+/**
+ * Asynchronously hashes the provided string with the SHA-256 algorithm.
+ * @param password - string
+ * @returns hashed password string
+ */
 const hashPassword = async (password: string) => {
     const msgUint8 = new TextEncoder().encode(password); // encode as (utf-8) Uint8Array
     const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // hash the message

@@ -20,22 +20,19 @@ export default function users() {
     const router = useRouter();
 
     const [message, setMessage] = useState('');
-    const [users, setUsers] = useState<userInfo[] | undefined>([]);
+    const [users, setUsers] = useState<userInfo[]>([]);
 
     useEffect(() => {
-        getUsers().then((users: userInfo[] | undefined) => {
-            setUsers(users);
-            
-            if (users == undefined) {
+        getUsers(router).then((userData: userInfo[] | undefined) => {
+            if (userData == undefined) {
                 setMessage(
                     'Internal server error encountered while fetching user info.'
                     + ' Please contact system administrator or try again later.'
                 );
-                return;
-            };
-
-            if (users.length == 0) {
-                setMessage('No user data available.')
+            } else if (userData.length == 0) {
+                setMessage('No user data available.');
+            } else {
+                setUsers(userData);
             };
         });
     }, []);

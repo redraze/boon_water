@@ -1,38 +1,32 @@
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { userInfo } from "../users/page";
 import Cookies from "js-cookie";
 
-export const getUsers = async () => {
+/**
+ * Requests user data from API endpoint.
+ * @router a nextjs/navigation router instance
+ * @returns an array containing users' info, or undefined if a server error is encountered
+ */
+export const getUsers = async (router: AppRouterInstance) => {
     try {
-        const token = Cookies.get('token');
-
-        // TODO
-        // check for token malformation/expiration
-        // if (badToken(token)) { throw new Error(...) };
-
-        // this ^ logic (client side token verification) is also present in the 
-        // verifyToken.ts lib function and could be generalized, abstracted into,
-        // and exported from a different(?) lib function
-        
-        const response = await fetch("/api/getUsers", {
+        const response = await fetch("/api/users", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                token: token
+                token: Cookies.get('token')
             }),
         });
 
         if (!response.ok) {
-            console.log('error logged from getUsers.tsx lib function')
-            return undefined;
+            console.log('api fetch response not OK')
         };
         
         const { users }: { users: userInfo[] } = await response.json();
         return users;
       
     } catch (error) {
-        console.error(error);
-        return undefined;
+        console.log('error thrown in [users.ts lib function]: ' + error);
     };
 };
