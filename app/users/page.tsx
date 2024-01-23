@@ -6,7 +6,6 @@ import { getUsers } from "../lib/getUsers";
 import Spinner from "../components/spinner/Spinner";
 import Message from "../components/message/Message";
 import Link from "next/link";
-import Nav from "../components/nav/Nav";
 
 export type userInfo = {
     id: number
@@ -46,7 +45,6 @@ export default function Users() {
     }, []);
 
     return (<>
-        <Nav />
         <Message text={message} />
         <table>
             {

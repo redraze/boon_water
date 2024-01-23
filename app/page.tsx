@@ -1,8 +1,5 @@
-import Nav from "./components/nav/Nav";
-
 export default function IndexPage() {
   return (<>
-    <Nav />
-    <span>Boon Water</span>
+    <h1>Boon Water Association</h1>
   </>);
 };
