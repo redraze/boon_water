@@ -72,7 +72,7 @@ const queryVerifyTokenApi = async (token: string | undefined, pathname: string) 
  * Verifies provided JWT token and checks if token is permitted to access requested resource. This function should be called server side.
  * @param token - JWT string to verify
  * @param pathname - url endpoint being requested
- * @returns boolean indicating token validity, or undefined if an error is thrown
+ * @returns a boolean indicating token validity, or undefined if an internal server error is encountered
  */
 export const verifyToken = (token: string | undefined, pathname: string) => {
     try {
