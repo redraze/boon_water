@@ -1,5 +1,64 @@
 import jwt from "jsonwebtoken";
 
+export const loggingEnabled = process.env.NODE_ENV == 'production' ? true : false;
+
+/**
+ * Asynchronously hashes the provided string with the SHA-256 algorithm.
+ * @param password - string
+ * @returns hashed password string
+ */
+const hashPassword = async (password: string) => {
+    const msgUint8 = new TextEncoder().encode(password); // encode as (utf-8) Uint8Array
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+    
+    const hashHex = hashArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join(""); // convert bytes to hex string
+    
+    return hashHex;
+};
+
+/**
+ * Sends credentials to server API route which then checks those credentials against a users database.
+ * @param email - string
+ * @param password - string
+ * @returns A signed JSON web token if provided credentials were authentic, undefined otherwise 
+ */
+export const checkLogin = async (email: string, password: string) => {
+    try {
+        const hash = await hashPassword(password);
+
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email,
+                hash,
+            }),
+        });
+
+        if (!response.ok) {
+            if (loggingEnabled) {
+                console.log('error logged from checkLogin.tsx lib function');
+            };
+            return undefined;
+        };
+        
+        const { token }: { token: string | undefined } = await response.json();
+        return token;
+      
+    } catch (error) {
+        if (loggingEnabled) {
+            console.log(error);
+        };
+        return undefined;
+    };
+};
+
+
 /**
  * Decodes jwt token and checks if it is expired.
  * @param token - JWT string to decode
@@ -30,10 +89,13 @@ export const clientSideTokenCheck = (token: string | undefined) => {
         return true;
 
     } catch (error) {
-        console.log('error thrown in [verifyToken.ts -> clientSideTokenCheck]: ' + error);
+        if (loggingEnabled) {
+            console.log('error thrown in [verifyToken.ts -> clientSideTokenCheck]: ' + error);
+        };
         return false;
     };
 };
+
 
 /**
  * Sends token to a server side API route for verification and to ensure token has permission to access desired resource.
@@ -41,7 +103,7 @@ export const clientSideTokenCheck = (token: string | undefined) => {
  * @param pathname - pathname string
  * @returns boolean indicating access permission
  */
-const queryVerifyTokenApi = async (token: string | undefined, pathname: string) => {
+const fetchValidity = async (token: string | undefined, pathname: string) => {
     if (!token) { throw new Error('missing token') };
 
     try {
@@ -52,6 +114,7 @@ const queryVerifyTokenApi = async (token: string | undefined, pathname: string) 
             },
             body: JSON.stringify({
                 token,
+                pathname
             }),
             // ensure time-based tokens are re-verified
             cache: 'no-cache',
@@ -63,10 +126,13 @@ const queryVerifyTokenApi = async (token: string | undefined, pathname: string) 
         return validity;
 
     } catch (error) {
-        console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]' + error);
+        if (loggingEnabled) {
+            console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]' + error);
+        };
         return false;
     };
 };
+
 
 /**
  * Verifies provided JWT token and checks if token is permitted to access requested resource. This function should be called server side.
@@ -76,7 +142,7 @@ const queryVerifyTokenApi = async (token: string | undefined, pathname: string) 
  */
 export const verifyToken = (token: string | undefined, pathname: string) => {
     try {
-        if (!token) { throw new Error('missing token [verifyToken.ts -> serverSideTokenCheck]') };
+        if (!token) { throw new Error('missing token') };
 
         if (!process.env.JWT_SECRET) {
             console.log('missing env variable: JWT_SECRET');
@@ -118,6 +184,7 @@ export const verifyToken = (token: string | undefined, pathname: string) => {
     // return validity;
 };
 
+
 /**
  * Verifies token on client machine, then sends token to server side API route for further verification.
  * @param token - JWT string to verify
@@ -126,5 +193,5 @@ export const verifyToken = (token: string | undefined, pathname: string) => {
  */
 export const fullTokenVerification = async (token: string | undefined, pathname: string) => {
     if (!clientSideTokenCheck(token)) { return false };
-    return await queryVerifyTokenApi(token, pathname);
+    return await fetchValidity(token, pathname);
 };

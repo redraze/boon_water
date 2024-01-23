@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkLogin } from "../lib/checkLogin";
+import { checkLogin } from "../lib/tokens";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");

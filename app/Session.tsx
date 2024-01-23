@@ -3,7 +3,7 @@
 import Cookies from "js-cookie";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, type ReactNode, useEffect } from "react";
-import { fullTokenVerification, clientSideTokenCheck } from "./lib/verifyToken";
+import { fullTokenVerification, clientSideTokenCheck } from "./lib/tokens";
 import Spinner from "./components/spinner/Spinner";
 import Message from "./components/message/Message";
 import Nav from "./components/nav/Nav";
@@ -19,8 +19,8 @@ export default function Session({
     const searchParams = useSearchParams();
 
     const [message, setMessage] = useState('');
+    const [isValid, setIsValid] = useState(false);
     const [body, setBody] = useState<ReactNode | JSX.Element>(<Spinner />);
-    const [validity, setValidity] = useState(false);
 
     useEffect(() => {
         setMessage('');
@@ -29,7 +29,7 @@ export default function Session({
         if (pathname == '/') {
             fullTokenVerification(token, pathname)
                 .then((validity: boolean) => {
-                    setValidity(validity);
+                    setIsValid(validity);
 
                     if (!validity) {
                         router.push('/login' + '?loginRequired=true');
@@ -60,28 +60,28 @@ export default function Session({
         else if (pathname == '/login') {
             // user was redirected to login page after logging out
             if (searchParams.get('loggedOut') == 'true') {
-                setValidity(false);
+                setIsValid(false);
                 setMessage('You have been logged out.');
                 setBody(children);
             }
 
             // user was redirected to login page after failing token validation
             else if (searchParams.get('loginRequired') == 'true') {
-                setValidity(false);
+                setIsValid(false);
                 setMessage('You must be logged in to see that page.');
                 setBody(children);
             }
                 
             // user failed a login attempt
             else if (searchParams.get('loginFalied') == 'true') {
-                setValidity(false);
+                setIsValid(false);
                 setMessage('Login failed.');
                 setBody(children);
             }
 
             // unathenticated user requested a resource that does not exist
             else if (searchParams.get('404') == 'true') {
-                setValidity(false);
+                setIsValid(false);
                 setMessage('Page not found.');
                 setBody(children);
             }
@@ -89,7 +89,7 @@ export default function Session({
             else {
                 fullTokenVerification(token, pathname)
                     .then((validity: boolean) => {
-                        setValidity(validity);
+                        setIsValid(validity);
                         if (validity) {
                             router.push('/' + '?haveToken=true');
                         } else {
@@ -102,12 +102,14 @@ export default function Session({
             
         // users page
         else if (pathname == '/users') {
-            // verify token on client side only. the associataed server side
+            // verify token on client side only. the associated server side
             // api route will verify the token and reroute if neccessary
             if (!clientSideTokenCheck(token)) {
-                setValidity(false);
-                router.push('/login' + '?loginRequired=true')
+                setIsValid(false);
+                router.push('/login' + '?loginRequired=true');
+
             } else {
+                setIsValid(true);
                 setBody(children);
             };
         }
@@ -122,9 +124,10 @@ export default function Session({
         // undefined endpoints
         else {
             if (!clientSideTokenCheck(token)) {
-                setValidity(false);
+                setIsValid(false);
                 router.replace('/login' +'?404=true');
             } else {
+                setIsValid(true);
                 router.replace('/' + '?404=true');
             };
         };
@@ -133,7 +136,7 @@ export default function Session({
 
     return (<>
         <Message text={ message } />
-        <Nav validity={validity} />
+        <Nav validity={ isValid } />
         { body }
     </>)
 };

@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUsers } from "../lib/getUsers";
+import { getAllUsers } from "../lib/users";
 import Spinner from "../components/spinner/Spinner";
 import Message from "../components/message/Message";
-import Link from "next/link";
 
 export type userInfo = {
     id: number
@@ -22,7 +21,7 @@ export default function Users() {
     const [users, setUsers] = useState<userInfo[]>([]);
 
     useEffect(() => {
-        getUsers().then((ret) => {
+        getAllUsers().then((ret) => {
             if (ret == undefined) {
                 setMessage(
                     'Internal server error encountered while retrieving user info.'
@@ -48,35 +47,33 @@ export default function Users() {
         <Message text={message} />
         <table>
             {
-                users ? 
+                users ? <>
                     <thead>
                         <tr>
                             <th>name</th>
                             <th>address</th>
                             <th>email</th>
                             <th>balance</th>
-                            <th></th>
+                            <th>edit user</th>
+                            <></>
                         </tr>
-                    </thead> : 
-                    <></>
+                    </thead>
+                    <tbody>
+                        { users.map((user: userInfo) => {
+                            return(
+                                <tr key={ user.id }>
+                                    <td>{ user.name }</td>
+                                    <td>{ user.address }</td>
+                                    <td>{ user.email }</td>
+                                    <td>{ user.balance }</td>
+                                    <td>[edit_icon]</td>
+                                </tr>
+                            );
+                        })
+                        } 
+                    </tbody>
+                </> : <></>
             }
-            <tbody>
-            {
-                users ?
-                    users.map((user: userInfo) => {
-                        return(
-                            <tr key={ user.id }>
-                                <td>{ user.name }</td>
-                                <td>{ user.address }</td>
-                                <td>{ user.email }</td>
-                                <td>{ user.balance }</td>
-                                <td><Link href={'/editUser' + `/${user.id}`}>edit</Link></td>
-                            </tr>
-                        );
-                    }) :
-                    <></>
-            }
-            </tbody>
         </table>
         { users ? <></> : <Spinner /> }
 
