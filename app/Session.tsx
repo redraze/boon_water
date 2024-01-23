@@ -3,9 +3,9 @@
 import Cookies from "js-cookie";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, type ReactNode, useEffect } from "react";
-import { fullTokenVerification, clientSideTokenCheck } from "../lib/verifyToken";
-import Spinner from "./spinner/Spinner";
-import Message from "./message/Message";
+import { fullTokenVerification, clientSideTokenCheck } from "./lib/verifyToken";
+import Spinner from "./components/spinner/Spinner";
+import Message from "./components/message/Message";
 
 export default function Session({
     children,
@@ -112,9 +112,9 @@ export default function Session({
         // undefined endpoints
         else {
             if (!clientSideTokenCheck(token)) {
-                router.push('/login' +'?404=true');
+                router.replace('/login' +'?404=true');
             } else {
-                router.push('/' + '?404=true');
+                router.replace('/' + '?404=true');
             };
         };
 

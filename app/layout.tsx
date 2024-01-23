@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Session from './components/Session'
+import Session from './Session'
 
 const inter = Inter({ subsets: ['latin'] })
 
