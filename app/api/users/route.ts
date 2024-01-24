@@ -1,3 +1,4 @@
+import clientPromise from "../../lib/dbConnect";
 import { verifyToken } from "../../lib/tokens";
 import { NextResponse } from "next/server";
 
@@ -10,10 +11,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ users: [], validity });
         };
 
-        // TODO
-        // connect to db
-        // query db for all users
-        // const users = ...
+        const dbClient = await clientPromise;
+        const db = dbClient?.db('BoonWater');
+        const collection = db?.collection('users');
+        const cursor = collection?.find({});
+        console.log(cursor?.bufferedCount())
         
         // test data
         const users = [
