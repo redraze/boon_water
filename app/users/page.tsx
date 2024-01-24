@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation";
 import { getAllUsers } from "../lib/users";
 import Spinner from "../components/spinner/Spinner";
 import Message from "../components/message/Message";
-
-export type userInfo = {
-    id: number
-    name: string
-    address: string
-    email: string
-    balance: number
-};
+import type { userInfo } from "../lib/commonTypes";
 
 export default function Users() {
     const router = useRouter();
@@ -20,8 +13,9 @@ export default function Users() {
     const [message, setMessage] = useState('');
     const [users, setUsers] = useState<userInfo[]>([]);
 
+    // gets all water users' data upon page load
     useEffect(() => {
-        getAllUsers().then((ret) => {
+        getAllUsers('/users').then((ret) => {
             if (ret == undefined) {
                 setMessage(
                     'Internal server error encountered while retrieving user info.'
