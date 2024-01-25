@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Session from './Session'
+import { Suspense } from 'react'
+import Spinner from './components/spinner/Spinner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,9 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
         <body className={inter.className}>
-          <Session>
-            {children}
-          </Session>
+          <Suspense fallback={ <Spinner /> }>
+            <Session>
+              {children}
+            </Session>
+          </Suspense>
         </body>
     </html>
   );

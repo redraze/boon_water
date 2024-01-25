@@ -1,4 +1,4 @@
-import clientPromise from "../../lib/dbConnect";
+// import clientPromise from "../../lib/dbConnect";
 import { verifyToken } from "../../lib/tokens";
 import { NextResponse } from "next/server";
 
@@ -11,14 +11,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ users: [], validity });
         };
 
-        const dbClient = await clientPromise;
-        const db = dbClient?.db('waterUsersDb');
-        const collection = db?.collection('waterUsers');
-        const cursor = collection?.find({});
-        const users = await cursor?.toArray();
-        await cursor?.close();
+        // const dbClient = await clientPromise;
+        // const db = dbClient?.db('waterUsersDb');
+        // const collection = db?.collection('waterUsers');
+        // const cursor = collection?.find({});
+        // const users = await cursor?.toArray();
+        // await cursor?.close();
 
-        return NextResponse.json({ users, validity })
+        // return NextResponse.json({ users, validity })
+        return NextResponse.json({ users: undefined, validity })
 
     } catch (error) {
         console.log(`error thrown in [/api/users] POST: ` + error);
