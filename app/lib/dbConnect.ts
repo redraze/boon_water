@@ -9,16 +9,16 @@ const options = {
     },
 };
 
-let client: MongoClient = new MongoClient(uri!, options);
+if (!uri) {
+    throw new Error ('MONGODB_URI not defined in .env.local');
+};
+
+let client: MongoClient = new MongoClient(uri, options);
 let clientPromise: Promise<MongoClient> = client.connect();
 
 declare global {
     var _mongoClientPromise: Promise<MongoClient>;
 };
-
-// if (!uri) {
-//     throw new Error ('MONGODB_URI not defined in .env.local');
-// };
 
 // if (process.env.NODE_ENV && process.env.NODE_ENV == "development") {
 //     // In development mode, use a global variable so that the value
