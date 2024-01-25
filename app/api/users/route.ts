@@ -11,7 +11,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ users: [], validity });
         };
 
-        const dbClient = await clientPromise;
+        // const dbClient = await clientPromise;
         // const db = dbClient?.db('waterUsersDb');
         // const collection = db?.collection('waterUsers');
         // const cursor = collection?.find({});
