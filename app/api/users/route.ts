@@ -1,4 +1,5 @@
 // import clientPromise from "../../lib/dbConnect";
+import options from "../../lib/dbConnect";
 import { verifyToken } from "../../lib/tokens";
 import { NextResponse } from "next/server";
 
