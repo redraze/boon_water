@@ -25,7 +25,7 @@ export const getAllUsers = async (pathname: string) => {
         // returning an object containing both usersInfo and a boolean indicating validity
         // is neccessary here because an empty usersInfo array is falsey and therefor 
         // indistinguishable from a simplified response only containing { false }
-        const res: { users: userInfo[], validity: boolean } = await response.json();
+        const res: { users: userInfo[] | undefined , validity: boolean } = await response.json();
         return res;
       
     } catch (error) {

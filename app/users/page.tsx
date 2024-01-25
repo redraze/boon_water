@@ -11,7 +11,7 @@ export default function Users() {
     const router = useRouter();
 
     const [message, setMessage] = useState('');
-    const [users, setUsers] = useState<userInfo[]>([]);
+    const [users, setUsers] = useState<userInfo[] | undefined>(undefined);
 
     // gets all water users' data upon page load
     useEffect(() => {
@@ -30,7 +30,7 @@ export default function Users() {
 
             } else {
                 setUsers(ret.users);
-                if (ret.users.length == 0) {
+                if (!ret.users) {
                     setMessage('No user data available.');
                 };
             };
@@ -53,17 +53,18 @@ export default function Users() {
                         </tr>
                     </thead>
                     <tbody>
-                        { users.map((user: userInfo) => {
-                            return(
-                                <tr key={ user.id }>
-                                    <td>{ user.name }</td>
-                                    <td>{ user.address }</td>
-                                    <td>{ user.email }</td>
-                                    <td>{ user.balance }</td>
-                                    <td>[edit_icon]</td>
-                                </tr>
-                            );
-                        })
+                        { 
+                            users?.map((user: userInfo) => {
+                                return(
+                                    <tr key={ user._id }>
+                                        <td>{ user.info.name }</td>
+                                        <td>{ user.info.address }</td>
+                                        <td>{ user.info.email }</td>
+                                        <td>{ user.info.balance }</td>
+                                        <td>[edit_icon]</td>
+                                    </tr>
+                                );
+                            })
                         } 
                     </tbody>
                 </> : <></>

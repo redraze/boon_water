@@ -12,18 +12,13 @@ export async function POST(req: Request) {
         };
 
         const dbClient = await clientPromise;
-        const db = dbClient?.db('BoonWater');
-        const collection = db?.collection('users');
+        const db = dbClient?.db('waterUsersDb');
+        const collection = db?.collection('waterUsers');
         const cursor = collection?.find({});
-        console.log(cursor?.bufferedCount())
-        
-        // test data
-        const users = [
-            { id: 1, name: 'user1', address: '1234 boon road', email: 'test@test.com', balance: 100 },
-            { id: 2, name: 'user2', address: '4321 boon road', email: 'foo@bar.aol', balance: -50 }
-        ];
-        
-        return NextResponse.json({ users, validity });
+        const users = await cursor?.toArray();
+        await cursor?.close();
+
+        return NextResponse.json({ users, validity })
 
     } catch (error) {
         console.log(`error thrown in [/api/users] POST: ` + error);
