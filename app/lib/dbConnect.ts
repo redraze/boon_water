@@ -12,9 +12,9 @@ const options = {
 let client: MongoClient = new MongoClient(uri!, options);
 let clientPromise: Promise<MongoClient> = client.connect();
 
-// declare global {
-//     var _mongoClientPromise: Promise<MongoClient>;
-// };
+declare global {
+    var _mongoClientPromise: Promise<MongoClient>;
+};
 
 // if (!uri) {
 //     throw new Error ('MONGODB_URI not defined in .env.local');
