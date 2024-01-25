@@ -1,18 +1,16 @@
-// import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 
-// const uri = process.env.MONGODB_URI;
-let options = {
+const uri = process.env.MONGODB_URI;
+const options = {
     serverApi: {
-        // version: ServerApiVersion.v1,
+        version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
     },
 };
 
-export default options;
-
-// let client: MongoClient | null = null;
-// let clientPromise: Promise<MongoClient> | null = null;
+let client: MongoClient = new MongoClient(uri!, options);
+let clientPromise: Promise<MongoClient> = client.connect();
 
 // declare global {
 //     var _mongoClientPromise: Promise<MongoClient>;
@@ -39,4 +37,4 @@ export default options;
 
 // // Export a module-scoped MongoClient promise. By doing this in a
 // // separate module, the client can be shared across functions.
-// export default clientPromise;
+export default clientPromise;
