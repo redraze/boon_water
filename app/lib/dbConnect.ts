@@ -9,32 +9,32 @@ const options = {
     },
 };
 
-if (!uri) {
-    throw new Error ('MONGODB_URI not defined in .env.local');
-};
-
-let client: MongoClient = new MongoClient(uri, options);
-let clientPromise: Promise<MongoClient> = client.connect();
+let client: MongoClient | undefined;
+let clientPromise: Promise<MongoClient> | undefined;
 
 declare global {
-    var _mongoClientPromise: Promise<MongoClient>;
+    var mongoClientPromise: Promise<MongoClient> | undefined
+}
+
+export const dbConnect = async () => {
+    if (!uri) {
+        throw new Error ('MONGODB_URI not defined in .env.local');
+    };
+
+    if (process.env.NODE_ENV && process.env.NODE_ENV == "development") {
+        // In development mode, use a global variable so that the value
+        // is preserved across module reloads caused by HMR (Hot Module Replacement).
+        if (!global.mongoClientPromise) {
+            client = new MongoClient(uri, options);
+            global.mongoClientPromise = client.connect();
+        };
+        clientPromise = global.mongoClientPromise;
+    
+    } else {
+        // In production mode, it's best to not use a global variable.
+        client = new MongoClient(uri, options);
+        clientPromise = client.connect();
+    };
+
+    return clientPromise;
 };
-
-// if (process.env.NODE_ENV && process.env.NODE_ENV == "development") {
-//     // In development mode, use a global variable so that the value
-//     // is preserved across module reloads caused by HMR (Hot Module Replacement).
-//     if (!global._mongoClientPromise) {
-//         client = new MongoClient(uri, options);
-//         global._mongoClientPromise = client.connect();
-//     };
-//     clientPromise = global._mongoClientPromise;
-
-// } else {
-//     // In production mode, it's best to not use a global variable.
-//     client = new MongoClient(uri, options);
-//     clientPromise = client.connect();
-// };
-
-// // Export a module-scoped MongoClient promise. By doing this in a
-// // separate module, the client can be shared across functions.
-export default clientPromise;
