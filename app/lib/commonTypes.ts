@@ -1,9 +1,9 @@
+export type voidFunc<T = void> = (params: T) => void;
+
 export type stateType<T> = {
   value: T
-  setValue: (params: T) => void
+  setValue: voidFunc<T>
 };
-
-export type voidFunc<T = void> = (params: T) => void;
 
 export type userInfo = {
   _id: string
