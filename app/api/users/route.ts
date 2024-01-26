@@ -1,4 +1,5 @@
-import clientPromise from "../../lib/dbConnect";
+import { MongoClient, ServerApiVersion } from "mongodb";
+// import clientPromise from "../../lib/dbConnect";
 import { verifyToken } from "../../lib/tokens";
 import { NextResponse } from "next/server";
 
@@ -11,15 +12,28 @@ export async function POST(req: Request) {
             return NextResponse.json({ users: [], validity });
         };
 
-        const dbClient = await clientPromise;
-        // const db = dbClient?.db('waterUsersDb');
-        // const collection = db?.collection('waterUsers');
-        // const cursor = collection?.find({});
-        // const users = await cursor?.toArray();
-        // await cursor?.close();
+        const uri = process.env.MONGODB_URI;
+        if (!uri) {throw new Error('MONGODB_URI not defined')};
 
-        // return NextResponse.json({ users, validity })
-        return NextResponse.json({ users: undefined, validity })
+        // const options = {
+        //     serverApi: {
+        //         version: ServerApiVersion.v1,
+        //         strict: true,
+        //         deprecationErrors: true,
+        //     },
+        // };
+        const client = new MongoClient(uri);
+        
+        const dbClient = await client.connect();
+        // const dbClient = await clientPromise;
+        const db = dbClient?.db('waterUsersDb');
+        const collection = db?.collection('waterUsers');
+        const cursor = collection?.find({});
+        const users = await cursor?.toArray();
+        await cursor?.close();
+
+        return NextResponse.json({ users, validity })
+        // return NextResponse.json({ users: undefined, validity })
 
     } catch (error) {
         console.log(`error thrown in [/api/users] POST: ` + error);
