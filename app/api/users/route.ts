@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-// import clientPromise from "../../lib/dbConnect";
+import clientPromise from "../../lib/dbConnect";
 import { verifyToken } from "../../lib/tokens";
 import { NextResponse } from "next/server";
 
@@ -15,16 +15,16 @@ export async function POST(req: Request) {
         const uri = process.env.MONGODB_URI;
         if (!uri) {throw new Error('MONGODB_URI not defined')};
 
-        // const options = {
-        //     serverApi: {
-        //         version: ServerApiVersion.v1,
-        //         strict: true,
-        //         deprecationErrors: true,
-        //     },
-        // };
-        const client = new MongoClient(uri);
-        
+        const options = {
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,
+                deprecationErrors: true,
+            },
+        };
+        const client = new MongoClient(uri, options);
         const dbClient = await client.connect();
+        
         // const dbClient = await clientPromise;
         const db = dbClient?.db('waterUsersDb');
         const collection = db?.collection('waterUsers');
