@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { getAllUsers } from "../lib/users";
 import Message from "../components/message/Message";
 import type { userInfo } from "../lib/commonTypes";
-import UsersTable from "../components/usersTable/usersTable";
+import UsersTable from "../components/users/usersTable";
+import AddUserModal from "../components/users/addUserModal";
 
 export default function Users() {
     const router = useRouter();
@@ -13,6 +14,7 @@ export default function Users() {
 
     const [message, setMessage] = useState('');
     const [users, setUsers] = useState<userInfo[] | undefined>(undefined);
+    const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
         getAllUsers(pathname).then((ret) => {
@@ -42,10 +44,12 @@ export default function Users() {
         <UsersTable 
             usersState={{ value: users, setValue: setUsers }}
             setMessage={ setMessage }
+            updatingState={{ value: updating, setValue: setUpdating }}
         />
-
-        {/* <button onClick={() => router.push('/addNewUser')}>
-            Add new user
-        </button> */}
+        <AddUserModal
+            usersState={{ value: users, setValue: setUsers }}
+            setMessage={ setMessage }
+            updatingState={{ value: updating, setValue: setUpdating }}
+        />
     </>);
 };

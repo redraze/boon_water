@@ -15,9 +15,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ users: [], validity });
         };
 
-        const dbClient = await dbConnect();
-        const db = dbClient?.db('waterUsersDb');
-        const collection = db?.collection('waterUsers');
+        const collection = await waterUsersCollection();
         const cursor = collection?.find({});
         const users = await cursor?.toArray();
         await cursor?.close();
@@ -45,10 +43,7 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ success: false, validity });
         };
 
-        const dbClient = await dbConnect();
-        const db = dbClient?.db('waterUsersDb');
-        const collection = db?.collection('waterUsers');
-        
+        const collection = await waterUsersCollection();
         const cursor = await collection.updateOne(
             { _id: new ObjectId(updateInfo._id) },
             { $set: { info: updateInfo.info } }
@@ -69,19 +64,59 @@ export async function PATCH(req: Request) {
 // adds a new water user
 export async function PUT(req: Request) {
     try {
-        const { token, pathname } = await req.json();
+        const { token, pathname, newUserInfo }: {
+            token: string, pathname: string, newUserInfo: userInfo['info']
+        } = await req.json();
 
         const validity = await validateRequest(token, pathname, 'PUT');
+        if (!validity) {
+            console.log('message logged from [/api/users] PUT: token validation failed');
+            return NextResponse.json({ success: false, validity, newUser: undefined });
+        };
+
+        const collection = await waterUsersCollection();
+        const cursor = await collection.insertOne({info: newUserInfo});
+
+        if (!cursor.insertedId) {
+            return NextResponse.json({ success: false, validity, newUser: undefined });
+        } else {
+            return NextResponse.json({
+                success: true,
+                validity,
+                newUser: {
+                    _id: cursor.insertedId,
+                    info: newUserInfo
+                }
+            });
+        };
+
+    } catch (error) {
+        console.log(`error thrown in [/api/users] PUT: ` + error);
+    };
+};
+
+
+// adds a new water user
+export async function DELETE(req: Request) {
+    try {
+        const { token, pathname, userId }: {
+            token: string, pathname: string, userId: string
+        } = await req.json();
+
+        const validity = await validateRequest(token, pathname, 'DELETE');
         if (!validity) {
             console.log('message logged from [/api/users] PUT: token validation failed');
             return NextResponse.json({ success: false, validity });
         };
 
-        // TODO
-        // connect to db
-        // send insert request and await response
+        const collection = await waterUsersCollection();
+        const cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
 
-        return NextResponse.json({ success: true, validity });
+        if (cursor.deletedCount == 0) {
+            return NextResponse.json({ success: false, validity });
+        } else {
+            return NextResponse.json({ success: true, validity });
+        };
 
     } catch (error) {
         console.log(`error thrown in [/api/users] PUT: ` + error);
@@ -110,4 +145,15 @@ const validateRequest = async (token: string, pathname: string, method: string) 
         throw new Error('[validateRequest function]: internal server error encountered');
     };
     return validity;
+};
+
+
+/**
+ * @returns the waterUsers collection in the waterUsersDb database.
+ */
+const waterUsersCollection = async () => {
+    const dbClient = await dbConnect();
+    const db = dbClient?.db('waterUsersDb');
+    const collection = db?.collection('waterUsers');
+    return collection;
 };

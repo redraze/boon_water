@@ -8,10 +8,9 @@ import type { userInfo } from "./commonTypes";
  * @returns undefined if a server error is encountered, or an object containing: users, an array contianing various info about users; validity, a boolean indicating token validity
  */
 export const getAllUsers = async (pathname: string) => {
-    // catch unauthorized users before backend request can be made
-    if (!pathname) { return { users: undefined, validity: false } };
-
     try {
+        if (!pathname) { return { users: undefined, validity: false } };
+        
         const response = await fetch("/api/users", {
             method: "POST",
             headers: {
@@ -48,7 +47,6 @@ export const getAllUsers = async (pathname: string) => {
  */
 export const editUser = async (pathname: string, updateInfo: userInfo) => {
     try {
-        // catch unauthorized users before backend request can be made
         if (!pathname) { return { success: false, validity: false } };
 
         const response = await fetch("/api/users", {
@@ -83,11 +81,10 @@ export const editUser = async (pathname: string, updateInfo: userInfo) => {
  * @param userInfo - object containing the water users' data
  * @returns undefined if a server error is encountered, or an object containing: success, a boolean indicating whether the water user's data was successfully edited; validity, a boolean indicating token validity
  */
-export const addNewUser = async (pathname: string, userInfo: userInfo ) => {
-    // catch unauthorized users before backend request can be made
-    if (!pathname) { return { success: false, validity: false } };
-
+export const addNewUser = async (pathname: string, newUserInfo: userInfo['info'] ) => {
     try {
+        if (!pathname) { return { success: false, validity: false, newUser: undefined } };
+    
         const response = await fetch("/api/users", {
             method: "PUT",
             headers: {
@@ -96,7 +93,46 @@ export const addNewUser = async (pathname: string, userInfo: userInfo ) => {
             body: JSON.stringify({
                 token: Cookies.get('token'),
                 pathname,
-                userInfo,
+                newUserInfo,
+            }),
+        });
+
+        if (!response.ok) { throw new Error('api fetch response not OK') };
+
+        const res: {
+            success: boolean,
+            validity: boolean,
+            newUser: userInfo | undefined
+        } = await response.json();
+        return res;
+      
+    } catch (error) {
+        if (loggingEnabled) {
+            console.log('error thrown in [/lib/users addNewUser function]: ' + error);
+        };
+    };
+};
+
+
+/**
+ * Attempts to delete a user from the database.
+ * @param pathname - string
+ * @param id - string
+ * @returns undefined if a server error is encountered, or an object containing: success, a boolean indicating whether the water user's data was successfully edited; validity, a boolean indicating token validity
+ */
+export const deleteUser = async (pathname: string, userId: string ) => {
+    try {
+        if (!pathname) { return { success: false, validity: false } };
+    
+        const response = await fetch("/api/users", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: Cookies.get('token'),
+                pathname,
+                userId,
             }),
         });
 
