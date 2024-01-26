@@ -19,7 +19,6 @@ export async function POST(req: Request) {
         await cursor?.close();
 
         return NextResponse.json({ users, validity })
-        // return NextResponse.json({ users: undefined, validity })
 
     } catch (error) {
         console.log(`error thrown in [/api/users] POST: ` + error);
