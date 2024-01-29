@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { stateType, userInfo, voidFunc } from "../../lib/commonTypes";
-import { editUser } from "../../lib/users";
+import { editUser } from "../../lib/usersFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import DeleteUserModal from "./deleteUserModal";
 import Spinner from "../spinner/Spinner";

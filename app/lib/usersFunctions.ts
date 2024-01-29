@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { loggingEnabled } from "./authentication";
+import { clientSideLoggingEnabled } from "./settings";
 import type { userInfo } from "./commonTypes";
 
 /**
@@ -31,7 +31,7 @@ export const getAllUsers = async (pathname: string) => {
         return res;
       
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/users getAllUsers function]: ' + error);
         };
     };
@@ -67,7 +67,7 @@ export const editUser = async (pathname: string, updateInfo: userInfo) => {
         return res;
       
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/users editUser function]: ' + error);
         };
     };
@@ -107,7 +107,7 @@ export const addNewUser = async (pathname: string, newUserInfo: userInfo['info']
         return res;
       
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/users addNewUser function]: ' + error);
         };
     };
@@ -142,7 +142,7 @@ export const deleteUser = async (pathname: string, userId: string ) => {
         return res;
       
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/users addNewUser function]: ' + error);
         };
     };

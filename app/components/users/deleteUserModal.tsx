@@ -1,6 +1,6 @@
 import { stateType, voidFunc } from "../../lib/commonTypes";
 import { userInfo } from "../../lib/commonTypes";
-import { deleteUser } from "../../lib/users";
+import { deleteUser } from "../../lib/usersFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Spinner from "../spinner/Spinner";
 

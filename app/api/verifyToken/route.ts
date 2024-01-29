@@ -1,4 +1,4 @@
-import { verifyToken } from "../../lib/authentication";
+import { verifyToken } from "../../lib/authFunctions";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -11,5 +11,6 @@ export async function POST(req: Request) {
 
     } catch (error) {
         console.log('error thrown in [/api/verifyToken]: ' + error);
+        return NextResponse.json({});
     }
 };

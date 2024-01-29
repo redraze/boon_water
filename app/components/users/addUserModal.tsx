@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { stateType, voidFunc } from "../../lib/commonTypes";
 import { userInfo } from "../../lib/commonTypes";
-import { addNewUser } from "../../lib/users";
+import { addNewUser } from "../../lib/usersFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Spinner from "../spinner/Spinner";
 

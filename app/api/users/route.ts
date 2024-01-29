@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { userInfo } from "../../lib/commonTypes";
 import { dbConnect } from "../../lib/dbConnect";
-import { verifyToken } from "../../lib/authentication";
+import { verifyToken } from "../../lib/authFunctions";
 import { NextResponse } from "next/server";
 
 // gets all water users' data
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
 
     } catch (error) {
         console.log(`error thrown in [/api/users] POST: ` + error);
+        return NextResponse.json({});
     };
 };
 
@@ -57,6 +58,7 @@ export async function PATCH(req: Request) {
 
     } catch (error) {
         console.log(`error thrown in [/api/users] PATCH: ` + error);
+        return NextResponse.json({});
     };
 };
 
@@ -92,11 +94,12 @@ export async function PUT(req: Request) {
 
     } catch (error) {
         console.log(`error thrown in [/api/users] PUT: ` + error);
+        return NextResponse.json({});
     };
 };
 
 
-// adds a new water user
+// deleted a water user's info (but not the user's historical water usage data)
 export async function DELETE(req: Request) {
     try {
         const { token, pathname, userId }: {
@@ -120,6 +123,7 @@ export async function DELETE(req: Request) {
 
     } catch (error) {
         console.log(`error thrown in [/api/users] PUT: ` + error);
+        return NextResponse.json({});
     };
 };
 

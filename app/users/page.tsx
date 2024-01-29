@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getAllUsers } from "../lib/users";
+import { getAllUsers } from "../lib/usersFunctions";
 import Message from "../components/message/Message";
 import type { userInfo } from "../lib/commonTypes";
 import UsersTable from "../components/users/usersTable";

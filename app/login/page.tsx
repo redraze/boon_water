@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkLogin } from "../lib/authentication";
+import { checkLogin } from "../lib/authFunctions";
 import Message from "../components/message/Message";
 
 export default function LoginPage() {

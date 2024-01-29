@@ -3,7 +3,7 @@
 import Cookies from "js-cookie";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, type ReactNode, useEffect } from "react";
-import { fullTokenVerification, clientSideTokenCheck } from "./lib/authentication";
+import { fullTokenVerification, clientSideTokenCheck } from "./lib/authFunctions";
 import Spinner from "./components/spinner/Spinner";
 import Message from "./components/message/Message";
 import Nav from "./components/nav/Nav";
@@ -105,6 +105,22 @@ export default function Session({
                 setIsValid(true);
                 setBody(children);
             };
+        }
+
+
+        // logged-in user's profile page
+        else if (pathname == '/profile') {
+            fullTokenVerification(token, pathname)
+                .then((validity: boolean) => {
+                    setIsValid(validity);
+
+                    if (!validity) {
+                        router.push('/login' + '?loginRequired=true');
+
+                    } else {
+                        setBody(children);
+                    };
+            });
         }
 
 

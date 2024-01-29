@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-
-export const loggingEnabled = process.env.NODE_ENV == 'production' ? true : false;
+import Cookies from "js-cookie";
+import { clientSideLoggingEnabled } from "./settings";
 
 /**
  * Asynchronously hashes the provided string with the SHA-256 algorithm.
@@ -29,7 +29,7 @@ export const checkLogin = async (email: string, password: string) => {
     try {
         const hash = await hashPassword(password);
 
-        const response = await fetch("/api/login", {
+        const response = await fetch("/api/auth", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -46,7 +46,48 @@ export const checkLogin = async (email: string, password: string) => {
         return token;
       
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
+            console.log('error thrown in [/lib/authentication -> checkLogin]: ' + error);
+        };
+    };
+};
+
+
+/**
+ * Sends password to server API route which then attempts to update the user's pw in the shadow db.
+ * @param newPw - string
+ * @param oldPw - string
+ * @returns A signed JSON web token if provided credentials were authentic, undefined otherwise 
+ */
+export const changePassword = async (oldPw: string, newPw: string) => {
+    try {
+        const oldHash = await hashPassword(oldPw);
+        const newHash = await hashPassword(newPw);
+
+        const oldToken = Cookies.get('token');
+        if ( !oldToken ) { throw new Error('token not found') };
+        const payload = jwt.decode(oldToken, { json: true });
+        const id = payload?.id;
+
+        const response = await fetch("/api/auth", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id,
+                oldHash,
+                newHash,
+            }),
+        });
+
+        if (!response.ok) { throw new Error('response not OK') };
+        
+        const { token }: { token: string | undefined } = await response.json();
+        return token;
+      
+    } catch (error) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/authentication -> checkLogin]: ' + error);
         };
     };
@@ -83,7 +124,7 @@ export const clientSideTokenCheck = (token: string | undefined) => {
         return true;
 
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/authentication -> clientSideTokenCheck]: ' + error);
         };
         return false;
@@ -120,7 +161,7 @@ const fetchValidity = async (token: string | undefined, pathname: string) => {
         return validity;
 
     } catch (error) {
-        if (loggingEnabled) {
+        if (clientSideLoggingEnabled) {
             console.log('error thrown in [/lib/authentication -> serverSideTokenCheck]' + error);
         };
         return false;

@@ -2,31 +2,35 @@
 
 import css from "./Nav.module.scss";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-// import { useState } from "react";
-// import Cookies from "js-cookie";
-// import jwt from "jsonwebtoken";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import jwt from "jsonwebtoken";
 
 export default function Nav(props: {validity: boolean}) {
     const router = useRouter();
-    const handleLogout = (e: any) => {
-        e.preventDefault();
+    const pathname = usePathname();
+
+    const handleLogout = () => {
         document.cookie = "token=; SameSite=lax; secure";
         router.push('/login' + '?loggedOut=true');
     };
 
-    // const [loggedIn, setLoggedIn] = useState('false');
-
-    // const token = Cookies.get('token');
-    // if (token) {
-    //     const payload = jwt.decode(
-    //         token,
-    //         { json: true }
-    //     );
-    //     const userName = payload?.['name'];
-    // };
+    const [userName, setUserName] = useState('');
+    useEffect(() => {
+        if (props.validity){
+            const token = Cookies.get('token');
+            if (token) {
+                const payload = jwt.decode(token, { json: true });
+                setUserName(payload?.name);
+            };
+        };
+    }, [props.validity]);
     
-    // const [profileDrop, setProfileDrop] = useState(false);
+    const [profileDrop, setProfileDrop] = useState(false);
+    useEffect(() => {
+        setProfileDrop(false);
+    }, [pathname]);
 
     return (<>
         <div className={ css.nav }>
@@ -42,8 +46,19 @@ export default function Nav(props: {validity: boolean}) {
                     <li>
                         <Link href='/dataEntry'>Data Entry</Link>
                     </li>
-                    <li onClick={ (e) => handleLogout(e) }>
-                        Log Out
+                    <li>
+                        Hi { userName }!
+                        <button onClick={ () => setProfileDrop(!profileDrop) }>
+                            [dropdown_icon]
+                        </button>
+                        <ul style={ profileDrop ? {display: "flex"} : {display: "none"} }>
+                            <li onClick={ () => router.push('/profile') }>
+                                Profile
+                            </li>
+                            <li onClick={ () => handleLogout() }>
+                                Log Out
+                            </li>
+                        </ul>
                     </li>
                 </ul> :
                 <></>
