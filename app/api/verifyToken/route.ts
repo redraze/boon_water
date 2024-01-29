@@ -1,4 +1,4 @@
-import { verifyToken } from "../../lib/tokens";
+import { verifyToken } from "../../lib/authentication";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

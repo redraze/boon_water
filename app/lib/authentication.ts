@@ -40,21 +40,15 @@ export const checkLogin = async (email: string, password: string) => {
             }),
         });
 
-        if (!response.ok) {
-            if (loggingEnabled) {
-                console.log('error logged from checkLogin.tsx lib function');
-            };
-            return undefined;
-        };
+        if (!response.ok) { throw new Error('response not OK') };
         
         const { token }: { token: string | undefined } = await response.json();
         return token;
       
     } catch (error) {
         if (loggingEnabled) {
-            console.log(error);
+            console.log('error thrown in [/lib/authentication -> checkLogin]: ' + error);
         };
-        return undefined;
     };
 };
 
@@ -90,7 +84,7 @@ export const clientSideTokenCheck = (token: string | undefined) => {
 
     } catch (error) {
         if (loggingEnabled) {
-            console.log('error thrown in [verifyToken.ts -> clientSideTokenCheck]: ' + error);
+            console.log('error thrown in [/lib/authentication -> clientSideTokenCheck]: ' + error);
         };
         return false;
     };
@@ -127,7 +121,7 @@ const fetchValidity = async (token: string | undefined, pathname: string) => {
 
     } catch (error) {
         if (loggingEnabled) {
-            console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]' + error);
+            console.log('error thrown in [/lib/authentication -> serverSideTokenCheck]' + error);
         };
         return false;
     };

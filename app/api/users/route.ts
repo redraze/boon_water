@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { userInfo } from "../../lib/commonTypes";
 import { dbConnect } from "../../lib/dbConnect";
-import { verifyToken } from "../../lib/tokens";
+import { verifyToken } from "../../lib/authentication";
 import { NextResponse } from "next/server";
 
 // gets all water users' data

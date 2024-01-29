@@ -3,7 +3,7 @@
 import Cookies from "js-cookie";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, type ReactNode, useEffect } from "react";
-import { fullTokenVerification, clientSideTokenCheck } from "./lib/tokens";
+import { fullTokenVerification, clientSideTokenCheck } from "./lib/authentication";
 import Spinner from "./components/spinner/Spinner";
 import Message from "./components/message/Message";
 import Nav from "./components/nav/Nav";
@@ -72,13 +72,6 @@ export default function Session({
                 setBody(children);
             }
                 
-            // user failed a login attempt
-            else if (searchParams.get('loginFalied') == 'true') {
-                setIsValid(false);
-                setMessage('Login failed.');
-                setBody(children);
-            }
-
             // unathenticated user requested a resource that does not exist
             else if (searchParams.get('404') == 'true') {
                 setIsValid(false);

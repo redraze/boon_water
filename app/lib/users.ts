@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { loggingEnabled } from "./tokens";
+import { loggingEnabled } from "./authentication";
 import type { userInfo } from "./commonTypes";
 
 /**

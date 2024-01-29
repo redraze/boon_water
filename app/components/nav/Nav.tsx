@@ -3,6 +3,9 @@
 import css from "./Nav.module.scss";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+// import { useState } from "react";
+// import Cookies from "js-cookie";
+// import jwt from "jsonwebtoken";
 
 export default function Nav(props: {validity: boolean}) {
     const router = useRouter();
@@ -11,6 +14,19 @@ export default function Nav(props: {validity: boolean}) {
         document.cookie = "token=; SameSite=lax; secure";
         router.push('/login' + '?loggedOut=true');
     };
+
+    // const [loggedIn, setLoggedIn] = useState('false');
+
+    // const token = Cookies.get('token');
+    // if (token) {
+    //     const payload = jwt.decode(
+    //         token,
+    //         { json: true }
+    //     );
+    //     const userName = payload?.['name'];
+    // };
+    
+    // const [profileDrop, setProfileDrop] = useState(false);
 
     return (<>
         <div className={ css.nav }>

@@ -2,17 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkLogin } from "../lib/tokens";
+import { checkLogin } from "../lib/authentication";
+import Message from "../components/message/Message";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
+  const [message, setMessage] = useState('');
 
   const handleLogin = () => {
     checkLogin(email, password).then((token: string | undefined) => {
       if (token == undefined) {
-        router.push('/login' + '?loginFailed=true');
+        setEmail('');
+        setPassword('');
+        setMessage('Login failed.')
       } else {
         document.cookie = `token=${token}; SameSite=lax; Secure`;
         router.push('/' + '?loginSuccessful=true');
@@ -20,7 +24,8 @@ export default function LoginPage() {
     });
   };
 
-  return (
+  return (<>
+    <Message text={ message } />
     <div>
       <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
         <label>
@@ -46,5 +51,5 @@ export default function LoginPage() {
         <button type="submit">Log In</button>
       </form>
     </div>
-  );
+  </>);
 };

@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { dbConnect } from "../../lib/dbConnect";
 
 async function authenticateUser(email: string, hash: string) {
-  try {
-    // TODO
-    // check email and hash against database
-    // and return associated id and username
-    // const { id, username } = checkDB(email, hash);
-    
-    return {
-      id: '123',
-      email: email,
-      username: 'testUser'
-    };
-  } catch {
-    throw new Error('unable to complete database query');
-  };
+  const dbClient = await dbConnect();
+  const db = dbClient?.db('shadowDb');
+  const collection = db?.collection('shadow');
+
+  const cursor = await collection?.findOne(
+    { email: email, hash: hash }, 
+    { projection: { _id: 1, email: 1, name: 1 }}
+  )
+
+  if (!cursor) { throw new Error('login failed') };
+  return cursor;
 };
 
 export async function POST(req: Request) {
@@ -32,9 +30,9 @@ export async function POST(req: Request) {
     
     const token = jwt.sign(
       { 
-        userId: userInfo.id,
-        userEmail: userInfo.email,
-        username: userInfo.username
+        id: userInfo._id,
+        email: userInfo.email,
+        name: userInfo.name
       },
       secret,
       expiryOptions
