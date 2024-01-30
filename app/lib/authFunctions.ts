@@ -3,6 +3,19 @@ import Cookies from "js-cookie";
 import { clientSideLoggingEnabled } from "./settings";
 
 /**
+ * Decodes the user's token, and retrieves the id from the decoded payload.
+ * @returns a string containing the user's id
+ */
+const getId = () => {
+    const oldToken = Cookies.get('token');
+    if ( !oldToken ) { throw new Error('token not found') };
+    const payload = jwt.decode(oldToken, { json: true });
+    const id: string | undefined = payload?.id;
+    return id;
+};
+
+
+/**
  * Asynchronously hashes the provided string with the SHA-256 algorithm.
  * @param password - string
  * @returns hashed password string
@@ -47,7 +60,7 @@ export const checkLogin = async (email: string, password: string) => {
       
     } catch (error) {
         if (clientSideLoggingEnabled) {
-            console.log('error thrown in [/lib/authentication -> checkLogin]: ' + error);
+            console.log('error thrown in [/lib/authFunctions -> checkLogin]: ' + error);
         };
     };
 };
@@ -64,18 +77,14 @@ export const changePassword = async (oldPw: string, newPw: string) => {
         const oldHash = await hashPassword(oldPw);
         const newHash = await hashPassword(newPw);
 
-        const oldToken = Cookies.get('token');
-        if ( !oldToken ) { throw new Error('token not found') };
-        const payload = jwt.decode(oldToken, { json: true });
-        const id = payload?.id;
-
         const response = await fetch("/api/auth", {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                id,
+                updateType: "password",
+                id: getId(),
                 oldHash,
                 newHash,
             }),
@@ -88,7 +97,43 @@ export const changePassword = async (oldPw: string, newPw: string) => {
       
     } catch (error) {
         if (clientSideLoggingEnabled) {
-            console.log('error thrown in [/lib/authentication -> checkLogin]: ' + error);
+            console.log('error thrown in [/lib/authFunctions -> changePassword]: ' + error);
+        };
+    };
+};
+
+
+/**
+ * Sends new email and password to server API route which then attempts to update the user's email in the shadow db.
+ * @param email - string
+ * @param password - string
+ * @returns A signed JSON web token if provided credentials were authentic, undefined otherwise 
+ */
+export const changeEmail = async (email: string, password: string) => {
+    try {
+        const hash = await hashPassword(password);
+
+        const response = await fetch("/api/auth", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                updateType: "email",
+                id: getId(),
+                email,
+                hash,
+            }),
+        });
+
+        if (!response.ok) { throw new Error('response not OK') };
+        
+        const { token }: { token: string | undefined } = await response.json();
+        return token;
+      
+    } catch (error) {
+        if (clientSideLoggingEnabled) {
+            console.log('error thrown in [/lib/authFunctions -> changeEmail]: ' + error);
         };
     };
 };
@@ -125,7 +170,7 @@ export const clientSideTokenCheck = (token: string | undefined) => {
 
     } catch (error) {
         if (clientSideLoggingEnabled) {
-            console.log('error thrown in [/lib/authentication -> clientSideTokenCheck]: ' + error);
+            console.log('error thrown in [/lib/authFunctions -> clientSideTokenCheck]: ' + error);
         };
         return false;
     };
@@ -162,7 +207,7 @@ const fetchValidity = async (token: string | undefined, pathname: string) => {
 
     } catch (error) {
         if (clientSideLoggingEnabled) {
-            console.log('error thrown in [/lib/authentication -> serverSideTokenCheck]' + error);
+            console.log('error thrown in [/lib/authFunctions -> fetchValidity]' + error);
         };
         return false;
     };
@@ -193,7 +238,7 @@ export const verifyToken = (token: string | undefined, pathname: string) => {
         return true;
 
     } catch (error) {
-        console.log('error thrown in [verifyToken.ts -> serverSideTokenCheck]: ' + error);
+        console.log('error thrown in [/lib/authFunctions -> verifyToken]: ' + error);
         return false;
     };
 

@@ -26,25 +26,50 @@ export async function POST(req: Request) {
 };
 
 
-// updates a user's hashed password in the shadow db.
+// updates a user's information in the shadow db.
 // returns a new JWT token if update was successfull
 export async function PATCH(req: Request) {
   try {
-    const { id, oldHash, newHash } = await req.json();
-    if (!id || !oldHash || !newHash) { throw new Error('missing user credentials') };
+    const vars: {
+      updateType: string
+      id: string,
+      email: string,
+      hash: string,
+      oldHash: string,
+      newHash: string
+    } = await req.json();
 
-    const collection = await shadowCollection();
-    const userInfo = await collection?.findOneAndUpdate(
-      { _id: new ObjectId(id), hash: oldHash },
-      { $set: {hash: newHash} },
-      { projection: { _id: 1, email: 1, name: 1 }}
-    );
-  
-    const token = generateToken(userInfo)
-    return NextResponse.json({ token });
+    if (vars.updateType == 'password') {
+      const { id, oldHash, newHash } = vars;
+      if (!id || !oldHash || !newHash) { throw new Error('missing user credentials') };
+
+      const collection = await shadowCollection();
+      const userInfo = await collection?.findOneAndUpdate(
+        { _id: new ObjectId(id), hash: oldHash },
+        { $set: {hash: newHash} },
+        { projection: { _id: 1, email: 1, name: 1 }}
+      );
+    
+      const token = generateToken(userInfo)
+      return NextResponse.json({ token });
+
+    } else if (vars.updateType == 'email') {
+      const { id, email, hash } = vars;
+      if (!id || !email || !hash) { throw new Error('missing user credentials') };
+      
+      const collection = await shadowCollection();
+      const userInfo = await collection?.findOneAndUpdate(
+        { _id: new ObjectId(id), hash: hash },
+        { $set: {email: email} },
+        { projection: { _id: 1, email: 1, name: 1 }}
+      );
+        
+      const token = generateToken(userInfo)
+      return NextResponse.json({ token });
+    };
 
   } catch (error) {
-    console.log('error thrown in [/api/users -> PATCH]: ' + error);
+    console.log('error thrown in [/api/users -> EMAIL]: ' + error);
     return NextResponse.json({});
   };
 };
