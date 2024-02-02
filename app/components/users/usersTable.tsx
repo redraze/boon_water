@@ -24,26 +24,19 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
     const [nameUpdate, setNameUpdate] = useState('');
     const [addressUpdate, setAddressUpdate] = useState('');
     const [emailUpdate, setEmailUpdate] = useState('');
-    const [balanceUpdate, setBalanceUpdate] = useState<number>(0);
+    const [balance, setBalance] = useState<number>(0);
 
-    const attemptBalanceUpdate = (num: string) => {
-        // TODO: improve this balance input sanitizer/state handler routine
-        // (its kinda janky currently)
-        if (!num) {
-            setBalanceUpdate(0);
-            setMessage('');
-        } else if (Number(num)) {
-            setBalanceUpdate(Number(num));
-            setMessage('');
-        } else { setMessage('Only numbers are allowed in the balance box.') };
-    };
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
 
     const setUpdateInfo = (user: userInfo) => {
         setPrevInfo(user);
         setNameUpdate(user.info.name);
         setAddressUpdate(user.info.address);
         setEmailUpdate(user.info.email);
-        setBalanceUpdate(user.info.balance);
+        setBalance(user.info.balance);
     };
 
     const resetInfo = () => {
@@ -51,7 +44,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
         setNameUpdate('');
         setAddressUpdate('');
         setEmailUpdate('');
-        setBalanceUpdate(0);
+        setBalance(0);
     };
 
     const updateUser = () => {
@@ -62,18 +55,24 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
             setUpdating(false);
             return;
         };
-
+        
         const updateInfo: userInfo = {
             _id: prevInfo._id,
             info: {
                 name: nameUpdate,
                 address: addressUpdate,
                 email: emailUpdate,
-                balance: balanceUpdate ? balanceUpdate : 0
+                balance: balance
             }
         };
 
-        if (prevInfo == updateInfo || !updateInfo) {
+        if (
+            !updateInfo || (
+                prevInfo.info.name == updateInfo.info.name 
+                && prevInfo.info.address == updateInfo.info.address 
+                && prevInfo.info.email == updateInfo.info.email
+            )
+        ) {
             setMessage('No edits made to selected user.');
             setUpdating(false);
             return;
@@ -95,6 +94,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                     'Database error enountered while attempting to update user info.'
                     + ' Please contact system administrator or try again later.'
                 );
+                setUpdating(false);
                 return;
 
             // success
@@ -155,23 +155,29 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                 value={ emailUpdate }
                                                 onChange={(e) => setEmailUpdate(e.target.value) }
                                             ></input></td>
-                                            <td><input
-                                                type="text"
-                                                value={ balanceUpdate }
-                                                onChange={(e) => attemptBalanceUpdate(e.target.value) }
-                                            ></input></td>
+                                            <td>{ formatter.format(balance) }</td>
                                             <td>
                                                 <button onClick={ () => resetInfo() }>
-                                                    [X_icon]
+                                                    [Cancel]
                                                 </button>
                                             </td>
                                             <td>
                                                 <button onClick={ () => updateUser() }>
-                                                    [submit_icon]
+                                                    [Submit]
                                                 </button>
                                             </td>
+                                            <td></td>
                                         </tr> :
                                         <tr key={ user._id }>
+                                            <td>{ user.info.name }</td>
+                                            <td>{ user.info.address }</td>
+                                            <td>{ user.info.email }</td>
+                                            <td>{ formatter.format(user.info.balance) }</td>
+                                            <td>
+                                                <button onClick={ () => setUpdateInfo(user) }>
+                                                    [Edit User]
+                                                </button>
+                                            </td>
                                             <td>
                                                 <button onClick={() => {
                                                     setActive(true);
@@ -180,19 +186,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                         id: user._id
                                                     });
                                                 }}>
-                                                    [delete_icon]
-                                                </button>
-                                            </td>
-                                            <td>{ user.info.name }</td>
-                                            <td>{ user.info.address }</td>
-                                            <td>{ user.info.email }</td>
-                                            <td>{ user.info.balance }</td>
-                                            <td>
-                                                <button onClick={() => {
-                                                    setUpdateInfo(user);
-                                                    setPrevInfo(user);
-                                                } }>
-                                                    [edit_icon]
+                                                    [Delete User]
                                                 </button>
                                             </td>
                                         </tr>

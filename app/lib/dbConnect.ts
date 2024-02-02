@@ -17,6 +17,8 @@ declare global {
 };
 
 export const dbConnect = async () => {
+    if (clientPromise) { return clientPromise };
+
     if (!uri) {
         throw new Error ('MONGODB_URI not defined in .env.local');
     };

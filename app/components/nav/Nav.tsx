@@ -38,7 +38,10 @@ export default function Nav(props: {validity: boolean}) {
                 props.validity ? 
                 <ul>
                     <li>
-                        <Link href='/users'>Water Users</Link>
+                        <Link href='/users'>Users</Link>
+                    </li>
+                    <li>
+                        <Link href='/balances'>Balances</Link>
                     </li>
                     <li>
                         <Link href='/billing'>Billing</Link>

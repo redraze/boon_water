@@ -3,6 +3,7 @@ import { userInfo } from "../../lib/commonTypes";
 import { deleteUser } from "../../lib/usersFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Spinner from "../spinner/Spinner";
+import { useState } from "react";
 
 type deleteUserModalPropsType = {
     usersState: stateType<userInfo[] | undefined>
@@ -27,6 +28,8 @@ export default function DeleteUserModal({
     const router = useRouter();
     const pathname = usePathname();
 
+    const [confirmation, setConfirmation] = useState('');
+    
     const handleSubmit = () => {
         setUpdating(true);
 
@@ -71,10 +74,16 @@ export default function DeleteUserModal({
                 <p>
                     Delete { info?.name } from the water users database?
                     <br/>
-                    (The transactional history for { info?.name } will not 
-                    be deleted from the database yet)
+                    (This action will irreversibly delete all of { info?.name }'s water usage and balance history data.)
                 </p>
-                <button onClick={ () => handleSubmit() }>Delete User</button>
+                <div>
+                    <p>type DELETE in the box to confirm:</p>
+                    <input onChange={ (e) => setConfirmation(e.target.value) }/>
+                </div>
+                <button
+                    onClick={ () => handleSubmit() }
+                    disabled={ confirmation == 'DELETE' ? false : true }
+                >Delete User</button>
                 <button onClick={ () => { setActive(false), setInfo(undefined) } }>
                     Cancel
                 </button>
