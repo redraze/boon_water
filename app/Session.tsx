@@ -108,6 +108,21 @@ export default function Session({
         }
 
 
+        // data entry page
+        else if (pathname == '/dataEntry') {
+            // verify token on client side only. the associated server side
+            // api route will verify the token and reroute if neccessary
+            if (!clientSideTokenCheck(token)) {
+                setIsValid(false);
+                router.push('/login' + '?loginRequired=true');
+
+            } else {
+                setIsValid(true);
+                setBody(children);
+            };
+        }
+
+
         // logged-in user's profile page
         else if (pathname == '/profile') {
             fullTokenVerification(token, pathname)

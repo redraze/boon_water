@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 import { userInfo } from "../../lib/commonTypes";
-import { dbConnect } from "../../lib/dbConnect";
-import { verifyToken } from "../../lib/authFunctions";
 import { NextResponse } from "next/server";
+import { collectionConnect } from "../../lib/dbFunctions";
+import { verifyToken } from "../../lib/authFunctions";
 
 // gets all water users' personal info
 export async function POST(req: Request) {
@@ -92,17 +92,20 @@ export async function PUT(req: Request) {
         collection = await collectionConnect('usage');
         cursor = await collection.insertOne({
             _id: userId,
-            prev: {
-                Q1: { 1: 0, 2: 0, 3: 0 },
-                Q2: { 4: 0, 5: 0, 6: 0 },
-                Q3: { 7: 0, 8: 0, 9: 0 },
-                Q4: { 10: 0, 11: 0, 12: 0 }
-            },
-            cur: {
-                Q1: { 1: 0, 2: 0, 3: 0 },
-                Q2: { 4: 0, 5: 0, 6: 0 },
-                Q3: { 7: 0, 8: 0, 9: 0 },
-                Q4: { 10: 0, 11: 0, 12: 0 }
+            name: newUserInfo.name,
+            data: {
+                prev: {
+                    Q1: { 1: 0, 2: 0, 3: 0 },
+                    Q2: { 1: 0, 2: 0, 3: 0 },
+                    Q3: { 1: 0, 2: 0, 3: 0 },
+                    Q4: { 1: 0, 2: 0, 3: 0 },
+                },
+                cur: {
+                    Q1: { 1: 0, 2: 0, 3: 0 },
+                    Q2: { 1: 0, 2: 0, 3: 0 },
+                    Q3: { 1: 0, 2: 0, 3: 0 },
+                    Q4: { 1: 0, 2: 0, 3: 0 },
+                }
             }
         });
         if (!cursor.acknowledged) {
@@ -110,18 +113,21 @@ export async function PUT(req: Request) {
             collection = await collectionConnect('waterUsers');
             const cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
             if (cursor.deletedCount == 0) {
-                console.log(`failed to delete inserted water user ${userId} from waterUsers collection. direct db modification required...`)
+                console.log(`failed to delete inserted water user ${userId} from waterUsers collection. manual db correction required...`)
             };
             return NextResponse.json({ success: false, validity, newUser: undefined });
         }
 
-        // insert new balance history document into balance collection
+        // insert new balance history document into balances collection
         collection = await collectionConnect('balances');
         cursor = await collection.insertOne({
             _id: userId,
-            prev: {},
-            cur: {
-                'new user creation': newUserInfo.balance
+            name: newUserInfo.name,
+            balanceHistory: {
+                prev: {},
+                cur: {
+                    'new user creation': newUserInfo.balance
+                }
             }
         })
         if (!cursor.acknowledged) {
@@ -129,12 +135,12 @@ export async function PUT(req: Request) {
             collection = await collectionConnect('waterUsers');
             let cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
             if (cursor.deletedCount == 0) {
-                console.log(`failed to delete inserted water user ${userId} from waterUsers collection. direct db modification required...`)
+                console.log(`failed to delete inserted water user ${userId} from waterUsers collection. manual db correction required...`)
             };
             collection = await collectionConnect('usage');
             cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
             if (cursor.deletedCount == 0) {
-                console.log(`failed to delete inserted water user ${userId} from usage collection. direct db modification required...`)
+                console.log(`failed to delete inserted water user ${userId} from usage collection. manual db correction required...`)
             };
             return NextResponse.json({ success: false, validity, newUser: undefined });
         };
@@ -171,21 +177,21 @@ export async function DELETE(req: Request) {
         let collection = await collectionConnect('waterUsers');
         let cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
         if (cursor.deletedCount == 0) {
-            console.log('failed to delete user from waterUsers collection. direct db modification required...');
+            console.log('failed to delete user from waterUsers collection. manual db correction required...');
             return NextResponse.json({ success: false, validity });
         }
 
         collection = await collectionConnect('usage');
         cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
         if (cursor.deletedCount == 0) {
-            console.log('failed to delete user from waterUsers collection. direct db modification required...');
+            console.log('failed to delete user from waterUsers collection. manual db correction required...');
             return NextResponse.json({ success: false, validity });
         }
 
         collection = await collectionConnect('balances');
         cursor = await collection.deleteOne({ _id: new ObjectId(userId) });
         if (cursor.deletedCount == 0) {
-            console.log('failed to delete user from waterUsers collection. direct db modification required...');
+            console.log('failed to delete user from waterUsers collection. manual db correction required...');
             return NextResponse.json({ success: false, validity });
         }
 
@@ -219,15 +225,4 @@ const validateRequest = async (token: string, pathname: string, method: string) 
         throw new Error('[validateRequest function]: internal server error encountered');
     };
     return validity;
-};
-
-
-/**
- * @returns the waterUsers collection in the waterUsersDb database.
- */
-const collectionConnect = async (name: string) => {
-    const dbClient = await dbConnect();
-    const db = dbClient?.db('waterUsersDb');
-    const collection = db?.collection(name);
-    return collection;
 };
