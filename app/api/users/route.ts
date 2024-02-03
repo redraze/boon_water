@@ -44,8 +44,8 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ success: false, validity });
         };
 
-        const collection = await collectionConnect('waterUsers');
-        const cursor = await collection.updateOne(
+        let collection = await collectionConnect('waterUsers');
+        let cursor = await collection.updateOne(
             { _id: new ObjectId(updateInfo._id) },
             { $set: { 
                 'info.name': updateInfo.info.name,
@@ -53,8 +53,28 @@ export async function PATCH(req: Request) {
                 'info.address': updateInfo.info.address
             }}
         );
-
         if (cursor.modifiedCount == 0) {
+            console.log("failed to update user's info in waterUsers collection")
+            return NextResponse.json({ success: false, validity });
+        };
+
+        collection = await collectionConnect('usage');
+        cursor = await collection.updateOne(
+            { _id: new ObjectId(updateInfo._id) },
+            { $set: { 'name': updateInfo.info.name } }
+        );
+        if (cursor.modifiedCount == 0) {
+            console.log("failed to update user's name in usage collection")
+            return NextResponse.json({ success: false, validity });
+        };
+
+        collection = await collectionConnect('balances');
+        cursor = await collection.updateOne(
+            { _id: new ObjectId(updateInfo._id) },
+            { $set: { 'name': updateInfo.info.name } }
+        );
+        if (cursor.modifiedCount == 0) {
+            console.log("failed to update user's name in balances collection")
             return NextResponse.json({ success: false, validity });
         };
         return NextResponse.json({ success: true, validity });
