@@ -1,3 +1,5 @@
+"use client";
+
 import { stateType, voidFunc } from "../../lib/commonTypes";
 import { userInfo } from "../../lib/commonTypes";
 import { deleteUser } from "../../lib/usersFunctions";

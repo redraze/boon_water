@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { stateType, voidFunc } from "../../lib/commonTypes";
 import { userInfo } from "../../lib/commonTypes";
