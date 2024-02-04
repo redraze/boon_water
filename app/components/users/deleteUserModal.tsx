@@ -1,3 +1,5 @@
+"use client";
+
 import { stateType, voidFunc } from "../../lib/commonTypes";
 import { userInfo } from "../../lib/commonTypes";
 import { deleteUser } from "../../lib/usersFunctions";
@@ -74,7 +76,7 @@ export default function DeleteUserModal({
                 <p>
                     Delete { info?.name } from the water users database?
                     <br/>
-                    (This action will irreversibly delete all of { info?.name }'s water usage and balance history data.)
+                    (This action will irreversibly delete all of the water usage and balance history data for { info?.name }.)
                 </p>
                 <div>
                     <p>type DELETE in the box to confirm:</p>

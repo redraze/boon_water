@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import css from "./Nav.module.scss";
 import Link from "next/link";

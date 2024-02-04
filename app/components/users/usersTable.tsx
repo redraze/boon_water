@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { stateType, userInfo, voidFunc } from "../../lib/commonTypes";
 import { editUser } from "../../lib/usersFunctions";
