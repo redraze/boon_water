@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getData } from "../lib/dataFunctions";
 import { quarterType, waterUsageType, yearType } from "../lib/commonTypes";
 import Message from "../components/message/Message";
@@ -47,11 +47,19 @@ export default function DataEntry() {
     };
     
     const [editBy, setEditBy] = useState('month');
+    const [selection, setSelection] = useState<string | undefined>();
+
+    const handleSubmit = () => {
+        // TODO
+    };
 
     return (<>
         <Message text={ message } />
         
-        <select onChange={ (e) => setEditBy(e.currentTarget.value) }>
+        <select onChange={ (e) => {
+            setEditBy(e.currentTarget.value);
+            setSelection(undefined);
+        }}>
             <option value='month' >Edit by month</option>
             <option value='user' >Edit by user</option>
         </select>
@@ -64,6 +72,7 @@ export default function DataEntry() {
                 || e.currentTarget.value == 'Q4'
             ) {
                 setQuarter(e.currentTarget.value);
+                setSelection(undefined);
             };
         }}>
             <option>Q1</option>
@@ -77,6 +86,7 @@ export default function DataEntry() {
                 || e.currentTarget.value == 'prev'
             ) {
                 setYear(e.currentTarget.value);
+                setSelection(undefined);
             };
         }}>
             <option value='cur'>Current Year</option>
@@ -91,6 +101,7 @@ export default function DataEntry() {
                     <td>{ monthsTable[2][quarter] }</td>
                     <td>{ monthsTable[3][quarter] }</td>
                     <td></td>
+                    <td></td>
                 </tr>
             </thead>
             <tbody>
@@ -102,10 +113,34 @@ export default function DataEntry() {
                                 user={user}
                                 year={year}
                                 quarter={quarter}
+                                editBy={editBy}
+                                selectionState={{value: selection, setValue: setSelection}}
                             />
                         );
                     })
                 }
+                <tr style={editBy == 'month' ? {display: ''} : {display: 'none'} }>
+                    <td></td>
+                    {
+                        ['M1', 'M2', 'M3'].map(m => {
+                            return selection == m ?
+                                <td><button onClick={() => setSelection(undefined)}>[cancel]</button></td> :
+                                <td><button onClick={() => setSelection(m)}>[edit]</button></td>
+                        })
+                    }
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    {
+                        ['M1', 'M2', 'M3'].map(m => {
+                            return selection == m ?
+                                <td><button onClick={() => handleSubmit()}>[submit]</button></td> :
+                                <td></td>
+                        })
+                    }
+                    <td></td>
+                </tr>
             </tbody>
         </table>
     </>);
