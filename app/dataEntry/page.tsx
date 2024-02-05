@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { getData } from "../lib/dataFunctions";
 import { quarterType, waterUsageType, yearType } from "../lib/commonTypes";
 import Message from "../components/message/Message";
-import UsageRow from "../components/dataEntry/usageRow";
 
 export default function DataEntry() {
     const router = useRouter();
@@ -13,6 +12,8 @@ export default function DataEntry() {
 
     const [message, setMessage] = useState('');
     const [usageData, setUsageData] = useState<waterUsageType[] | undefined>(undefined);
+
+    type usageUpdateType = {[id: string]: waterUsageType['data']};
 
     useEffect(() => {
         getData(pathname).then((ret) => {
@@ -32,7 +33,12 @@ export default function DataEntry() {
                 setUsageData(ret.data);
                 if (!ret.data) {
                     setMessage('No water usage data available.');
+                    return;
                 };
+                
+                let dataMap: usageUpdateType = {};
+                ret.data.map(user => { dataMap![user._id] = user.data });
+                setUsageUpdate(dataMap);
             };
         })
     }, []);
@@ -46,24 +52,29 @@ export default function DataEntry() {
         3: { Q1: 'March', Q2: 'June', Q3: 'September', Q4: 'December' }
     };
     
-    const [editBy, setEditBy] = useState('month');
-    const [selection, setSelection] = useState<string | undefined>();
+    const [usageUpdate, setUsageUpdate] = useState<usageUpdateType>({});
+    const [r, reRender] = useState(false)
+
+    const updateData = (id: string, month: 1 | 2 | 3, val: string) => {
+        if (isNaN(Number(val))) { return };
+
+        setUsageUpdate((draft = usageUpdate) => {
+            draft[id][year][quarter][month] = Number(val)
+            return draft
+        });
+        
+        // force rerender
+        reRender(!r)
+    };
 
     const handleSubmit = () => {
         // TODO
+        // check for changes in the data before making a backend api request
     };
 
     return (<>
         <Message text={ message } />
         
-        <select onChange={ (e) => {
-            setEditBy(e.currentTarget.value);
-            setSelection(undefined);
-        }}>
-            <option value='month' >Edit by month</option>
-            <option value='user' >Edit by user</option>
-        </select>
-
         <select onChange={ (e) => {
             if (
                 e.currentTarget.value == 'Q1' 
@@ -72,7 +83,6 @@ export default function DataEntry() {
                 || e.currentTarget.value == 'Q4'
             ) {
                 setQuarter(e.currentTarget.value);
-                setSelection(undefined);
             };
         }}>
             <option>Q1</option>
@@ -80,18 +90,22 @@ export default function DataEntry() {
             <option>Q3</option>
             <option>Q4</option>
         </select>
+
         <select onChange={ (e) => {
             if (
                 e.currentTarget.value == 'cur' 
                 || e.currentTarget.value == 'prev'
             ) {
                 setYear(e.currentTarget.value);
-                setSelection(undefined);
             };
         }}>
             <option value='cur'>Current Year</option>
             <option value='prev'>Previous Year</option>
         </select>
+
+        <button onClick={ () => handleSubmit() }>
+            Submit changes for { quarter }, { year == 'cur' ? 'current year' : 'previous year'}.
+        </button>
 
         <table>
             <thead>
@@ -100,47 +114,30 @@ export default function DataEntry() {
                     <td>{ monthsTable[1][quarter] }</td>
                     <td>{ monthsTable[2][quarter] }</td>
                     <td>{ monthsTable[3][quarter] }</td>
-                    <td></td>
-                    <td></td>
                 </tr>
             </thead>
             <tbody>
                 {
                     usageData?.map(user => {
                         return(
-                            <UsageRow
-                                key={user._id}
-                                user={user}
-                                year={year}
-                                quarter={quarter}
-                                editBy={editBy}
-                                selectionState={{value: selection, setValue: setSelection}}
-                            />
+                            <tr key={user._id}>
+                                <td>{ user.name }</td>
+                                <td><input
+                                    onChange={(e) => updateData(user._id, 1, e.currentTarget.value)}
+                                    value={usageUpdate[user._id][year][quarter][1]}
+                                /></td>
+                                <td><input
+                                    onChange={(e) => updateData(user._id, 2, e.currentTarget.value)}
+                                    value={usageUpdate[user._id][year][quarter][2]}
+                                /></td>
+                                <td><input
+                                    onChange={(e) => updateData(user._id, 3, e.currentTarget.value)}
+                                    value={usageUpdate[user._id][year][quarter][3]}
+                                /></td>
+                            </tr>
                         );
                     })
                 }
-                <tr style={editBy == 'month' ? {display: ''} : {display: 'none'} }>
-                    <td></td>
-                    {
-                        ['M1', 'M2', 'M3'].map(m => {
-                            return selection == m ?
-                                <td><button onClick={() => setSelection(undefined)}>[cancel]</button></td> :
-                                <td><button onClick={() => setSelection(m)}>[edit]</button></td>
-                        })
-                    }
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    {
-                        ['M1', 'M2', 'M3'].map(m => {
-                            return selection == m ?
-                                <td><button onClick={() => handleSubmit()}>[submit]</button></td> :
-                                <td></td>
-                        })
-                    }
-                    <td></td>
-                </tr>
             </tbody>
         </table>
     </>);
