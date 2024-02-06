@@ -6,6 +6,8 @@ import { getData, patchData } from "../lib/dataFunctions";
 import { quarterType, waterUsageType, yearType, patchDataType } from "../lib/commonTypes";
 import Message from "../components/message/Message";
 import Spinner from "../components/spinner/Spinner";
+import Selections from "../components/dataEntry/Selections";
+import TableHead from "../components/dataEntry/TableHead";
 
 export default function DataEntry() {
     const router = useRouter();
@@ -14,6 +16,7 @@ export default function DataEntry() {
     const [message, setMessage] = useState('');
     const [usageData, setUsageData] = useState<waterUsageType[] | undefined>(undefined);
 
+    const [usageUpdate, setUsageUpdate] = useState<usageUpdateType>({});
     type usageUpdateType = {[id: string]: waterUsageType['data']};
 
     const fetchData = () => {
@@ -48,15 +51,7 @@ export default function DataEntry() {
     const [year, setYear] = useState<yearType>('cur');
     const [quarter, setQuarter] = useState<quarterType>('Q1');
 
-    const monthsTable = {
-        1: { Q1: 'January', Q2: 'April', Q3: 'July', Q4: 'October' },
-        2: { Q1: 'February', Q2: 'May', Q3: 'August', Q4: 'November' },
-        3: { Q1: 'March', Q2: 'June', Q3: 'September', Q4: 'December' }
-    };
-    
-    const [usageUpdate, setUsageUpdate] = useState<usageUpdateType>({});
-
-    const updateData = (id: string, month: 1 | 2 | 3, val: string) => {
+    const updateUsage = (id: string, month: 1 | 2 | 3, val: string) => {
         if (isNaN(Number(val))) { return };
 
         setUsageUpdate((draft = usageUpdate) => {
@@ -65,9 +60,9 @@ export default function DataEntry() {
         });
     };
 
-    const resetData = () => {
+    const resetUsage = () => {
         let dataMap: usageUpdateType = {};
-        usageData?.map(user => { dataMap![user._id] = structuredClone(user.data) });
+        usageData?.map(user => { dataMap[user._id] = structuredClone(user.data) });
         setUsageUpdate(dataMap);
     };
 
@@ -105,7 +100,10 @@ export default function DataEntry() {
                     'Internal server error encountered while retrieving user info.'
                     + ' Please contact system administrator or try again later.'
                 );
-                
+                // a user with any token (valid or tampered-with) that experiences
+                // a server error will arrive at this point. should those users 
+                // (both valid and malicious) be routed somewhere else?
+
             } else if (!ret.validity) {
                 router.push('/login' + '?loginRequired=true')
                 
@@ -121,79 +119,47 @@ export default function DataEntry() {
 
     return (<>
         <Message text={ message } />
-        {
-            updating ? <Spinner /> : <>
-                <select onChange={ (e) => {
-                    if (
-                        e.currentTarget.value == 'Q1' 
-                        || e.currentTarget.value == 'Q2' 
-                        || e.currentTarget.value == 'Q3' 
-                        || e.currentTarget.value == 'Q4'
-                    ) {
-                        setQuarter(e.currentTarget.value);
-                        resetData();
-                    };
-                }}>
-                    <option>Q1</option>
-                    <option>Q2</option>
-                    <option>Q3</option>
-                    <option>Q4</option>
-                </select>
+        { updating ? <Spinner /> : <>
+            <Selections 
+                setQuarter={setQuarter}
+                setYear={setYear}
+                resetUsage={resetUsage}
+            />
 
-                <select onChange={ (e) => {
-                    if (
-                        e.currentTarget.value == 'cur' 
-                        || e.currentTarget.value == 'prev'
-                    ) {
-                        setYear(e.currentTarget.value);
-                        resetData();
-                    };
-                }}>
-                    <option value='cur'>Current Year</option>
-                    <option value='prev'>Previous Year</option>
-                </select>
+            <button onClick={ () => resetUsage() }>
+                Clear changes.
+            </button>
 
-                <button onClick={ () => resetData() }>
-                    Clear changes.
-                </button>
+            <button onClick={ () => handleSubmit() }>
+                Submit changes for { quarter }, { year == 'cur' ? 'current year' : 'previous year'}.
+            </button>
 
-                <button onClick={ () => handleSubmit() }>
-                    Submit changes for { quarter }, { year == 'cur' ? 'current year' : 'previous year'}.
-                </button>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <td></td>
-                            <td>{ monthsTable[1][quarter] }</td>
-                            <td>{ monthsTable[2][quarter] }</td>
-                            <td>{ monthsTable[3][quarter] }</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            usageData?.map(user => {
-                                return(
-                                    <tr key={user._id}>
-                                        <td>{ user.name }</td>
-                                        <td><input
-                                            onChange={(e) => updateData(user._id, 1, e.currentTarget.value)}
-                                            value={usageUpdate[user._id][year][quarter][1]}
-                                        /></td>
-                                        <td><input
-                                            onChange={(e) => updateData(user._id, 2, e.currentTarget.value)}
-                                            value={usageUpdate[user._id][year][quarter][2]}
-                                        /></td>
-                                        <td><input
-                                            onChange={(e) => updateData(user._id, 3, e.currentTarget.value)}
-                                            value={usageUpdate[user._id][year][quarter][3]}
-                                        /></td>
-                                    </tr>
-                                );
-                            })
-                        }
-                    </tbody>
-                </table>
-        </>}
+            <table>
+                <TableHead quarter={quarter} />
+                <tbody>
+                    {
+                        usageData?.map(user => {
+                            return(
+                                <tr key={user._id}>
+                                    <td>{ user.name }</td>
+                                    <td><input
+                                        onChange={(e) => updateUsage(user._id, 1, e.currentTarget.value)}
+                                        value={usageUpdate[user._id][year][quarter][1]}
+                                    /></td>
+                                    <td><input
+                                        onChange={(e) => updateUsage(user._id, 2, e.currentTarget.value)}
+                                        value={usageUpdate[user._id][year][quarter][2]}
+                                    /></td>
+                                    <td><input
+                                        onChange={(e) => updateUsage(user._id, 3, e.currentTarget.value)}
+                                        value={usageUpdate[user._id][year][quarter][3]}
+                                    /></td>
+                                </tr>
+                            );
+                        })
+                    }
+                </tbody>
+            </table>
+        </> }
     </>);
 };
