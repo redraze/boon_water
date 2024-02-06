@@ -15,6 +15,11 @@ export type userInfo = {
   }
 };
 
+export type patchDataType = {
+  id: string,
+  update: waterUsageType['data']
+};
+
 export type waterUsageType = {
   _id: string,
   name: string,
