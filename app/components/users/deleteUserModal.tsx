@@ -80,13 +80,13 @@ export default function DeleteUserModal({
                 </p>
                 <div>
                     <p>type DELETE in the box to confirm:</p>
-                    <input onChange={ (e) => setConfirmation(e.target.value) }/>
+                    <input onChange={ (e) => setConfirmation(e.target.value) } value={ confirmation } />
                 </div>
                 <button
-                    onClick={ () => handleSubmit() }
+                    onClick={ () => { handleSubmit(), setConfirmation('') } }
                     disabled={ confirmation == 'DELETE' ? false : true }
                 >Delete User</button>
-                <button onClick={ () => { setActive(false), setInfo(undefined) } }>
+                <button onClick={ () => { setActive(false), setInfo(undefined), setConfirmation('') } }>
                     Cancel
                 </button>
             </>}

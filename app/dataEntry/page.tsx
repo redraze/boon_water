@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getData, patchData } from "../lib/dataFunctions";
+import { getData, patchData } from "../lib/dataEntryFunctions";
 import { quarterType, waterUsageType, yearType, patchDataType } from "../lib/commonTypes";
 import Message from "../components/message/Message";
 import Spinner from "../components/spinner/Spinner";

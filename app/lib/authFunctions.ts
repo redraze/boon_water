@@ -215,6 +215,32 @@ const fetchValidity = async (token: string | undefined, pathname: string) => {
 
 
 /**
+ * Attempts to validate request.
+ * @param token - JWT token in string form
+ * @param pathname - pathname where request originated
+ * @param origin - API call origin
+ * @param method - string, method being requested
+ * @returns boolean indicating token validity
+ * @throws undefined if a server error is encountered
+ */
+export const validateRequest = async (token: string, pathname: string, origin: string, method: string) => {
+    // prevent users with valid tokens but invalid permissions from 
+    // gaining access to protected endpoints through request origin spoofing
+    if (pathname !== origin) {
+        console.log(`message logged from [authFunctions -> /api${origin}] ${method}: invalid pathname origin`);
+        // TODO: log request and flag for review
+        return false;
+    };
+
+    const validity = verifyToken(token, pathname);
+    if (validity == undefined) {
+        throw new Error('[validateRequest function]: internal server error encountered');
+    };
+    return validity;
+};
+
+
+/**
  * Verifies provided JWT token and checks if token is permitted to access requested resource. This function should be called server side.
  * @param token - JWT string to verify
  * @param pathname - url endpoint being requested

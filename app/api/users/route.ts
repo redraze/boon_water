@@ -2,16 +2,18 @@ import { ObjectId } from "mongodb";
 import { userInfo } from "../../lib/commonTypes";
 import { NextResponse } from "next/server";
 import { collectionConnect } from "../../lib/dbFunctions";
-import { verifyToken } from "../../lib/authFunctions";
+import { validateRequest } from "../../lib/authFunctions";
+
+const origin = '/users';
 
 // gets all water users' personal info
 export async function POST(req: Request) {
     try {
         const { token, pathname } = await req.json();
 
-        const validity = await validateRequest(token, pathname, 'POST');
+        const validity = await validateRequest(token, pathname, origin, 'POST');
         if (!validity) {
-            console.log('message logged from [/api/users] POST: token validation failed');
+            console.log(`message logged from [/api${origin}] POST: token validation failed`);
             return NextResponse.json({ users: [], validity });
         };
 
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ users, validity })
 
     } catch (error) {
-        console.log(`error thrown in [/api/users] POST: ` + error);
+        console.log(`error thrown in [/api/${origin}] POST: ` + error);
         return NextResponse.json({});
     };
 };
@@ -38,9 +40,9 @@ export async function PATCH(req: Request) {
             token: string, pathname: string, updateInfo: userInfo
         } = await req.json();
 
-        const validity = await validateRequest(token, pathname, 'PATCH');
+        const validity = await validateRequest(token, pathname, origin, 'PATCH');
         if (!validity) {
-            console.log('message logged from [/api/users] PATCH: token validation failed');
+            console.log(`message logged from [/api${origin}] PATCH: token validation failed`);
             return NextResponse.json({ success: false, validity });
         };
 
@@ -80,7 +82,7 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ success: true, validity });
 
     } catch (error) {
-        console.log(`error thrown in [/api/users] PATCH: ` + error);
+        console.log(`error thrown in [/api${origin}] PATCH: ` + error);
         return NextResponse.json({});
     };
 };
@@ -93,9 +95,9 @@ export async function PUT(req: Request) {
             token: string, pathname: string, newUserInfo: userInfo['info']
         } = await req.json();
 
-        const validity = await validateRequest(token, pathname, 'PUT');
+        const validity = await validateRequest(token, pathname, origin, 'PUT');
         if (!validity) {
-            console.log('message logged from [/api/users] PUT: token validation failed');
+            console.log(`message logged from [/api${origin}] PUT: token validation failed`);
             return NextResponse.json({ success: false, validity, newUser: undefined });
         };
 
@@ -143,12 +145,15 @@ export async function PUT(req: Request) {
         cursor = await collection.insertOne({
             _id: userId,
             name: newUserInfo.name,
-            balanceHistory: {
-                prev: {},
-                cur: {
-                    'new user creation': newUserInfo.balance
+            cur: [
+                {
+                    timeStamp: new Date().valueOf(),
+                    note: 'new user inital balance',
+                    balanceChange: newUserInfo.balance,
+                    newBalance: newUserInfo.balance
                 }
-            }
+            ],
+            prev: []
         })
         if (!cursor.acknowledged) {
             console.log('failed to insert new water usage balance document in balance collection');
@@ -175,7 +180,7 @@ export async function PUT(req: Request) {
         });
 
     } catch (error) {
-        console.log(`error thrown in [/api/users] PUT: ` + error);
+        console.log(`error thrown in [/api${origin}] PUT: ` + error);
         return NextResponse.json({});
     };
 };
@@ -188,9 +193,9 @@ export async function DELETE(req: Request) {
             token: string, pathname: string, userId: string
         } = await req.json();
 
-        const validity = await validateRequest(token, pathname, 'DELETE');
+        const validity = await validateRequest(token, pathname, origin, 'DELETE');
         if (!validity) {
-            console.log('message logged from [/api/users] PUT: token validation failed');
+            console.log(`message logged from [/api${origin}] PUT: token validation failed`);
             return NextResponse.json({ success: false, validity });
         };
 
@@ -218,31 +223,7 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ success: true, validity });
 
     } catch (error) {
-        console.log(`error thrown in [/api/users] PUT: ` + error);
+        console.log(`error thrown in [/api${origin}] PUT: ` + error);
         return NextResponse.json({});
     };
-};
-
-
-/**
- * Attempts to validate request.
- * @param req - Request
- * @param method - string
- * @throws undefined if a server error is encountered
- * @returns boolean indicating token validity
- */
-const validateRequest = async (token: string, pathname: string, method: string) => {
-    // prevent users with valid tokens but invalid permissions from 
-    // gaining access to protected endpoints through request origin spoofing
-    if (pathname !== '/users') {
-        console.log(`message logged from [/api/users] ${method}: invalid pathname origin`);
-        // TODO: log request and flag for review
-        return false;
-    };
-
-    const validity = verifyToken(token, pathname);
-    if (validity == undefined) {
-        throw new Error('[validateRequest function]: internal server error encountered');
-    };
-    return validity;
 };

@@ -93,23 +93,12 @@ export default function Session({
         }
             
             
-        // users page
-        else if (pathname == '/users') {
-            // verify token on client side only. the associated server side
-            // api route will verify the token and reroute if neccessary
-            if (!clientSideTokenCheck(token)) {
-                setIsValid(false);
-                router.push('/login' + '?loginRequired=true');
-
-            } else {
-                setIsValid(true);
-                setBody(children);
-            };
-        }
-
-
-        // data entry page
-        else if (pathname == '/dataEntry') {
+        // users, data entry, and balances page
+        else if (
+            pathname == '/users'
+            || pathname == '/dataEntry'
+            || pathname == '/balances'
+        ) {
             // verify token on client side only. the associated server side
             // api route will verify the token and reroute if neccessary
             if (!clientSideTokenCheck(token)) {
