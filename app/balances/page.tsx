@@ -5,7 +5,6 @@ import { balanceHistoryDictType } from "../lib/commonTypes";
 import { getHistory } from "../lib/balancesFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Message from "../components/message/Message";
-import TransactionModal from "../components/balances/TransactionModal";
 import HistoryTable from "../components/balances/HistoryTable";
 
 export default function Balances() {
@@ -60,7 +59,10 @@ export default function Balances() {
     return (<>
         <Message text={ message } />
         <select onChange={e => setId(e.currentTarget.value) }>{ options }</select>
-        <HistoryTable id={id} history={history} />
-        <TransactionModal id={id} setHistory={setHistory} />
+        <HistoryTable
+            id={id}
+            historyState={{value: history, setValue: setHistory}}
+            setMessage={setMessage}
+        />
     </>);
 };

@@ -1,20 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { balanceHistoryDictType } from "../../lib/commonTypes";
+import { balanceHistoryDictType, stateType, voidFunc } from "../../lib/commonTypes";
 import EntryRow from "./EntryRow";
+import BalanceCorrection from "./BalanceCorrection";
 
 type HistoryTablePropTypes = {
     id: string,
-    history: balanceHistoryDictType | undefined
+    historyState: stateType<balanceHistoryDictType | undefined>,
+    setMessage: voidFunc<string>
 };
 
-export default function HistoryTable({ id, history}: HistoryTablePropTypes) {
+export default function HistoryTable({ id, historyState, setMessage }: HistoryTablePropTypes) {
+    const {value: history, setValue: setHistory} = historyState;
+
     const [innerCur, setInnerCur] = useState<JSX.Element[]>();
     const [innerPrev, setInnerPrev] = useState<JSX.Element[]>();
+    const [currentBalance, setCurrentBalance] = useState(0);
 
     useEffect(() => {
         if (!history) { return };
+
+        setCurrentBalance(history[id].cur[0].newBalance);
 
         setInnerCur(() => {
             let draft: JSX.Element[] = [];
@@ -52,6 +59,16 @@ export default function HistoryTable({ id, history}: HistoryTablePropTypes) {
                 </tr>
             </thead>
             <tbody>
+                {
+                    year == 'cur' ?
+                        <BalanceCorrection
+                            id={id}
+                            year={year}
+                            currentBalance={currentBalance}
+                            setHistory={setHistory}
+                            setMessage={setMessage}
+                        /> : <></>
+                }
                 { year == 'cur' ? innerCur : innerPrev }
             </tbody>
         </table>
