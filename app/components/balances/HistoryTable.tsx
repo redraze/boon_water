@@ -9,20 +9,30 @@ type HistoryTablePropTypes = {
     id: string,
     historyState: stateType<balanceHistoryDictType | undefined>,
     setMessage: voidFunc<string>
+    setLoading: voidFunc<boolean>
 };
 
-export default function HistoryTable({ id, historyState, setMessage }: HistoryTablePropTypes) {
-    const {value: history, setValue: setHistory} = historyState;
+export default function HistoryTable(
+    {
+        id,
+        historyState,
+        setMessage,
+        setLoading
+    }: HistoryTablePropTypes
+) {
+    const { value: history } = historyState;
 
-    const [innerCur, setInnerCur] = useState<JSX.Element[]>();
-    const [innerPrev, setInnerPrev] = useState<JSX.Element[]>();
+    const [innerCur, setInnerCur] = useState<JSX.Element[]>([]);
+    const [innerPrev, setInnerPrev] = useState<JSX.Element[]>([]);
     const [currentBalance, setCurrentBalance] = useState(0);
 
     useEffect(() => {
         if (!history) { return };
-
+        
+        setLoading(true);
+        
         setCurrentBalance(history[id].cur[0].newBalance);
-
+        
         setInnerCur(() => {
             let draft: JSX.Element[] = [];
             history[id].cur.map(entry => {
@@ -30,7 +40,7 @@ export default function HistoryTable({ id, historyState, setMessage }: HistoryTa
             });
             return draft;
         });
-
+        
         setInnerPrev(() => {
             let draft: JSX.Element[] = [];
             history[id].prev.map(entry => {
@@ -38,6 +48,8 @@ export default function HistoryTable({ id, historyState, setMessage }: HistoryTa
             });
             return draft;
         });
+
+        setLoading(false);
     }, [id]);
 
     const [year, setYear] = useState('cur');
@@ -64,9 +76,11 @@ export default function HistoryTable({ id, historyState, setMessage }: HistoryTa
                         <BalanceCorrection
                             id={id}
                             year={year}
-                            currentBalance={currentBalance}
-                            setHistory={setHistory}
+                            balanceState={{ value: currentBalance, setValue: setCurrentBalance }}
+                            historyState={historyState}
                             setMessage={setMessage}
+                            innerCurState={{ value: innerCur, setValue: setInnerCur }}
+                            setLoading={setLoading}
                         /> : <></>
                 }
                 { year == 'cur' ? innerCur : innerPrev }

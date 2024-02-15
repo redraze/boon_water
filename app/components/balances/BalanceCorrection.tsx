@@ -1,31 +1,95 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import { patchHistory } from "../../lib/balancesFunctions";
-import { voidFunc } from "../../lib/commonTypes";
+import { patchHistory } from "../../lib/balancesFunctions";
+import { balanceHistoryDictType, stateType, voidFunc } from "../../lib/commonTypes";
+import { usePathname, useRouter } from "next/navigation";
+import EntryRow from "./EntryRow";
 
 type TransactionModalPropTypes = {
     id: string,
     year: string,
-    currentBalance: number
-    setHistory: voidFunc<any>,
+    balanceState: stateType<number>
+    historyState: stateType<balanceHistoryDictType | undefined>
     setMessage: voidFunc<string>
+    innerCurState: stateType<JSX.Element[]>
+    setLoading: voidFunc<boolean>
 };
 
 export default function BalanceCorrection(
     {
         id,
         year,
-        currentBalance,
-        setHistory,
-        setMessage 
+        balanceState,
+        historyState,
+        setMessage,
+        innerCurState,
+        setLoading
     }: TransactionModalPropTypes
 ) {
+    const pathname = usePathname();
+    const router = useRouter();
+
+    const { value: currentBalance, setValue: setCurrentBalance } = balanceState;
+    const { value: history, setValue: setHistory } = historyState;
+    const { value: innerCur, setValue: setInnerCur } = innerCurState;
+
     const handleSubmit = () => {
-        // TODO
-        // patchHistory().then(() => {
-        //     ...
-        // })
+        if (newBalance == currentBalance || balanceChange == 0) {
+            setMessage('no balance changes found');
+            return;
+        };
+        
+        if (description == '') {
+            setMessage('please enter a description for the balance correction');
+            return;
+        };
+        
+        setLoading(true);
+
+        patchHistory(
+            pathname,
+            id,
+            balanceChange,
+            newBalance,
+            description
+        ).then((ret) => {
+            if (ret == undefined) {
+                setMessage(
+                    'Internal server error encountered while retrieving user info.'
+                    + ' Please contact system administrator or try again later.'
+                );
+                // a user with any token (valid or tampered-with) that experiences
+                // a server error will arrive at this point. should those users 
+                // (both valid and malicious) be routed somewhere else?
+
+            } else if (!ret.validity) {
+                router.push('/login' + '?loginRequired=true')
+
+            } else {
+                if (!ret.success || !ret.entry) {
+                    setMessage('error encountered. balance entry could not be posted.');
+                    return;
+                };
+
+                setMessage('balance entry posted successfully');
+
+                let draft = history;
+                draft![id].cur = [ret.entry , ...draft![id].cur];
+                setHistory(draft);
+
+                setInnerCur([
+                    <EntryRow key={ret.entry.timeStamp} entry={ ret.entry } />
+                    , ...innerCur
+                ]);
+
+                setCurrentBalance(ret.entry.newBalance);
+
+                reset();
+            };
+        });
+
+        setLoading(false);
     };
 
     const reset = () => {
@@ -47,11 +111,13 @@ export default function BalanceCorrection(
             setMessage('');
             return;
         };
-        
-        const num = Number(val);
+
+        let num = Number(val)
         if (num) {
+            num = Math.round(num * 100) / 100
+            const diff = Math.round((currentBalance + num) * 100) / 100
             setBalanceChange(num);
-            setNewBalance(currentBalance + num);
+            setNewBalance(diff);
             setMessage('');
         
         } else { setMessage('Only numbers are allowed in balance boxes.') };
@@ -65,9 +131,11 @@ export default function BalanceCorrection(
             return;
         };
         
-        const num = Number(val);
+        let num = Number(val)
         if (num) {
-            setBalanceChange(num - currentBalance);
+            num = Math.round(num * 100) / 100
+            const diff = Math.round((num - currentBalance) * 100) / 100
+            setBalanceChange(diff);
             setNewBalance(num);
             setMessage('');
         
@@ -100,8 +168,8 @@ export default function BalanceCorrection(
                 />
             </td>
 
-            <td><button onClick={() => reset()}>[clear_icon]</button></td>
-            <td><button onClick={() => handleSubmit()}>[submit_icon]</button></td>
+            <td><button onClick={() => reset()}>[clear]</button></td>
+            <td><button onClick={() => handleSubmit()}>[submit]</button></td>
         </tr>
     </>);
 };

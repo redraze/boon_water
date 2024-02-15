@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { clientSideLoggingEnabled } from "./settings";
-import { usersBalancesType } from "./commonTypes";
+import { balanceEntryType, usersBalancesType } from "./commonTypes";
 
 /**
  * Attmptes to fetch all water users' balance history data.
@@ -49,10 +49,14 @@ export const patchHistory = async (
     pathname: string,
     id: string,
     balanceChange: number,
+    newBalance: number,
     note: string
 ) => {
+    
     try {
-        if (!pathname) { return { success: false, validity: false } };
+        if (!pathname) {
+            return { success: false, entry: undefined, validity: false }
+        };
 
         const response = await fetch("/api/balances", {
             method: "PATCH",
@@ -64,13 +68,18 @@ export const patchHistory = async (
                 pathname,
                 id,
                 balanceChange,
+                newBalance,
                 note
             }),
         });
 
         if (!response.ok) { throw new Error('api fetch response not OK') };
 
-        const res: { success: boolean, validity: boolean } = await response.json();
+        const res: { 
+            success: boolean,
+            entry: balanceEntryType | undefined,
+            validity: boolean 
+        } = await response.json();
         return res;
       
     } catch (error) {

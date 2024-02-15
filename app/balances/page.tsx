@@ -17,7 +17,11 @@ export default function Balances() {
     const [history, setHistory] = useState<balanceHistoryDictType | undefined>();
     const [id, setId] = useState('');
 
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
+        setLoading(true);
+        
         getHistory(pathname).then(ret => {
             if (ret == undefined) {
                 setMessage(
@@ -54,15 +58,22 @@ export default function Balances() {
                 setId(ret.data[0]._id);
             };
         });
+
+        setLoading(false);
     }, []);
 
     return (<>
         <Message text={ message } />
-        <select onChange={e => setId(e.currentTarget.value) }>{ options }</select>
-        <HistoryTable
-            id={id}
-            historyState={{value: history, setValue: setHistory}}
-            setMessage={setMessage}
-        />
+        {
+            loading ? <></> : <>
+                <select onChange={e => setId(e.currentTarget.value) }>{ options }</select>
+                <HistoryTable
+                    id={id}
+                    historyState={{value: history, setValue: setHistory}}
+                    setMessage={setMessage}
+                    setLoading={setLoading}
+                />
+            </>
+        }
     </>);
 };
