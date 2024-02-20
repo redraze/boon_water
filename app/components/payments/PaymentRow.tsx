@@ -1,19 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { voidFunc } from "../../lib/commonTypes";
+import { useEffect, useState } from "react";
+import { stateType, voidFunc } from "../../lib/commonTypes";
 import { paymentsInfoType } from "../../payments/page";
 
 type PaymentRowPropsType = {
-    info: paymentsInfoType,
-    setPaymentsInfo: voidFunc<paymentsInfoType[]>
-    setMessage: voidFunc<string>
+    id: string,
+    info: paymentsInfoType['id'],
+    paymentsInfoState: stateType<paymentsInfoType | undefined>
+    setMessage: voidFunc<string>,
+    reset: boolean
 };
 
-export default function PaymentRow({ info, setPaymentsInfo, setMessage }: PaymentRowPropsType) {
+export default function PaymentRow({ id, info, paymentsInfoState, setMessage, reset }: PaymentRowPropsType) {
+    const { value: paymentsInfo, setValue: setPaymentsInfo } = paymentsInfoState
+    
     const [payment, setPayment] = useState<number>(0);
     const [newBalance, setNewBalance] = useState<number>(info.balance);
-
+    
+    useEffect(() => { setPayment(0) }, [reset])
+    
     const attmeptSetPayment = (val: string) => {
         if (!val) {
             setPayment(0);
@@ -26,7 +32,7 @@ export default function PaymentRow({ info, setPaymentsInfo, setMessage }: Paymen
         if (num) {
             num = Math.round(num * 100) / 100;
             setPayment(num);
-            setNewBalance(info.balance + num);
+            setNewBalance(info.balance - num);
             setMessage('');
         } else { setMessage('Only numbers are allowed in balance boxes.') };
     };
@@ -36,13 +42,6 @@ export default function PaymentRow({ info, setPaymentsInfo, setMessage }: Paymen
         currency: 'USD',
     });
 
-    const updatePaymentsInfo = () => {
-        // TODO
-        // setPaymentsInfo(() => {
-        //     ...
-        // })
-    };
-
     return(
         <tr>
             <td>{info.name}</td>
@@ -50,7 +49,15 @@ export default function PaymentRow({ info, setPaymentsInfo, setMessage }: Paymen
             <td><input
                 value={payment}
                 onChange={ e => attmeptSetPayment(e.currentTarget.value) }
-                onBlur={ () => updatePaymentsInfo() }
+                onBlur={ () => {
+                    const draft = paymentsInfo;
+                    paymentsInfo![id] = {
+                        name: info.name,
+                        payment: payment,
+                        balance: newBalance
+                    };
+                    setPaymentsInfo(draft);
+                } }
             /></td>
             <td>{formatter.format(newBalance)}</td>
         </tr>

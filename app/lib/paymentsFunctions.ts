@@ -1,9 +1,10 @@
 import Cookies from "js-cookie";
 import { clientSideLoggingEnabled } from "./settings";
 import type { userInfo } from "./commonTypes";
+import type { paymentsInfoType } from "../payments/page";
 
 /**
- * Attmptes to fetch all water users' data.
+ * Attempts to fetch all water users' data.
  * @param pathname - string containing the origin of the request
  * @returns undefined if a server error is encountered, or an object containing: users, an array contianing various info about users; validity, a boolean indicating token validity
  */
@@ -39,17 +40,26 @@ export const getAllUsers = async (pathname: string) => {
 
 
 /**
- * Attempts to edit a single water user's data.
+ * Attempts to update specified users' balances and balance histories with submitted payment information.
  * @param pathname - string
- * @param userId - string containing ID of water user to be edited
- * @param userInfo - object containing the water users' data
- * @returns undefined if a server error is encountered, or an object containing: success, a boolean indicating whether the water user's data was successfully edited; validity, a boolean indicating token validity
+ * @param payments - an array of objects containing user information and the payments those users are making
+ * @param note - a string describing the payment(s) being made
+ * @returns undefined if a server error is encountered, or an object containing: success, a boolean indicating whether the water users' data was successfully updated; validity, a boolean indicating token validity
  */
-export const editUser = async (pathname: string, updateInfo: userInfo) => {
+export const submitPayments = async (
+    pathname: string,
+    payments: ({ 
+        id: string,
+        name: string,
+        balance: number,
+        payment: number
+    } | undefined)[],
+    note: string
+) => {
     try {
         if (!pathname) { return { success: false, validity: false } };
 
-        const response = await fetch("/api/users", {
+        const response = await fetch("/api/payments", {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -57,7 +67,8 @@ export const editUser = async (pathname: string, updateInfo: userInfo) => {
             body: JSON.stringify({
                 token: Cookies.get('token'),
                 pathname,
-                updateInfo,
+                payments,
+                note
             }),
         });
 

@@ -41,16 +41,16 @@ export default function Nav(props: {validity: boolean}) {
                         <Link href='/users'>Users</Link>
                     </li>
                     <li>
+                        <Link href='/dataEntry'>Data Entry</Link>
+                    </li>
+                    <li>
+                        <Link href='/payments'>Payment Entry</Link>
+                    </li>
+                    <li>
                         <Link href='/balances'>Balance History</Link>
                     </li>
                     <li>
-                        <Link href='/payments'>Enter Payments</Link>
-                    </li>
-                    <li>
                         <Link href='/billing'>Billing</Link>
-                    </li>
-                    <li>
-                        <Link href='/dataEntry'>Data Entry</Link>
                     </li>
                     <li>
                         Hi { userName }!

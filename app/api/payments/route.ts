@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { userInfo } from "../../lib/commonTypes";
+import { balanceEntryType, userInfo } from "../../lib/commonTypes";
 import { NextResponse } from "next/server";
 import { collectionConnect } from "../../lib/dbFunctions";
 import { validateRequest } from "../../lib/authFunctions";
@@ -35,9 +35,20 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
     try {
         const {
-            token, pathname, updateInfo
+            token,
+            pathname,
+            payments,
+            note
         }: {
-            token: string, pathname: string, updateInfo: userInfo
+            token: string,
+            pathname: string,
+            payments: ({
+                id: string,
+                name: string,
+                payment: number,
+                balance: number
+            } | undefined)[],
+            note: string
         } = await req.json();
 
         const validity = await validateRequest(token, pathname, origin, 'PATCH');
@@ -46,40 +57,57 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ success: false, validity });
         };
 
-        let collection = await collectionConnect('waterUsers');
-        let cursor = await collection.updateOne(
-            { _id: new ObjectId(updateInfo._id) },
-            { $set: { 
-                'info.name': updateInfo.info.name,
-                'info.email': updateInfo.info.email,
-                'info.address': updateInfo.info.address
-            }}
-        );
-        if (cursor.modifiedCount == 0) {
+        if (!payments || !note) {
+            console.log(`message logged from [/api${origin}] PATCH: incomplete request`);
+            return NextResponse.json({ success: false, validity });
+        };
+
+        let success = true;
+
+        // push balance entries (payments) to users' balance histories
+        let collection = await collectionConnect('balances');
+        payments.map(async paymentInfo => {
+            if (!paymentInfo) { return };
+            const entry: balanceEntryType = {
+                timeStamp: new Date().valueOf(),
+                note: note,
+                balanceChange: paymentInfo.payment * -1,
+                newBalance: paymentInfo.balance
+            };
+            const cursor = await collection.updateOne(
+                { _id: new ObjectId(paymentInfo.id) },
+                {
+                    $push: {
+                       cur: {
+                          $each: [ entry ],
+                          $position: 0
+                       }
+                    }
+                }
+            )
+            if (!cursor.modifiedCount) { success = false };
+        });
+        if (!success) {
+            console.log("failed to update user's name in balances collection")
+            return NextResponse.json({ success, validity });
+        };
+
+        // update users' balances
+        collection = await collectionConnect('waterUsers');
+        payments.map(async paymentInfo => {
+            if (!paymentInfo) { return };
+            const cursor = await collection.updateOne(
+                { _id: new ObjectId(paymentInfo.id) },
+                { $set: { 'info.balance': paymentInfo.balance } }
+            );
+            if (!cursor.modifiedCount) { success = false };
+        });
+        if (!success) {
             console.log("failed to update user's info in waterUsers collection")
             return NextResponse.json({ success: false, validity });
         };
 
-        collection = await collectionConnect('usage');
-        cursor = await collection.updateOne(
-            { _id: new ObjectId(updateInfo._id) },
-            { $set: { 'name': updateInfo.info.name } }
-        );
-        if (cursor.modifiedCount == 0) {
-            console.log("failed to update user's name in usage collection")
-            return NextResponse.json({ success: false, validity });
-        };
-
-        collection = await collectionConnect('balances');
-        cursor = await collection.updateOne(
-            { _id: new ObjectId(updateInfo._id) },
-            { $set: { 'name': updateInfo.info.name } }
-        );
-        if (cursor.modifiedCount == 0) {
-            console.log("failed to update user's name in balances collection")
-            return NextResponse.json({ success: false, validity });
-        };
-        return NextResponse.json({ success: true, validity });
+        return NextResponse.json({ success, validity });
 
     } catch (error) {
         console.log(`error thrown in [/api${origin}] PATCH: ` + error);

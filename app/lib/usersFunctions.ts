@@ -3,7 +3,7 @@ import { clientSideLoggingEnabled } from "./settings";
 import type { userInfo } from "./commonTypes";
 
 /**
- * Attmptes to fetch all water users' data.
+ * Attempts to fetch all water users' data.
  * @param pathname - string containing the origin of the request
  * @returns undefined if a server error is encountered, or an object containing: users, an array contianing various info about users; validity, a boolean indicating token validity
  */
