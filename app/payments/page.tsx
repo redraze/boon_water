@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../lib/usersFunctions";
+import { getAllUsers } from "../lib/paymentsFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Message from "../components/message/Message";
 import PaymentRow from "../components/payments/PaymentRow";
@@ -42,7 +42,8 @@ export default function Balances() {
                     setMessage('No user data available.');
                 };
 
-                setPaymentsInfo((draft: paymentsInfoType[] = []) => {
+                setPaymentsInfo(() => {
+                    const draft: paymentsInfoType[] = [];
                     ret.users!.map(user => {
                         draft.push({
                             id: user._id,
@@ -73,10 +74,12 @@ export default function Balances() {
             loading ? <></> : <>
                 <table>
                     <thead>
-                        <tr></tr>
-                        <tr>current balance</tr>
-                        <tr>payment amount</tr>
-                        <tr>new balance</tr>
+                        <tr>
+                            <td></td>
+                            <td>current balance</td>
+                            <td>payment amount</td>
+                            <td>new balance</td>
+                        </tr>
                     </thead>
 
                     <tbody>

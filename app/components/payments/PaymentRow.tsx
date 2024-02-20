@@ -22,10 +22,11 @@ export default function PaymentRow({ info, setPaymentsInfo, setMessage }: Paymen
             return;
         };
         
-        let num = Number(val)
+        let num = Number(val);
         if (num) {
-            num = Math.round(num * 100) / 100
-            setNewBalance(newBalance + num);
+            num = Math.round(num * 100) / 100;
+            setPayment(num);
+            setNewBalance(info.balance + num);
             setMessage('');
         } else { setMessage('Only numbers are allowed in balance boxes.') };
     };
@@ -42,14 +43,16 @@ export default function PaymentRow({ info, setPaymentsInfo, setMessage }: Paymen
         // })
     };
 
-    return(<>
-        <tr>{info.name}</tr>
-        <tr>{info.balance}</tr>
-        <tr><input
-            value={payment}
-            onChange={ e => attmeptSetPayment(e.currentTarget.value) }
-            onBlur={ () => updatePaymentsInfo() }
-        /></tr>
-        <tr>{formatter.format(newBalance)}</tr>
-    </>);
+    return(
+        <tr>
+            <td>{info.name}</td>
+            <td>{formatter.format(info.balance)}</td>
+            <td><input
+                value={payment}
+                onChange={ e => attmeptSetPayment(e.currentTarget.value) }
+                onBlur={ () => updatePaymentsInfo() }
+            /></td>
+            <td>{formatter.format(newBalance)}</td>
+        </tr>
+    );
 };

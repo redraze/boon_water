@@ -98,6 +98,7 @@ export default function Session({
             pathname == '/users'
             || pathname == '/dataEntry'
             || pathname == '/balances'
+            || pathname == '/payments'
         ) {
             // verify token on client side only. the associated server side
             // api route will verify the token and reroute if neccessary
