@@ -7,7 +7,8 @@ const origin = '/billing';
 // gets all water users' water usage data
 export async function POST(req: Request) {
     try {
-        const { token, pathname, year, quarter } = await req.json();
+        const { token, pathname } = await req.json();
+        // const { token, pathname, year, quarter } = await req.json();
 
         const validity = await validateRequest(token, pathname, origin, 'POST');
         if (!validity) {
@@ -18,11 +19,12 @@ export async function POST(req: Request) {
         const collection = await collectionConnect('usage');
         const cursor = collection?.find(
             {},
-            { projection: {
-                _id: 1, 
-                name: 1, 
-                data: { [year]: { [quarter]: 1 } } 
-            }}
+            // uncomment to fetch only the specified year and quarter data
+            // { projection: {
+            //     _id: 1, 
+            //     name: 1, 
+            //     data: { [year]: { [quarter]: 1 } } 
+            // }}
         );
         const data = await cursor?.toArray();
         await cursor?.close();

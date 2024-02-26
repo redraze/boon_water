@@ -5,28 +5,24 @@ import { useEffect, useState } from "react";
 import Message from "../components/message/Message";
 import { getUsage } from "../lib/billingFunctions";
 import type { quarterType, waterUsageType, yearType } from "../lib/commonTypes";
-import Bills from "../components/billings/Bills";
-import Selections from "../components/billings/Selections";
+import Bills from "../components/billing/Bills";
+import Selections from "../components/billing/Selections";
 
 export default function Billing() {
     const router = useRouter();
     const pathname = usePathname();
 
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
     const [usage, setUsage] = useState<waterUsageType[]>([]);
-    
-    const m = new Date().getMonth();
-    const q = 'Q' + Math.floor(m / 3) + 1;
-    const [quarter, setQuarter] = useState<quarterType>(
-        q == 'Q1' || q == 'Q2' || q == 'Q3' || q == 'Q4' ?
-        q : 'Q1'
-    );
-    const [year, setYear] = useState<yearType>('cur');
-    
-    const handler = () => {
-        getUsage(pathname, year, quarter).then(ret => {
-            if (ret == undefined) {
+    useEffect(() => {
+        // prevent data re-fetching during dev env hot reloads 
+        if (usage.length) { return };
+
+        setLoading(true);
+        getUsage(pathname).then(ret => {
+                if (ret == undefined) {
                 setMessage(
                     'Internal server error encountered while retrieving user info.'
                     + ' Please contact system administrator or try again later.'
@@ -44,19 +40,27 @@ export default function Billing() {
                     return;
                 };
                 setUsage(ret.data!);
-                console.log(ret.data);
             };
         });
-    };
+        setLoading(false);
+    }, []);
     
-    useEffect(() => { handler() }, []);
-
+    const m = new Date().getMonth();
+    const q = 'Q' + Math.floor(m / 3) + 1;
+    const [quarter, setQuarter] = useState<quarterType>(
+        q == 'Q1' || q == 'Q2' || q == 'Q3' || q == 'Q4' ?
+        q : 'Q1'
+    );
+    const [year, setYear] = useState<yearType>('cur');
+    
     return (<>
         <Message text={ message } />
-
-        <Selections setYear={setYear} setQuarter={setQuarter} />
-        <button onClick={ () => handler() }>generate bills</button>
-
-        <Bills data={usage} year={year} quarter={quarter} />
+        { loading ? <></> : <>
+            <Selections
+                setYear={setYear}
+                quarterState={{ value: quarter, setValue: setQuarter }}
+            />
+            <Bills data={usage} year={year} quarter={quarter} />
+        </>}
     </>);
 };
