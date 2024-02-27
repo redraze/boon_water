@@ -55,3 +55,12 @@ export type balanceHistoryDictType = {
       cur: balanceEntryType[]
   }
 };
+
+// billing types
+export type readingsDict = {
+  [id: string]: number[]
+};
+
+export type usersInfoDictType = {
+  [id: string]: userInfo['info']
+};

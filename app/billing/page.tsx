@@ -3,8 +3,13 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Message from "../components/message/Message";
-import { getUsage } from "../lib/billingFunctions";
-import type { quarterType, waterUsageType, yearType } from "../lib/commonTypes";
+import { getUserData } from "../lib/billingFunctions";
+import type {
+    quarterType,
+    usersInfoDictType,
+    waterUsageType,
+    yearType
+} from "../lib/commonTypes";
 import Bills from "../components/billing/Bills";
 import Selections from "../components/billing/Selections";
 
@@ -16,12 +21,14 @@ export default function Billing() {
     const [message, setMessage] = useState('');
 
     const [usage, setUsage] = useState<waterUsageType[]>([]);
+    const [users, setUsers] = useState<usersInfoDictType>({});
+
     useEffect(() => {
         // prevent data re-fetching during dev env hot reloads 
         if (usage.length) { return };
 
         setLoading(true);
-        getUsage(pathname).then(ret => {
+        getUserData(pathname).then(ret => {
                 if (ret == undefined) {
                 setMessage(
                     'Internal server error encountered while retrieving user info.'
@@ -35,11 +42,20 @@ export default function Billing() {
                 router.push('/login' + '?loginRequired=true')
 
             } else {
-                if (!ret.data!.length) {
+                if (
+                    !ret.data || !ret.data.length 
+                    || !ret.users || !ret.users.length
+                ) {
                     setMessage('No water usage data available.');
                     return;
                 };
                 setUsage(ret.data!);
+
+                const tempUsers: usersInfoDictType = {};
+                ret.users.map(user => {
+                    tempUsers[user._id] = user.info
+                });
+                setUsers(tempUsers);
             };
         });
         setLoading(false);
@@ -60,7 +76,7 @@ export default function Billing() {
                 setYear={setYear}
                 quarterState={{ value: quarter, setValue: setQuarter }}
             />
-            <Bills data={usage} year={year} quarter={quarter} />
+            <Bills users={users} usage={usage} year={year} quarter={quarter} />
         </>}
     </>);
 };

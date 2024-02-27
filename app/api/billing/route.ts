@@ -4,11 +4,10 @@ import { collectionConnect } from "../../lib/dbFunctions";
 
 const origin = '/billing';
 
-// gets all water users' water usage data
+// gets all water users' info and water usage data
 export async function POST(req: Request) {
     try {
         const { token, pathname } = await req.json();
-        // const { token, pathname, year, quarter } = await req.json();
 
         const validity = await validateRequest(token, pathname, origin, 'POST');
         if (!validity) {
@@ -16,20 +15,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ data: [], validity });
         };
 
-        const collection = await collectionConnect('usage');
-        const cursor = collection?.find(
-            {},
-            // uncomment to fetch only the specified year and quarter data
-            // { projection: {
-            //     _id: 1, 
-            //     name: 1, 
-            //     data: { [year]: { [quarter]: 1 } } 
-            // }}
-        );
+        let collection = await collectionConnect('usage');
+        let cursor = collection?.find({});
         const data = await cursor?.toArray();
         await cursor?.close();
 
-        return NextResponse.json({ data, validity })
+        collection = await collectionConnect('waterUsers');
+        cursor = collection?.find({});
+        const users = await cursor?.toArray();
+        await cursor?.close();
+
+        return NextResponse.json({ users, data, validity })
 
     } catch (error) {
         console.log(`error thrown in [/api${origin}] POST: ` + error);

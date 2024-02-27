@@ -1,15 +1,17 @@
 import Cookies from "js-cookie";
 import { clientSideLoggingEnabled } from "./settings";
-import { quarterType, waterUsageType, yearType } from "./commonTypes";
+import { quarterType, userInfo, waterUsageType, yearType } from "./commonTypes";
+import { rates } from "./billingRates";
 
 /**
- * Attempts to fetch water usage data for all users for the specified year and quarter.
+ * Attempts to fetch all water users' info and usage data.
  * @param pathname - string
+ * @returns an object containing water users' info, water users' usage, and the validity of the provided token
  * @throws if server side error is encountered
  */
-export const getUsage = async (pathname: string) => {
+export const getUserData = async (pathname: string) => {
     try {
-        if (!pathname) { return { data: undefined, validity: false } };
+        if (!pathname) { return { users: undefined, data: undefined, validity: false } };
 
         const response = await fetch("/api/billing", {
             method: "POST",
@@ -24,7 +26,11 @@ export const getUsage = async (pathname: string) => {
 
         if (!response.ok) { throw new Error('api fetch response not OK') };
 
-        const res: { data: waterUsageType[], validity: boolean } = await response.json();
+        const res: {
+            users: userInfo[],
+            data: waterUsageType[],
+            validity: boolean
+        } = await response.json();
         return res;
       
     } catch (error) {
@@ -34,14 +40,15 @@ export const getUsage = async (pathname: string) => {
     };
 };
 
+
 /**
- * Calculates the charges for the water used from the given year/quarter.
+ * Calculates the meter readings for the water user from the given year/quarter.
  * @param entry - water usage data
  * @param year - string
  * @param quarter - string
- * @returns a number representing the payment due
+ * @returns an array of numbers containing the meter readings
  */
-export const calculateCharge = (
+export const getReadings = (
     entry: waterUsageType,
     year: yearType,
     quarter: quarterType
@@ -64,6 +71,37 @@ export const calculateCharge = (
         readings.push(item[1]);
     });
 
-    // TODO: calculate the charges for the user
-    return 0;
+    return readings;
+};
+
+
+/**
+ * Calculates the overage charge (if any) for a given water usage. 
+ * @param usage - number
+ * @returns number
+ */
+export const calculateOverageCharge = (usage: number) => {
+    let overageCharge = 0;
+
+    if (usage > rates.thirdOverage) {
+        // first overage
+        overageCharge += (rates.secondOverage - rates.firstOverage) * rates.firstOverageRate
+
+        // second overage
+        overageCharge += (rates.thirdOverage - rates.secondOverage) * rates.secondOverageRate
+
+        // third overage
+        overageCharge += (usage - rates.thirdOverage) * rates.thirdOverageRate
+    } else if (usage > rates.secondOverage) {
+        // first overage
+        overageCharge += (rates.secondOverage - rates.firstOverage) * rates.firstOverageRate
+
+        // second overage
+        overageCharge += (usage - rates.secondOverage) * rates.secondOverageRate
+    } else if (usage > rates.firstOverage) {
+        // first overage
+        overageCharge += (usage - rates.firstOverage) * rates.firstOverageRate
+    };
+
+    return overageCharge;
 };

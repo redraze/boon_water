@@ -1,30 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { quarterType, waterUsageType, yearType } from "../../lib/commonTypes";
-import { calculateCharge } from "../../lib/billingFunctions";
+import { useEffect, useRef, useState } from "react";
+import type {
+    quarterType,
+    readingsDict,
+    usersInfoDictType,
+    waterUsageType,
+    yearType
+} from "../../lib/commonTypes";
+import { getReadings } from "../../lib/billingFunctions";
+import UserActions from "./UserActions";
+import Statement from "./Statement";
 
 type billsPropsType = {
-    data: waterUsageType[],
+    users: usersInfoDictType,
+    usage: waterUsageType[],
     year: yearType,
     quarter: quarterType
 };
 
-export default function Bills({ data, year, quarter }: billsPropsType) {
-    const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-    });
-
+export default function Bills({ users, usage, year, quarter }: billsPropsType) {
     const [tabs, setTabs] = useState<JSX.Element[]>([]);
-    const [charges, setCharges] = useState<{[id: string]: number}>({});
+    const [statementInfo, setStatementInfo] = useState<readingsDict>({});
     const [active, setActive] = useState('');
 
     useEffect(() => {
         const tempTabs: JSX.Element[] = [];
-        const tempCharges: {[id: string]: number} = {};
+        const tempStatementInfo: readingsDict = {};
 
-        data.map(entry => {
+        usage.map(entry => {
             tempTabs.push(
                 <div
                     key={entry._id}
@@ -34,34 +38,48 @@ export default function Bills({ data, year, quarter }: billsPropsType) {
                     {entry.name}
                 </div>
             );
-            tempCharges[entry._id] = calculateCharge(entry, year, quarter);
+
+            const readings = getReadings(entry, year, quarter);
+            tempStatementInfo[entry._id] = readings;
         });
 
         setTabs(tempTabs);
-        setCharges(tempCharges);
-        setActive(data[0]?._id);
-    }, [data]);
+        setStatementInfo(tempStatementInfo);
+        setActive(usage[0]?._id);
+    }, [usage]);
 
     useEffect(() => {
-        const tempCharges: {[id: string]: number} = {};
-        data.map(entry => {
-            tempCharges[entry._id] = calculateCharge(entry, year, quarter);
+        const tempStatementInfo: readingsDict = {};
+        usage.map(entry => {
+            const readings = getReadings(entry, year, quarter);
+            tempStatementInfo[entry._id] = readings;
         });
-        setCharges(tempCharges);
+        setStatementInfo(tempStatementInfo);
     }, [year, quarter]);
+
+    const date = new Date();
+    const formattedDate = [date.getMonth() + 1, date.getDate(), date.getFullYear()].join('/');
+    
+    const pdfRef = useRef(null);
 
     return(<>
         { tabs }
-        {
-            data.map(entry => {
-                return <div
-                    key={entry._id}
-                    style={ active == entry._id ? {display: 'flex'} : {display: 'none'} }
-                >
-                    <h1>{entry.name}</h1>
-                    <h2>charges due: {formatter.format(charges[entry._id])}</h2>
-                </div>
-            })
-        }
+        <div ref={pdfRef}>
+            {
+                Object.entries(statementInfo).map(([id, readings]) => {
+                    return (
+                        <Statement
+                            key={id}
+                            id={id}
+                            info={users[id]}
+                            readings={readings}
+                            date={formattedDate}
+                            active={active}
+                        />
+                    );
+                })
+            }
+        </div>
+        <UserActions quarter={quarter} pdfRef={pdfRef} />
     </>);
 };
