@@ -8,7 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  
+  AZURE_WEBAPP_NAME: WBA-Test2
+
 jobs:
   build_and_push:
     name: build Docker image and push to Github container registry
@@ -17,7 +18,10 @@ jobs:
     permissions:
       packages: write
       contents: read
-    
+
+    outputs:
+      LABELS: ${{ steps.meta.outputs.labels }}
+
     steps:
       - uses: actions/checkout@v4
       
@@ -41,3 +45,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: deploy image to Azure web app
+      
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+    
+    steps:
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: ${{ needs.build_and_push.outputs.LABELS }}
