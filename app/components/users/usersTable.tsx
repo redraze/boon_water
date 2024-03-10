@@ -27,6 +27,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
     const [addressUpdate, setAddressUpdate] = useState('');
     const [emailUpdate, setEmailUpdate] = useState('');
     const [balance, setBalance] = useState<number>(0);
+    const [comp, setComp] = useState(false);
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -39,6 +40,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
         setAddressUpdate(user.info.address);
         setEmailUpdate(user.info.email);
         setBalance(user.info.balance);
+        setComp(user.info.comp);
     };
 
     const resetInfo = () => {
@@ -64,7 +66,8 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                 name: nameUpdate,
                 address: addressUpdate,
                 email: emailUpdate,
-                balance: balance
+                balance,
+                comp
             }
         };
 
@@ -73,6 +76,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                 prevInfo.info.name == updateInfo.info.name 
                 && prevInfo.info.address == updateInfo.info.address 
                 && prevInfo.info.email == updateInfo.info.email
+                && prevInfo.info.comp == updateInfo.info.comp
             )
         ) {
             setMessage('No edits made to selected user.');
@@ -80,8 +84,10 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
             return;
         };
 
+        const nameChanged = nameUpdate !== updateInfo.info.name;
+
         // submit changes to backend API
-        editUser(pathname, updateInfo).then((res) => {
+        editUser(pathname, updateInfo, nameChanged).then((res) => {
             if (res == undefined) {
                 setMessage(
                     'Internal server error encountered while updating user info.'
@@ -133,6 +139,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                 <th>address</th>
                                 <th>email</th>
                                 <th>balance</th>
+                                <th>comp</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -158,6 +165,11 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                 onChange={(e) => setEmailUpdate(e.target.value) }
                                             ></input></td>
                                             <td>{ formatter.format(balance) }</td>
+                                            <td><input 
+                                                type="checkbox"
+                                                defaultChecked={ user.info.comp }
+                                                onChange={e => setComp(e.currentTarget.checked)}
+                                            /></td>
                                             <td>
                                                 <button onClick={ () => resetInfo() }>
                                                     [Cancel]
@@ -175,6 +187,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                             <td>{ user.info.address }</td>
                                             <td>{ user.info.email }</td>
                                             <td>{ formatter.format(user.info.balance) }</td>
+                                            <td>{ user.info.comp ? 'yes' : 'no' }</td>
                                             <td>
                                                 <button onClick={ () => setUpdateInfo(user) }>
                                                     [Edit User]

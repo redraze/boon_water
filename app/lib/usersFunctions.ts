@@ -43,9 +43,14 @@ export const getAllUsers = async (pathname: string) => {
  * @param pathname - string
  * @param userId - string containing ID of water user to be edited
  * @param userInfo - object containing the water users' data
+ * @param nameChanged - a boolean indicating whether a change to the user's name has been made
  * @returns undefined if a server error is encountered, or an object containing: success, a boolean indicating whether the water user's data was successfully edited; validity, a boolean indicating token validity
  */
-export const editUser = async (pathname: string, updateInfo: userInfo) => {
+export const editUser = async (
+    pathname: string,
+    updateInfo: userInfo,
+    nameChanged: boolean
+) => {
     try {
         if (!pathname) { return { success: false, validity: false } };
 
@@ -58,6 +63,7 @@ export const editUser = async (pathname: string, updateInfo: userInfo) => {
                 token: Cookies.get('token'),
                 pathname,
                 updateInfo,
+                nameChanged
             }),
         });
 

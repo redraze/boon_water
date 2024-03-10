@@ -26,6 +26,7 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
     const [address, setAddress] = useState('');
     const [email, setEmail] = useState('');
     const [balance, setBalance] = useState(0);
+    const [comp, setComp] = useState(false);
 
     const attemptBalanceUpdate = (num: string) => {
         // TODO: improve this balance input sanitizer/state handler routine
@@ -44,6 +45,7 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
         setAddress('');
         setEmail('');
         setBalance(0);
+        setComp(false);
     };
 
     const handleSubmit = () => {
@@ -59,7 +61,8 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
             name,
             address,
             email,
-            balance
+            balance: comp ? 0 : balance,
+            comp
         };
         
         // submit new user info to backend API
@@ -125,12 +128,21 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
                         />
                     </label>
                     <label>
+                        New user comp:
+                        <input
+                            type="checkbox"
+                            checked={comp}
+                            onChange={e => setComp(e.currentTarget.checked) }
+                        />
+                    </label>
+                    <label>
                         New water user balance:
                         <input
                             type="text"
                             placeholder="balance"
                             value={ balance }
                             onChange={e => attemptBalanceUpdate(e.target.value) }
+                            disabled={comp}
                         />
                     </label>
                     <input type="submit" value="Submit"/>

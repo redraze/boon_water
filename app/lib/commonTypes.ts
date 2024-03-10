@@ -13,6 +13,7 @@ export type userInfo = {
     address: string
     email: string
     balance: number
+    comp: boolean
   }
 };
 

@@ -69,7 +69,8 @@ export default function Statement({ id, active, info, readings, date }: Statemen
                     <p>prev balance: { formatter.format(info.balance) }</p>
                     <p>base water charge: { formatter.format(baseCharge) }</p>
                     <p>total overage charges: { formatter.format(overageCharge) }</p>
-                    <p>new balance: { formatter.format(info.balance + baseCharge + overageCharge) }</p>
+                    <p>new balance: { info.comp ? 0 : formatter.format(info.balance + baseCharge + overageCharge) }
+                    { info.comp ? <p><b>(USER IS COMP'D)</b></p> : <></> }</p>
                 </div>
             </div>
         </div>
