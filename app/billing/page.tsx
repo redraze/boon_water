@@ -61,13 +61,19 @@ export default function Billing() {
         setLoading(false);
     }, []);
     
-    const m = new Date().getMonth();
-    const q = 'Q' + Math.floor(m / 3) + 1;
-    const [quarter, setQuarter] = useState<quarterType>(
-        q == 'Q1' || q == 'Q2' || q == 'Q3' || q == 'Q4' ?
-        q : 'Q1'
-    );
+    const [quarter, setQuarter] = useState<quarterType>('Q1');
     const [year, setYear] = useState<yearType>('cur');
+
+    const q = Math.floor(new Date().getMonth() / 3);
+    if (q == 0) {
+        setQuarter('Q4');
+        setYear('prev');
+    } else {
+        if (q == 1) { setQuarter('Q1') }
+        else if (q == 2) { setQuarter('Q2') }
+        else if (q == 3) { setQuarter('Q3') };
+        setYear('cur');
+    };
     
     return (<>
         <Message text={ message } />

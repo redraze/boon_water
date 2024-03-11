@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 };
 
 
-// gets a water users' balance history by id
+// pushes a new balance transaction to the water user's balance history
 export async function PATCH(req: Request) {
     try {
         const { token, pathname, id, balanceChange, newBalance, note } = await req.json();

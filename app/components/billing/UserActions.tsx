@@ -25,7 +25,7 @@ export default function UserActions({ quarter, pdfRef }: userActionsPropTypes) {
         <button onClick={() => download()}>download bills</button>
         <button onClick={() => email()}>email bills</button>
         <button onClick={() => postPayments()}>
-            post payments to account balances as &quot;{quarter} charges&quot;
+            post charges to account balances as &quot;{quarter} charges&quot;
         </button>
     </>);
 };

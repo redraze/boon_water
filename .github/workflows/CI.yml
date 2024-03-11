@@ -13,7 +13,7 @@ env:
 
 jobs:
   build_and_push:
-    name: build Docker image and push to Github container registry
+    name: build and push Docker image to ghcr
     
     runs-on: ubuntu-latest
     permissions:
