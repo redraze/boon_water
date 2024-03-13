@@ -70,7 +70,7 @@ export default function Statement({ id, active, info, readings, date }: Statemen
                     <p>base water charge: { formatter.format(baseCharge) }</p>
                     <p>total overage charges: { formatter.format(overageCharge) }</p>
                     <p>new balance: { info.comp ? 0 : formatter.format(info.balance + baseCharge + overageCharge) }
-                    { info.comp ? <p><b>(USER IS COMP&apos;D)</b></p> : <></> }</p>
+                    { info.comp ? <b>(USER IS COMP&apos;D)</b> : <></> }</p>
                 </div>
             </div>
         </div>
