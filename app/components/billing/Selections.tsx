@@ -4,15 +4,15 @@ import { useState } from "react";
 import { quarterType, stateType, voidFunc, yearType } from "../../lib/commonTypes";
 
 type SelectionsProps = {
-    quarterState: stateType<quarterType>
-    setYear: voidFunc<yearType>
+    quarterState: stateType<quarterType | undefined>
+    setYear: voidFunc<yearType | undefined>
 };
 
 export default function Selections({ quarterState, setYear }: SelectionsProps) {
     const {value: quarter, setValue: setQuarter } = quarterState;
 
     const [y, setY] = useState<yearType>('cur');
-    const [q, setQ] = useState<quarterType>(quarter);
+    const [q, setQ] = useState<quarterType>(quarter ? quarter : 'Q1');
 
     return (<>
         <select onChange={ (e) => {
@@ -25,6 +25,7 @@ export default function Selections({ quarterState, setYear }: SelectionsProps) {
                 setQ(e.currentTarget.value);
             };
         }}>
+            <option value={''} selected disabled hidden>Quarter</option>
             <option>Q1</option>
             <option>Q2</option>
             <option>Q3</option>
@@ -39,6 +40,7 @@ export default function Selections({ quarterState, setYear }: SelectionsProps) {
                 setY(e.currentTarget.value);
             };
         }}>
+            <option value={''} selected disabled hidden>Year</option>
             <option value='cur'>Current Year</option>
             <option value='prev'>Previous Year</option>
         </select>
