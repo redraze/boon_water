@@ -41,7 +41,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository }}
 
       - name: print
-        run: "echo ${{ steps.meta.outputs.tags }}\n${{ steps.meta.outputs.labels }}"
+        run: "echo\n tags: ${{ steps.meta.outputs.tags }}\nlabels: ${{ steps.meta.outputs.labels }}"
       
   #     - name: Build and push Docker images
   #       uses: docker/build-push-action@v5
