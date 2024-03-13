@@ -48,7 +48,7 @@ export default function LoginPage() {
           />
         </label>
         <br />
-        <button type="submit">Log In, changed!</button>
+        <button type="submit">Log In</button>
       </form>
     </div>
   </>);
