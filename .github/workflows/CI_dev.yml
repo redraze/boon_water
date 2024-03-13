@@ -40,29 +40,27 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository }}
 
-      - name: print
-        run: "echo ${{ env.REGISTRY }}/${{ github.repository }}:latest"
-      
-  #     - name: Build and push Docker images
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: .
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-  # deploy:
-  #   name: deploy image to Azure web app
+  deploy:
+    name: deploy image to Azure web app
       
-  #   needs: build_and_push
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: none
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
     
-  #   steps:
-  #     - name: Deploy to Azure Web App
-  #       uses: azure/webapps-deploy@v3
-  #       with:
-  #         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-  #         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-  #         images: ${{ needs.build_and_push.outputs.TAGS }}
+    steps:
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          # images: ${{ needs.build_and_push.outputs.TAGS }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}:latest
