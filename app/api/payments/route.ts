@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { balanceEntryType, userInfo } from "../../lib/commonTypes";
+import { balanceEntryType } from "../../lib/commonTypes";
 import { NextResponse } from "next/server";
 import { collectionConnect } from "../../lib/dbFunctions";
 import { validateRequest } from "../../lib/authFunctions";
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 };
 
 
-// edits an existing water user's contact info
+// posts payments to water user's billing history, and updates their current balances
 export async function PATCH(req: Request) {
     try {
         const {
@@ -88,7 +88,7 @@ export async function PATCH(req: Request) {
             if (!cursor.modifiedCount) { success = false };
         });
         if (!success) {
-            console.log("failed to update user's name in balances collection")
+            console.log("failed to post some or all payments to user balance histories")
             return NextResponse.json({ success, validity });
         };
 
@@ -103,8 +103,8 @@ export async function PATCH(req: Request) {
             if (!cursor.modifiedCount) { success = false };
         });
         if (!success) {
-            console.log("failed to update user's info in waterUsers collection")
-            return NextResponse.json({ success: false, validity });
+            console.log("failed to update some or all users' balances")
+            return NextResponse.json({ success, validity });
         };
 
         return NextResponse.json({ success, validity });

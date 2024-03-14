@@ -73,7 +73,13 @@ export default function Billing() {
             />
             {
                 (year && quarter) ? 
-                    <Bills users={users} usage={usage} year={year} quarter={quarter} />
+                    <Bills
+                        users={users}
+                        usage={usage}
+                        year={year}
+                        quarter={quarter}
+                        setMessage={setMessage}
+                    />
                     : <></>
             }
         </>}

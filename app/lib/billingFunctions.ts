@@ -2,6 +2,7 @@ import Cookies from "js-cookie";
 import { clientSideLoggingEnabled } from "./settings";
 import { quarterType, userInfo, waterUsageType, yearType } from "./commonTypes";
 import { rates } from "./billingRates";
+import { chargeType } from "../components/billing/UserActions";
 
 /**
  * Attempts to fetch all water users' info and usage data.
@@ -29,6 +30,46 @@ export const getUserData = async (pathname: string) => {
         const res: {
             users: userInfo[],
             data: waterUsageType[],
+            validity: boolean
+        } = await response.json();
+        return res;
+      
+    } catch (error) {
+        if (clientSideLoggingEnabled) {
+            console.log('error thrown in [/lib/billingFunctions getUsage function]: ' + error);
+        };
+    };
+};
+
+
+/**
+ * Attempts to update each water user's billing history and current balance using the current bills' payments.
+ * @param pathname - string
+ * 
+ * @returns an object containing the success of the requested operation as a boolean, and the validity of the provided token
+ * @throws if server side error is encountered
+ */
+export const postPaymentsToBalances = async (pathname: string, charges: chargeType[], note: string) => {
+    try {
+        if (!pathname) { return { success: false, validity: false } };
+
+        const response = await fetch("/api/billing", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: Cookies.get('token'),
+                pathname,
+                charges,
+                note
+            })
+        });
+
+        if (!response.ok) { throw new Error('api fetch response not OK') };
+
+        const res: {
+            success: boolean,
             validity: boolean
         } = await response.json();
         return res;

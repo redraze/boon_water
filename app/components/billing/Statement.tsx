@@ -57,20 +57,24 @@ export default function Statement({ id, active, info, readings, date }: Statemen
                 </div>
                 
                 <div>
-                    <p><b>total gallons used:</b> {totalUsage}</p>
                     <p>Meter readings</p>
                     <p>beginning of quarter: {readings[0]}</p>
                     <p>end of first month: {readings[1]}</p>
                     <p>end of second month: {readings[2]}</p>
                     <p>end of third month: {readings[3]}</p>
+                    <p><b>total gallons used:</b> {totalUsage}</p>
                 </div>
 
                 <div>
-                    <p>prev balance: { formatter.format(info.balance) }</p>
                     <p>base water charge: { formatter.format(baseCharge) }</p>
-                    <p>total overage charges: { formatter.format(overageCharge) }</p>
-                    <p>new balance: { info.comp ? 0 : formatter.format(info.balance + baseCharge + overageCharge) }
-                    { info.comp ? <b>(USER IS COMP&apos;D)</b> : <></> }</p>
+                    <p>overage charges: { formatter.format(overageCharge) }</p>
+                    <p>total charges: { formatter.format(baseCharge + overageCharge) }</p>
+                    <p>prev balance: { formatter.format(info.balance) }</p>
+                    <p>new balance: { info.comp ? 
+                        (info.balance < 0 ? formatter.format(info.balance) : formatter.format(0) ) :
+                        formatter.format(info.balance + baseCharge + overageCharge)
+                    }
+                    { info.comp ? <b> (USER IS COMP&apos;D)</b> : <></> }</p>
                 </div>
             </div>
         </div>

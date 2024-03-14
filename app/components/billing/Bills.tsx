@@ -5,6 +5,7 @@ import type {
     quarterType,
     readingsDict,
     usersInfoDictType,
+    voidFunc,
     waterUsageType,
     yearType
 } from "../../lib/commonTypes";
@@ -17,34 +18,20 @@ type billsPropsType = {
     usage: waterUsageType[],
     year: yearType,
     quarter: quarterType
+    setMessage: voidFunc<string>
 };
 
-export default function Bills({ users, usage, year, quarter }: billsPropsType) {
-    const [tabs, setTabs] = useState<JSX.Element[]>([]);
+export default function Bills({ users, usage, year, quarter, setMessage }: billsPropsType) {
     const [statementInfo, setStatementInfo] = useState<readingsDict>({});
     const [active, setActive] = useState('');
 
     useEffect(() => {
-        const tempTabs: JSX.Element[] = [];
-        const tempStatementInfo: readingsDict = {};
-
-        usage.map(entry => {
-            tempTabs.push(
-                <div
-                    key={entry._id}
-                    className={ entry._id == active ? 'tab_active' : 'tab_inactive' }
-                    onClick={ () => setActive(entry._id) }
-                >
-                    {entry.name}
-                </div>
-            );
-
-            const readings = getReadings(entry, year, quarter);
-            tempStatementInfo[entry._id] = readings;
+        setStatementInfo((draft: readingsDict = {}) => {
+            usage.map(entry => {
+                draft[entry._id] = getReadings(entry, year, quarter)
+            });
+            return draft;
         });
-
-        setTabs(tempTabs);
-        setStatementInfo(tempStatementInfo);
         setActive(usage[0]?._id);
     }, [usage]);
 
@@ -63,7 +50,17 @@ export default function Bills({ users, usage, year, quarter }: billsPropsType) {
     const pdfRef = useRef(null);
 
     return(<>
-        { tabs }
+        {
+            usage.map(entry => {
+                return (<div
+                    key={entry._id}
+                    className={ entry._id == active ? 'tab_active' : 'tab_inactive' }
+                    onClick={ () => setActive(entry._id) }
+                >
+                    {entry.name}
+                </div>);
+            })
+        }
         <div ref={pdfRef}>
             {
                 Object.entries(statementInfo).map(([id, readings]) => {
@@ -80,6 +77,12 @@ export default function Bills({ users, usage, year, quarter }: billsPropsType) {
                 })
             }
         </div>
-        <UserActions quarter={quarter} pdfRef={pdfRef} />
+        <UserActions 
+            quarter={quarter}
+            pdfRef={pdfRef}
+            statementInfo={statementInfo}
+            users={users}
+            setMessage={setMessage}
+        />
     </>);
 };
