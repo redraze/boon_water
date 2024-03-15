@@ -1,6 +1,6 @@
 "use client";
 
-import { MutableRefObject, cloneElement, useState } from "react";
+import { MutableRefObject, useState } from "react";
 import { 
     quarterType,
     readingsDict,
@@ -12,8 +12,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { rates } from "../../lib/billingRates";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { display } from "html2canvas/dist/types/css/property-descriptors/display";
-import { isNull } from "util";
 
 export type chargeType = {
     id: string,
