@@ -51,7 +51,7 @@ export async function PATCH(req: Request) {
         let success = true;
 
         let collection = await collectionConnect('balances');
-        let cursor = await collection.updateOne(
+        let cursor = await collection!.updateOne(
             { _id: new ObjectId(id) },
             {
                 $push: {
@@ -68,7 +68,7 @@ export async function PATCH(req: Request) {
         };
 
         collection = await collectionConnect('waterUsers');
-        cursor = await collection.updateOne(
+        cursor = await collection!.updateOne(
             { _id: new ObjectId(id) },
             { $set: { 'info.balance': newBalance } }
         );
@@ -76,7 +76,7 @@ export async function PATCH(req: Request) {
             success = false;
 
             collection = await collectionConnect('balances');
-            cursor = await collection.updateOne(
+            cursor = await collection!.updateOne(
                 { _id: new ObjectId(id) },
                 { $pop: { 'cur' : -1 } }
             );
