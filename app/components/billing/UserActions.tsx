@@ -1,6 +1,6 @@
 "use client";
 
-import { MutableRefObject, useState } from "react";
+import { MutableRefObject, cloneElement, useState } from "react";
 import { 
     quarterType,
     readingsDict,
@@ -10,6 +10,10 @@ import {
 import { calculateOverageCharge, postPaymentsToBalances } from "../../lib/billingFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import { rates } from "../../lib/billingRates";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { display } from "html2canvas/dist/types/css/property-descriptors/display";
+import { isNull } from "util";
 
 export type chargeType = {
     id: string,
@@ -38,8 +42,28 @@ export default function UserActions(
     const pathname = usePathname();
     const router = useRouter();
 
-    const download = () => {
-        // TODO: download bills as pdf's in a zip file
+    const download = async () => {
+        if (pdfRef == null || pdfRef.current == null) { return };
+        const pdf = new jsPDF();
+        const childrenArray = pdfRef.current.children;
+        for (let i = 0; i < childrenArray.length; i++) {
+            const child = childrenArray[i];
+            const style = child.getAttribute('style');
+            const canvas = await html2canvas(
+                // @ts-expect-error
+                childrenArray[i],
+                {
+                    scale: 1,
+                    logging: false,
+                }
+            );
+            if (style) { child.setAttribute('style', style) };
+            const imgData = canvas.toDataURL('image/jpeg');
+            // @ts-expect-error
+            pdf.addImage(imgData, 'JPEG', 0, 0);
+            if (i !== childrenArray.length - 1) { pdf.addPage() };
+        };
+        pdf.save(`${quarter}.pdf`);
     };
 
     const email = () => {
