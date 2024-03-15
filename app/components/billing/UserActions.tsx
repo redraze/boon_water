@@ -42,25 +42,26 @@ export default function UserActions(
     const pathname = usePathname();
     const router = useRouter();
 
-    const download = async () => {
+    const download = () => {
         if (pdfRef == null || pdfRef.current == null) { return };
         const pdf = new jsPDF();
         const childrenArray = pdfRef.current.children;
         for (let i = 0; i < childrenArray.length; i++) {
             const child = childrenArray[i];
             const style = child.getAttribute('style');
-            const canvas = await html2canvas(
+            html2canvas(
                 // @ts-expect-error
                 childrenArray[i],
                 {
                     scale: 1,
                     logging: false,
                 }
-            );
+            ).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg');
+                // @ts-expect-error
+                pdf.addImage(imgData, 'JPEG', 0, 0);
+            });
             if (style) { child.setAttribute('style', style) };
-            const imgData = canvas.toDataURL('image/jpeg');
-            // @ts-expect-error
-            pdf.addImage(imgData, 'JPEG', 0, 0);
             if (i !== childrenArray.length - 1) { pdf.addPage() };
         };
         pdf.save(`${quarter}.pdf`);
