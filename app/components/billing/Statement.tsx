@@ -19,12 +19,12 @@ export default function Statement({ id, active, info, readings, date }: Statemen
     });
 
     const totalUsage = readings[3] - readings[0];
-    const baseCharge = totalUsage > rates.baseRateThresh ? rates.gtThresh : rates.ltThresh
+    const baseCharge = totalUsage > rates.baseRateThresh ? rates.gtThresh : rates.ltThresh;
     const overageCharge = calculateOverageCharge(totalUsage);
 
     return (
         <div
-            style={ active == id ? {display: ''} : {display: 'none'} }
+            style={ active == id ? {} : {display: 'none'} }
             className={ active == id ? '' : '' }
         >
             <div>

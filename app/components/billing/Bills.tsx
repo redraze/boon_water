@@ -83,6 +83,7 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
             statementInfo={statementInfo}
             users={users}
             setMessage={setMessage}
+            usage={usage}
         />
     </>);
 };

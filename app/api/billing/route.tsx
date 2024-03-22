@@ -1,11 +1,73 @@
 import { NextResponse } from "next/server";
 import { validateRequest } from "../../lib/authFunctions";
 import { collectionConnect } from "../../lib/dbFunctions";
-import { chargeType } from "../../components/billing/UserActions";
+import { chargeType, statementType } from "../../components/billing/UserActions";
 import { balanceEntryType } from "../../lib/commonTypes";
 import { ObjectId } from "mongodb";
+import mail from "@sendgrid/mail";
+import { messageBody } from "../../lib/billingFunctions";
 
 const origin = '/billing';
+
+const sendgridApiKey = process.env.SENDGRID_API_KEY;
+const smtpEmail = process.env.SMTP_EMAIL;
+
+// send emails contianing quarterly bills to water users 
+export async function PUT(req: Request) {
+    try {
+        const { 
+            token, 
+            pathname, 
+            statements,
+            emailNote,
+            quarter
+        }: {
+            token: string, 
+            pathname: string, 
+            statements: statementType[],
+            emailNote: string
+            quarter: string
+        } = await req.json();
+        
+        const validity = await validateRequest(token, pathname, origin, 'PUT');
+        if (!validity) {
+            console.log(`message logged from [/api${origin}] PUT: token validation failed`);
+            return NextResponse.json({ success: false, validity });
+        };
+        
+        if (!sendgridApiKey) { throw new Error('sendgrid API key is not set!') };
+        mail.setApiKey(sendgridApiKey);
+        
+        if (!smtpEmail) { throw new Error('SMTP_email key is not set!') };
+        
+        let success = true;
+        statements.map(statement => {
+            mail
+                .send({
+                    to: statement.email,
+                    from: process.env.SMTP_email!,
+                    subject: `${quarter} Statement`,
+                    html: messageBody(statement, emailNote)
+                })
+
+                .then(() => {
+                    // console.log(`message sent to ${statement.name}!`);
+                })
+
+                .catch((error) => {
+                    success = false;
+                    console.log(`error thrown in [/api${origin}] PUT: ` + error);
+                });
+        });
+
+        return NextResponse.json({success, validity});
+
+    } catch (error) {
+        console.log(`error thrown in [/api${origin}] PUT: ` + error);
+        return NextResponse.json({});
+    }
+};
+
 
 // gets all water users' info and water usage data
 export async function POST(req: Request) {
