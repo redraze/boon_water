@@ -56,38 +56,43 @@ export default function UserActions(
     const pathname = usePathname();
     const router = useRouter();
 
-    // TODO: fix this function. it still has problems:
-    // 1)   accessing hidden elements
-    // 2)   no dataUrl stream (empty string)
-    // 3)   blank pdf prints (probably due to the enmpty dataUrl string)
+    const [pdfLoading, setPdfLoading] = useState(true);
+    // TODO: fix this...
     const download = () => {
-        if (pdfRef == null || pdfRef.current == null) { return };
-        const pdf = new jsPDF();
-        const childrenArray = pdfRef.current.children;
-        for (let i = 0; i < childrenArray.length; i++) {
-            const child = childrenArray[i];
-            for (let j = 0; j < child.children.length; j++) {
-                domtoimage
-                    .toJpeg(child.children[j])
-                    .then(dataUrl => {
-                            const img = new Image();
-                            img.src = dataUrl;
-                            pdf.addImage(img, 'JPEG', 0, 0, 1, 1);
-                        })
-                        .catch(error => {
-                            console.log('error', error);
-                        });
-            };
-            if (i !== usage.length - 1) { pdf.addPage() };
-        };
+        // if (pdfRef == null || pdfRef.current == null) { return };
+        // setPdfLoading(true);
+        // const pdf = new jsPDF();
+        // const childrenArray = pdfRef.current.children;
+
+        // for (let i = 0; i < childrenArray.length; i++) {
+        //     const child = childrenArray[i];
+        //     console.log(child)
+        //     // const style = child.getAttribute('style');
+        //     child.removeAttribute('style');
+
+        //     domtoimage
+        //         .toPng(child)
+        //         .then(dataUrl => {
+        //             const img = new Image();
+        //             img.src = dataUrl;
+        //             // @ts-expect-error
+        //             pdf.addImage(img, 'PNG', 0, 0);
+        //         })
+        //         .catch(error => {
+        //             console.log('error', error);
+        //         });
+                
+        //     // if (style) { child.setAttribute('style', style) };
+        //     if (i !== usage.length - 1) { pdf.addPage() };
+        // };
 
         // pdf.save(`${quarter}.pdf`);
+        // setPdfLoading(false);
     };
 
     const [emailsLoading, setEmailsLoading] = useState(false);
     const [emailsSent, setEmailsSent] = useState(false);
     const [emailNote, setEmailNote] = useState('');
-
     const email = () => {
         setEmailsLoading(true);
 
@@ -132,7 +137,6 @@ export default function UserActions(
 
     const [paymentsLoading, setPaymentsLoading] = useState(false);
     const [paymentsPosted, setPaymentsPosted] = useState(false);
-
     const postPayments = () => {
         setPaymentsLoading(true);
 
@@ -187,7 +191,12 @@ export default function UserActions(
     };
 
     return (<>
-        <button onClick={() => download()}>download bills</button>
+        <button 
+            disabled={pdfLoading} 
+            onClick={() => download()}
+        >
+            download bills
+        </button>
         
         <button 
             disabled={emailsLoading || emailsSent} 

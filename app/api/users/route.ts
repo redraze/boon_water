@@ -46,6 +46,8 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ success: false, validity });
         };
 
+        let success = true;
+
         let collection = await collectionConnect('waterUsers');
         let cursor = await collection.updateOne(
             { _id: new ObjectId(updateInfo._id) },
@@ -58,7 +60,7 @@ export async function PATCH(req: Request) {
         );
         if (cursor.modifiedCount == 0) {
             console.log(`message logged from [/api${origin}] PATCH: failed to update user's info in waterUsers collection`)
-            return NextResponse.json({ success: false, validity });
+            success = false;
         };
 
         if (nameChanged) {
@@ -69,7 +71,7 @@ export async function PATCH(req: Request) {
             );
             if (cursor.modifiedCount == 0) {
                 console.log(`message logged from [/api${origin}] PATCH: failed to update user's info in usage collection`)
-                return NextResponse.json({ success: false, validity });
+                success = false;
             };
 
             collection = await collectionConnect('balances');
@@ -79,11 +81,11 @@ export async function PATCH(req: Request) {
             );
             if (cursor.modifiedCount == 0) {
                 console.log(`message logged from [/api${origin}] PATCH: failed to update user's info in balances collection`)
-                return NextResponse.json({ success: false, validity });
+                success = false;
             };
         };
 
-        return NextResponse.json({ success: true, validity });
+        return NextResponse.json({ success, validity });
 
     } catch (error) {
         console.log(`error thrown in [/api${origin}] PATCH: ` + error);

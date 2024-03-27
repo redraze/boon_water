@@ -146,7 +146,12 @@ export const changeEmail = async (email: string, password: string) => {
  */
 export const clientSideTokenCheck = (token: string | undefined) => {
     try {
-        if (!token) { throw new Error('missing token') };
+        if (!token) { 
+            if (clientSideLoggingEnabled) {
+                console.log('auth failed! (missing token)');
+            };
+            return false;
+         };
         
         const payload = jwt.decode(
             token,

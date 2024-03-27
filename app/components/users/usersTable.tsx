@@ -84,7 +84,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
             return;
         };
 
-        const nameChanged = nameUpdate !== updateInfo.info.name;
+        const nameChanged = nameUpdate !== prevInfo.info.name;
 
         // submit changes to backend API
         editUser(pathname, updateInfo, nameChanged).then((res) => {
