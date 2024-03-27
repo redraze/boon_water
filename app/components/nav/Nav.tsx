@@ -1,6 +1,5 @@
 "use client";
 
-import css from "./Nav.module.scss";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,42 +32,85 @@ export default function Nav(props: {validity: boolean}) {
     }, [pathname]);
 
     return (<>
-        <div className={ css.nav }>
-            {
-                props.validity ? 
-                <ul>
-                    <li>
-                        <Link href='/users'>Users</Link>
-                    </li>
-                    <li>
-                        <Link href='/dataEntry'>Data Entry</Link>
-                    </li>
-                    <li>
-                        <Link href='/payments'>Payment Entry</Link>
-                    </li>
-                    <li>
-                        <Link href='/balances'>Balance History</Link>
-                    </li>
-                    <li>
-                        <Link href='/billing'>Billing</Link>
-                    </li>
-                    <li>
-                        Hi { userName }!
-                        <button onClick={ () => setProfileDrop(!profileDrop) }>
-                            [dropdown_icon]
-                        </button>
-                        <ul style={ profileDrop ? {display: "flex"} : {display: "none"} }>
-                            <li onClick={ () => router.push('/profile') }>
-                                Profile
-                            </li>
-                            <li onClick={ () => handleLogout() }>
-                                Log Out
-                            </li>
-                        </ul>
-                    </li>
-                </ul> :
-                <></>
-            }
-        </div>
+        {
+            props.validity ? <>
+                <div className="sticky top-0 flex px-10 py-1 border-b-4 border-indigo-500 bg-white flex justify-between">
+                    <ul className="flex justify-between">
+                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                            <Link 
+                                href='/users' 
+                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                            >
+                                Users
+                            </Link>
+                        </li>
+                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                            <Link 
+                                href='/dataEntry' 
+                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                            >
+                                Data Entry
+                            </Link>
+                        </li>
+                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                            <Link 
+                                href='/payments' 
+                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                            >
+                                Payment Entry
+                            </Link>
+                        </li>
+                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                            <Link 
+                                href='/balances' 
+                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                            >
+                                Balance History
+                            </Link>
+                        </li>
+                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                            <Link 
+                                href='/billing' 
+                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                            >
+                                Billing
+                            </Link>
+                        </li>
+                    </ul>
+                    <div className="flex justify-end flex">
+                        <div
+                            onMouseEnter={() => setProfileDrop(true)} 
+                            onMouseLeave={() => setProfileDrop(false)}
+                            className="relative"
+                        >
+                            <div className="py-2 flex hover:cursor-pointer">
+                                <span className="text-lg pr-2 m-auto">Hi { userName }!</span>
+                                <button className="p-2">
+                                    <img src="settings.ico" alt="[options]" className="h-6 w-6"/>
+                                </button>
+                            </div>
+                            <ul 
+                                className="absolute top-12 right-2 bg-white border-4 border-sky-500 rounded-lg w-full"
+                                style={ profileDrop ? {display: "block"} : {display: "none"} }
+                            >
+                                <li 
+                                    onClick={ () => router.push('/profile') }
+                                    className="group hover:bg-sky-500 flex transition-all py-2 px-4 hover:cursor-pointer"
+                                >
+                                    <span className="group-hover:text-white whitespace-nowrap transition-all">Profile</span>
+                                </li>
+                                <li
+                                    onClick={ () => handleLogout() }
+                                    className="group hover:bg-sky-500 flex transition-all py-2 px-4 hover:cursor-pointer"
+                                >
+                                    <span className="group-hover:text-white whitespace-nowrap transition-all">Log Out</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </> :
+            <></>
+        }
     </>);
 };

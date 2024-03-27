@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import './globals.css'
 import Session from './Session'
 import { Suspense } from 'react'
 import Spinner from './components/spinner/Spinner'

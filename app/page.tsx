@@ -1,5 +1,9 @@
 export default function IndexPage() {
   return (<>
-    <h1>Boon Water Association</h1>
+    <div 
+      className="w-vw flex mt-60 justify-center"
+    >
+      <span className="text-5xl m-auto">Boon Water Association</span>
+    </div>
   </>);
 };
