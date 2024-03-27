@@ -14,12 +14,15 @@ export default function DataEntry() {
     const pathname = usePathname();
 
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(true);
+
     const [usageData, setUsageData] = useState<waterUsageType[] | undefined>(undefined);
 
     const [usageUpdate, setUsageUpdate] = useState<usageUpdateType>({});
     type usageUpdateType = {[id: string]: waterUsageType['data']};
 
     const fetchData = () => {
+        setLoading(true);
         getData(pathname).then((ret) => {
             if (ret == undefined) {
                 setMessage(
@@ -44,7 +47,8 @@ export default function DataEntry() {
                 ret.data.map(user => { dataMap![user._id] = structuredClone(user.data) });
                 setUsageUpdate(dataMap);
             };
-        })
+        });
+        setLoading(false);
     };
     useEffect(() => { fetchData() }, []);
 
@@ -66,14 +70,13 @@ export default function DataEntry() {
         setUsageUpdate(dataMap);
     };
 
-    const [updating, setUpdating] = useState(false);
     const handleSubmit = () => {
         if (!usageUpdate) { 
             setMessage('no water usage data found.');
             return;
         };
         
-        setUpdating(true);
+        setLoading(true);
 
         const updates: patchDataType[] = [];
         usageData?.map(user => {
@@ -90,7 +93,7 @@ export default function DataEntry() {
  
         if (updates.length == 0) {
             setMessage('no changes to water usage data found.');
-            setUpdating(false);
+            setLoading(false);
             return;
         };
 
@@ -114,12 +117,12 @@ export default function DataEntry() {
             };
         });
 
-        setUpdating(false);
+        setLoading(false);
     };
 
     return (<>
         <Message text={ message } />
-        { updating ? <Spinner /> : <>
+        { loading ? <Spinner /> : <>
             <Selections 
                 setQuarter={setQuarter}
                 setYear={setYear}

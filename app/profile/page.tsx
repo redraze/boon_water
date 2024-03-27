@@ -21,7 +21,11 @@ export default function Profile() {
   
     return (<>
         <Message text={ message } />
-        <SideNav setSelection={setSelection} />
-        { inner }
+        <div className="h-screen w-full flex">
+            <div className="absolute h-screen flex">
+                <SideNav setSelection={setSelection} />
+            </div>
+            { inner }
+        </div>
     </>);
 };

@@ -6,6 +6,7 @@ import { getHistory } from "../lib/balancesFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Message from "../components/message/Message";
 import HistoryTable from "../components/balances/HistoryTable";
+import Spinner from "../components/spinner/Spinner";
 
 export default function Balances() {
     const pathname = usePathname();
@@ -65,7 +66,7 @@ export default function Balances() {
     return (<>
         <Message text={ message } />
         {
-            loading ? <></> : <>
+            loading ? <Spinner /> : <>
                 <select onChange={e => setId(e.currentTarget.value) }>{ options }</select>
                 <HistoryTable
                     id={id}

@@ -5,6 +5,7 @@ import { getAllUsers, submitPayments } from "../lib/paymentsFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Message from "../components/message/Message";
 import PaymentRow from "../components/payments/PaymentRow";
+import Spinner from "../components/spinner/Spinner";
 
 export type paymentsInfoType = {
     [id: string]: {
@@ -132,7 +133,7 @@ export default function Balances() {
     return (<>
         <Message text={ message } />
         {
-            loading || !paymentsInfo ? <></> : <>
+            loading || !paymentsInfo ? <Spinner /> : <>
                 <table>
                     <thead>
                         <tr>

@@ -12,6 +12,7 @@ import type {
 } from "../lib/commonTypes";
 import Bills from "../components/billing/Bills";
 import Selections from "../components/billing/Selections";
+import Spinner from "../components/spinner/Spinner";
 
 export default function Billing() {
     const router = useRouter();
@@ -66,7 +67,7 @@ export default function Billing() {
 
     return (<>
         <Message text={ message } />
-        { loading ? <></> : <>
+        { loading ? <Spinner /> : <>
             <Selections
                 setYear={setYear}
                 quarterState={{ value: quarter, setValue: setQuarter }}

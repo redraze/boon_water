@@ -35,46 +35,78 @@ export default function Nav(props: {validity: boolean}) {
     return (<>
         {
             props.validity ? <>
-                <div className="fixed w-full top-0 flex px-10 py-1 border-b-4 border-indigo-500 bg-white flex justify-between">
+                <div className="z-10 fixed w-full top-0 flex px-10 py-1 border-b-4 border-indigo-500 bg-white flex justify-between">
                     <ul className="flex justify-between">
-                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                        <li className="flex">
+                            <Link 
+                                href='/' 
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
+                            >
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Home
+                                </span>
+                            </Link>
+                        </li>
+                        <li className="flex">
                             <Link 
                                 href='/users' 
-                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
                             >
-                                Users
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Users
+                                </span>
                             </Link>
                         </li>
-                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                        <li className="flex">
                             <Link 
                                 href='/dataEntry' 
-                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
                             >
-                                Data Entry
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Data Entry
+                                </span>
                             </Link>
                         </li>
-                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                        <li className="flex">
                             <Link 
                                 href='/payments' 
-                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
                             >
-                                Payment Entry
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Payment Entry
+                                </span>
                             </Link>
                         </li>
-                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                        <li className="flex">
                             <Link 
                                 href='/balances' 
-                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
                             >
-                                Balance History
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Balance History
+                                </span>
                             </Link>
                         </li>
-                        <li className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'>
+                        <li className="flex">
                             <Link 
                                 href='/billing' 
-                                className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
                             >
-                                Billing
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Billing
+                                </span>
                             </Link>
                         </li>
                     </ul>

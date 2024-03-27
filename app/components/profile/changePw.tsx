@@ -26,29 +26,41 @@ export default function ChangePw({ setMessage }: { setMessage: voidFunc<string> 
         };
     };
 
-    return (<div>
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-            <label>
-                Old password:
-                <input
-                    type="password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    required
-                />
-            </label>
-            <br />
-            <label>
-                New password:
-                <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                />
-            </label>
-            <br />
-            <button type="submit">Change password</button>
-        </form>
-    </div>);
+    return (
+        <div className="flex m-auto pt-10">
+            <form 
+                className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+                onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+            >
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Old password:
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        required
+                    />
+                </label>
+                <br />
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    New password:
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                    />
+                </label>
+                <br />
+                <button
+                    className="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="submit"
+                >
+                    Change password
+                </button>
+            </form>
+        </div>
+    );
 };

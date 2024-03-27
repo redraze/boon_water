@@ -14,9 +14,10 @@ export default function Users() {
 
     const [message, setMessage] = useState('');
     const [users, setUsers] = useState<userInfo[] | undefined>(undefined);
-    const [updating, setUpdating] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setLoading(true);
         getAllUsers(pathname).then((ret) => {
             if (ret == undefined) {
                 setMessage(
@@ -37,6 +38,7 @@ export default function Users() {
                 };
             };
         });
+        setLoading(false);
     }, []);
     
     return (<>
@@ -44,12 +46,12 @@ export default function Users() {
         <UsersTable 
             usersState={{ value: users, setValue: setUsers }}
             setMessage={ setMessage }
-            updatingState={{ value: updating, setValue: setUpdating }}
+            updatingState={{ value: loading, setValue: setLoading }}
         />
         <AddUserModal
             usersState={{ value: users, setValue: setUsers }}
             setMessage={ setMessage }
-            updatingState={{ value: updating, setValue: setUpdating }}
+            updatingState={{ value: loading, setValue: setLoading }}
         />
     </>);
 };
