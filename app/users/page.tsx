@@ -43,15 +43,19 @@ export default function Users() {
     
     return (<>
         <Message text={message} />
-        <UsersTable 
-            usersState={{ value: users, setValue: setUsers }}
-            setMessage={ setMessage }
-            updatingState={{ value: loading, setValue: setLoading }}
-        />
-        <AddUserModal
-            usersState={{ value: users, setValue: setUsers }}
-            setMessage={ setMessage }
-            updatingState={{ value: loading, setValue: setLoading }}
-        />
+        <div className="h-screen w-full flex p-32">
+            <div className="flex flex-col w-full mx-auto">
+                <UsersTable 
+                    usersState={{ value: users, setValue: setUsers }}
+                    setMessage={ setMessage }
+                    updatingState={{ value: loading, setValue: setLoading }}
+                />
+                <AddUserModal
+                    usersState={{ value: users, setValue: setUsers }}
+                    setMessage={ setMessage }
+                    updatingState={{ value: loading, setValue: setLoading }}
+                />
+            </div>
+        </div>
     </>);
 };

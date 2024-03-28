@@ -95,7 +95,15 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
     };
 
     return(<>
-        <button onClick={ () => setActive(true) }>Add New User</button>
+        <div className="w-full flex pt-6">
+            <button
+                onClick={ () => setActive(true) }
+                className=" m-auto border-sky-600 border-2 bg-white hover:bg-blue-600 hover:text-white font-bold py-2 px-4 rounded"
+            >
+                Add New User
+            </button>
+        </div>
+
         <div style={ active ? { "display": "flex" } : { "display": "none" } }>
             { updating ? <Spinner /> : <>
                 <button onClick={ () => {setActive(false), resetInfo()} }>[close_icon]</button>

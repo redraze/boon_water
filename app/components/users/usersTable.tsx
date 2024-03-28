@@ -6,6 +6,7 @@ import { editUser } from "../../lib/usersFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import DeleteUserModal from "./deleteUserModal";
 import Spinner from "../spinner/Spinner";
+import Image from "next/image";
 
 type usersTablePropsType = {
     usersState: stateType<userInfo[] | undefined>
@@ -130,54 +131,76 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
    
     return(<>
         { updating ? <Spinner /> :
-            <table>
+            <table className="mx-auto w-full text-left table-auto">
                 {
                     users ? <>
-                        <thead>
+                        <thead className="uppercase">
                             <tr>
-                                <th>name</th>
-                                <th>address</th>
-                                <th>email</th>
-                                <th>balance</th>
-                                <th>comp</th>
-                                <th></th>
-                                <th></th>
+                                <th className="bg-sky-400 p-2 border-black border-2">name</th>
+                                <th className="bg-sky-400 p-2 border-black border-2">address</th>
+                                <th className="bg-sky-400 p-2 border-black border-2">email</th>
+                                <th className="bg-sky-400 p-2 border-black border-2">balance</th>
+                                <th className="bg-sky-400 p-2 border-black border-2">comp</th>
+                                <th className=""></th>
+                                <th className=""></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="">
                             { 
                                 users?.map((user: userInfo) => {
                                     return(prevInfo?._id == user._id ?
                                         <tr key={ user._id }>
-                                            <td><input
-                                                type="text"
-                                                value={ nameUpdate }
-                                                onChange={(e) => setNameUpdate(e.target.value) }
-                                            ></input></td>
-                                            <td><input
-                                                type="text"
-                                                value={ addressUpdate }
-                                                onChange={(e) => setAddressUpdate(e.target.value) }
-                                            ></input></td>
-                                            <td><input
-                                                type="text"
-                                                value={ emailUpdate }
-                                                onChange={(e) => setEmailUpdate(e.target.value) }
-                                            ></input></td>
+                                            <td>
+                                                <input
+                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    type="text"
+                                                    value={ nameUpdate }
+                                                    onChange={(e) => setNameUpdate(e.target.value) }
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    type="text"
+                                                    value={ addressUpdate }
+                                                    onChange={(e) => setAddressUpdate(e.target.value) }
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    type="text"
+                                                    value={ emailUpdate }
+                                                    onChange={(e) => setEmailUpdate(e.target.value) }
+                                                />
+                                            </td>
                                             <td>{ formatter.format(balance) }</td>
-                                            <td><input 
-                                                type="checkbox"
-                                                defaultChecked={ user.info.comp }
-                                                onChange={e => setComp(e.currentTarget.checked)}
-                                            /></td>
+                                            <td className="h-full \">
+                                                <input 
+                                                    className="flex m-auto w-6 h-6"
+                                                    type="checkbox"
+                                                    defaultChecked={ user.info.comp }
+                                                    onChange={e => setComp(e.currentTarget.checked)}
+                                                />
+                                            </td>
                                             <td>
                                                 <button onClick={ () => resetInfo() }>
-                                                    [Cancel]
+                                                <Image
+                                                    src="/back.ico"
+                                                    alt="[back]"
+                                                    height={30}
+                                                    width={30}
+                                                /> 
                                                 </button>
                                             </td>
                                             <td>
                                                 <button onClick={ () => updateUser() }>
-                                                    [Submit]
+                                                    <Image
+                                                        src="/save.ico"
+                                                        alt="[save]"
+                                                        height={25}
+                                                        width={25}
+                                                    /> 
                                                 </button>
                                             </td>
                                             <td></td>
@@ -187,10 +210,30 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                             <td>{ user.info.address }</td>
                                             <td>{ user.info.email }</td>
                                             <td>{ formatter.format(user.info.balance) }</td>
-                                            <td>{ user.info.comp ? 'yes' : 'no' }</td>
+                                            <td>{ user.info.comp ? 
+                                                <Image 
+                                                    className="flex m-auto"
+                                                    src="/checked.ico"
+                                                    alt="yes"
+                                                    height={40}
+                                                    width={40}
+                                                /> : 
+                                                <Image 
+                                                    className="flex m-auto"
+                                                    src="/close.ico"
+                                                    alt="no"
+                                                    height={30}
+                                                    width={30}
+                                                />
+                                            }</td>
                                             <td>
                                                 <button onClick={ () => setUpdateInfo(user) }>
-                                                    [Edit User]
+                                                    <Image
+                                                        src="/edit.ico"
+                                                        alt="[edit]"
+                                                        height={25}
+                                                        width={25}
+                                                    />
                                                 </button>
                                             </td>
                                             <td>
@@ -201,7 +244,12 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                         id: user._id
                                                     });
                                                 }}>
-                                                    [Delete User]
+                                                    <Image
+                                                        src="/delete.ico"
+                                                        alt="[delete]"
+                                                        height={20}
+                                                        width={20}
+                                                    />
                                                 </button>
                                             </td>
                                         </tr>
