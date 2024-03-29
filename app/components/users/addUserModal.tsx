@@ -95,7 +95,7 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
     };
 
     return(<>
-        <div className="fixed w-full flex pb-6 bottom-0 left-0">
+        <div className="fixed flex pb-6 bottom-0 left-0 left-1/2 transform -translate-x-1/2">
             <button
                 onClick={ () => { resetInfo(), setActive(true) } }
                 className=" m-auto border-sky-600 border-2 bg-white hover:bg-sky-600 hover:text-white font-bold py-2 px-4 rounded"
@@ -122,8 +122,8 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
                                     className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal"
                                     onClick={ () => {setActive(false)} }
                                 >
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    <svg className="w-3 h-3" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                                     </svg>
                                     <span className="sr-only">Close modal</span>
                                 </button>
@@ -181,7 +181,7 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
                                     type="submit" 
                                     className="text-white inline-flex items-center bg-sky-700 hover:bg-sky-800 focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-lg px-5 py-2.5 text-center dark:bg-sky-600 dark:hover:bg-sky-700 dark:focus:ring-sky-800"
                                 >
-                                    <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                                    <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"></path></svg>
                                     Add new user
                                 </button>
                             </form>
