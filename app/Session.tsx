@@ -39,7 +39,7 @@ export default function Session({
 
                         // user was redirected to index page after successful login attempt
                         if (searchParams.get('loginSuccessful') == 'true') {
-                            setMessage('You have been logged in.');
+                            setMessage('Login successful!');
                         };
 
                         // authenticated user attmpted to navigate to the login page
