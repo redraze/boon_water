@@ -10,7 +10,7 @@ export default function TableHead({ quarter }: { quarter: quarterType }) {
     };
     
     return (<>
-        <thead>
+        <thead className="bg-gray-500 text-white uppercase text-xl">
             <tr>
                 <td></td>
                 <td>{ monthsTable[1][quarter] }</td>

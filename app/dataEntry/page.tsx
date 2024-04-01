@@ -123,46 +123,72 @@ export default function DataEntry() {
     return (<>
         <Message text={ message } />
         { loading ? <Spinner /> : <>
-            <Selections 
-                setQuarter={setQuarter}
-                setYear={setYear}
-                resetUsage={resetUsage}
-            />
+            <div className="p-32 h-screen w-full">
+                <div className="flex w-full justify-between mb-10">
+                    <Selections 
+                        setQuarter={setQuarter}
+                        setYear={setYear}
+                        resetUsage={resetUsage}
+                    />
 
-            <button onClick={ () => resetUsage() }>
-                Clear changes.
-            </button>
+                    <button
+                        className="bg-gray-200 border-2 border-sky-500 hover:bg-sky-500 hover:text-white rounded-lg p-2 text-l uppercase"
+                        onClick={ () => resetUsage() }
+                    >
+                        clear changes
+                    </button>
 
-            <button onClick={ () => handleSubmit() }>
-                Submit changes for { quarter }, { year == 'cur' ? 'current year' : 'previous year'}.
-            </button>
+                    <button 
+                        className="bg-gray-200 border-2 border-sky-500 hover:bg-sky-500 hover:text-white rounded-lg p-2 text-l uppercase"
+                        onClick={ () => handleSubmit() }
+                    >
+                        Submit changes for <b>{ quarter }, { year == 'cur' ? 'current year' : 'previous year'}</b>
+                    </button>
+                </div>
 
-            <table>
-                <TableHead quarter={quarter} />
-                <tbody>
-                    {
-                        usageData?.map(user => {
-                            return(
-                                <tr key={user._id}>
-                                    <td>{ user.name }</td>
-                                    <td><input
-                                        onChange={(e) => updateUsage(user._id, 1, e.currentTarget.value)}
-                                        value={usageUpdate[user._id][year][quarter][1]}
-                                    /></td>
-                                    <td><input
-                                        onChange={(e) => updateUsage(user._id, 2, e.currentTarget.value)}
-                                        value={usageUpdate[user._id][year][quarter][2]}
-                                    /></td>
-                                    <td><input
-                                        onChange={(e) => updateUsage(user._id, 3, e.currentTarget.value)}
-                                        value={usageUpdate[user._id][year][quarter][3]}
-                                    /></td>
-                                </tr>
-                            );
-                        })
-                    }
-                </tbody>
-            </table>
+                <table className="w-full">
+                    <TableHead quarter={quarter} />
+                    <tbody>
+                        {
+                            usageData?.map((user, idx) => {
+                                return(
+                                    <tr
+                                        className={ 
+                                            idx % 2 ? 
+                                                'bg-gray-300' :
+                                                'bg-gray-100'
+                                        }
+                                        key={user._id}
+                                    >
+                                        <td className="text-xl">{ user.name }</td>
+                                        <td>
+                                            <input
+                                                className="p-1 my-2 rounded-lg"
+                                                onChange={(e) => updateUsage(user._id, 1, e.currentTarget.value)}
+                                                value={usageUpdate[user._id][year][quarter][1]}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                className="p-1 my-2 rounded-lg"
+                                                onChange={(e) => updateUsage(user._id, 2, e.currentTarget.value)}
+                                                value={usageUpdate[user._id][year][quarter][2]}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                className="p-1 my-2 rounded-lg"
+                                                onChange={(e) => updateUsage(user._id, 3, e.currentTarget.value)}
+                                                value={usageUpdate[user._id][year][quarter][3]}
+                                            />
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        }
+                    </tbody>
+                </table>
+            </div>
         </> }
     </>);
 };
