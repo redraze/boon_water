@@ -5,6 +5,7 @@ import { patchHistory } from "../../lib/balancesFunctions";
 import { balanceHistoryDictType, stateType, voidFunc } from "../../lib/commonTypes";
 import { usePathname, useRouter } from "next/navigation";
 import EntryRow from "./EntryRow";
+import Image from "next/image";
 
 type TransactionModalPropTypes = {
     id: string,
@@ -79,7 +80,7 @@ export default function BalanceCorrection(
                 setHistory(draft);
 
                 setInnerCur([
-                    <EntryRow key={ret.entry.timeStamp} entry={ ret.entry } />
+                    <EntryRow key={ret.entry.timeStamp} entry={ ret.entry } n={innerCur.length % 2 + 1} />
                     , ...innerCur
                 ]);
 
@@ -143,12 +144,13 @@ export default function BalanceCorrection(
     };
 
     return (<>
-        <tr>
+        <tr className="bg-gray-100">
             <td></td>
             <td></td>
 
             <td>
                 <input 
+                    className="m-2 rounded-lg p-2 text-l"
                     value={balanceChange} 
                     onChange={ (e) => balanceChangeCalc(e.currentTarget.value) }
                 />
@@ -156,20 +158,37 @@ export default function BalanceCorrection(
 
             <td>
                 <input
+                    className="m-2 rounded-lg p-2 text-l"
                     value={newBalance}
                     onChange={ (e) => newBalanceCalc(e.currentTarget.value) }
                 />
             </td>
             <td>
                 <input 
+                    className="m-2 rounded-lg p-2 text-l"
                     value={description}
                     placeholder="payment, late fee, etc..."
                     onChange={ (e) => setDescription(e.currentTarget.value) }
                 />
             </td>
 
-            <td><button onClick={() => reset()}>[clear]</button></td>
-            <td><button onClick={() => handleSubmit()}>[submit]</button></td>
+            <td className="bg-white pl-2">
+                <button
+                    className="bg-white border-2 border-gray-200 hover:bg-gray-200 rounded-lg p-2 text-xl"
+                    onClick={() => reset()}
+                >
+                    Clear
+                </button>
+            </td>
+            
+            <td className="bg-white">
+                <button 
+                    className="bg-white border-2 border-sky-500 hover:text-white hover:bg-sky-500 rounded-lg p-2 text-xl"
+                    onClick={() => handleSubmit()}
+                >
+                    Post Entry
+                </button>
+            </td>
         </tr>
     </>);
 };

@@ -51,7 +51,15 @@ export default function Balances() {
                         prev: user.prev,
                         cur: user.cur
                     };
-                    optionsDraft.push(<option key={user._id} value={user._id}>{ user.name }</option>);
+                    optionsDraft.push(
+                        <option
+                            className="text-xl"
+                            key={user._id}
+                            value={user._id}
+                        >
+                            { user.name }
+                        </option>
+                    );
                 });
 
                 setHistory(historyDraft);
@@ -63,17 +71,37 @@ export default function Balances() {
         setLoading(false);
     }, []);
 
+    const [year, setYear] = useState('cur');
+
     return (<>
         <Message text={ message } />
         {
             loading ? <Spinner /> : <>
-                <select onChange={e => setId(e.currentTarget.value) }>{ options }</select>
-                <HistoryTable
-                    id={id}
-                    historyState={{value: history, setValue: setHistory}}
-                    setMessage={setMessage}
-                    setLoading={setLoading}
-                />
+                <div className="p-32">
+                    <div className="w-full pb-4">
+                        <select 
+                            className="border-gray-300 focus:border-sky-500 border-2 p-2 m-2 rounded-lg text-xl"
+                            onChange={e => setId(e.currentTarget.value) }
+                        >
+                            { options }
+                        </select>
+                        <select 
+                            className="border-gray-300 focus:border-sky-500 border-2 p-2 m-2 rounded-lg text-xl"
+                            onChange={(e) => setYear(e.currentTarget.value)}
+                        >
+                            <option value='cur'>Current Year</option>
+                            <option value='prev'>Previous Year</option>
+                        </select>
+                    </div>
+                    
+                    <HistoryTable
+                        id={id}
+                        historyState={{value: history, setValue: setHistory}}
+                        setMessage={setMessage}
+                        setLoading={setLoading}
+                        year={year}
+                    />
+                </div>
             </>
         }
     </>);
