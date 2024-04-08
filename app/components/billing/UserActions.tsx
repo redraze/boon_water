@@ -191,39 +191,44 @@ export default function UserActions(
     };
 
     return (<>
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t-4 border-sky-500">
-            <div className="w-full flex justify-center">
+        <div className="w-full border-b-4 border-t-2 border-sky-500 flex mt-8 py-8">
+            <div className="w-full flex justify-between px-10">
                 <button 
-                    className="border-2 border-gray-400 p-2 m-2 text-xl bg-gray-200 text-gray-400 rounded-lg"
-                    // className="border-2 border-sky-500 p-2 m-2 text-xl hover:bg-sky-500 hover:text-white rounded-lg"
+                    className="border-2 border-gray-400 p-2 m-2 bg-gray-200 text-gray-400 rounded-lg"
                     disabled={pdfLoading} 
                     onClick={() => download()}
                 >
                     download bills
                 </button>
                 
-                <button 
-                    className="border-2 border-sky-500 p-2 m-2 text-xl hover:bg-sky-500 hover:text-white rounded-lg"
-                    disabled={emailsLoading || emailsSent} 
-                    onClick={() => email()}
-                >
-                    {
-                        emailsSent ? 
-                        <span>{quarter} emails already sent!</span> :
-                        <span>email bills to water users</span>
-                    }
-                </button>
-                <input 
-                    className="border-2 m-2 p-2 rounded-lg focus:border-sky-500"
-                    disabled={emailsLoading || emailsSent} 
-                    value={emailNote} 
-                    onChange={e => { setEmailNote(e.currentTarget.value) }}
-                    type="text" 
-                    placeholder="(optional note to water users)"
-                />
+                {/* <div className="border-x-2 border-sky-500"></div> */}
+
+                <div>
+                    <button 
+                        className="border-2 border-sky-500 p-2 m-2 hover:bg-sky-500 hover:text-white rounded-lg"
+                        disabled={emailsLoading || emailsSent} 
+                        onClick={() => email()}
+                    >
+                        {
+                            emailsSent ? 
+                            <span>{quarter} emails already sent!</span> :
+                            <span>email bills to water users</span>
+                        }
+                    </button>
+                    <input 
+                        className="border-2 m-2 p-2 rounded-lg focus:border-sky-500"
+                        disabled={emailsLoading || emailsSent} 
+                        value={emailNote} 
+                        onChange={e => { setEmailNote(e.currentTarget.value) }}
+                        type="text" 
+                        placeholder="(optional note to water users)"
+                    />
+                </div>
                 
+                {/* <div className="border-x-2 border-sky-500"></div> */}
+
                 <button 
-                    className="border-2 border-sky-500 p-2 m-2 text-xl hover:bg-sky-500 hover:text-white rounded-lg"
+                    className="border-2 border-sky-500 p-2 m-2 hover:bg-sky-500 hover:text-white rounded-lg"
                     disabled={paymentsLoading || paymentsPosted} 
                     onClick={() => postPayments()}
                 >

@@ -60,15 +60,16 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
         />
 
         {/* username tabs */}
-        <div className="w-full flex border-b-2 border-t-2 border-gray-500 my-4">
+        <div className="fixed flex bottom-0 left-0 w-full bg-white border-t-4 border-sky-500 text-l">
+        {/* TODO: make this div horizontally scrollable (using inline-block ?) */}
             {
                 usage.map(entry => {
                     return (<div
                         key={entry._id}
                         onClick={ () => setActive(entry._id) }
                         className={ entry._id == active ? 
-                            'bg-white text-sky-500 p-1 m-1 rounded-lg border-2 border-sky-500' :
-                            'text-gray-200 bg-gray-400 p-1 m-1 rounded-lg border-2'
+                            'hover:cursor-pointer bg-white text-sky-500 p-1 m-1 rounded-lg border-2 border-sky-500' :
+                            'hover:cursor-pointer text-gray-200 bg-gray-400 p-1 m-1 rounded-lg border-2'
                         }
                     >
                         {entry.name}
@@ -78,7 +79,7 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
         </div>
 
         {/* selected user's statement */}
-        <div ref={pdfRef} className="pb-32">
+        <div ref={pdfRef} className="pb-10">
             {
                 Object.entries(statementInfo).map(([id, readings]) => {
                     return (
