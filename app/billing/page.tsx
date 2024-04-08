@@ -68,21 +68,23 @@ export default function Billing() {
     return (<>
         <Message text={ message } />
         { loading ? <Spinner /> : <>
-            <Selections
-                setYear={setYear}
-                quarterState={{ value: quarter, setValue: setQuarter }}
-            />
-            {
-                (year && quarter) ? 
-                    <Bills
-                        users={users}
-                        usage={usage}
-                        year={year}
-                        quarter={quarter}
-                        setMessage={setMessage}
-                    />
-                    : <></>
-            }
+            <div className="p-20 w-full h-screen">
+                <Selections
+                    setYear={setYear}
+                    quarterState={{ value: quarter, setValue: setQuarter }}
+                />
+                {
+                    (year && quarter) ? 
+                        <Bills
+                            users={users}
+                            usage={usage}
+                            year={year}
+                            quarter={quarter}
+                            setMessage={setMessage}
+                        />
+                        : <></>
+                }
+            </div>
         </>}
     </>);
 };

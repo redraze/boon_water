@@ -50,18 +50,35 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
     const pdfRef = useRef(null);
 
     return(<>
-        {
-            usage.map(entry => {
-                return (<div
-                    key={entry._id}
-                    className={ entry._id == active ? 'tab_active' : 'tab_inactive' }
-                    onClick={ () => setActive(entry._id) }
-                >
-                    {entry.name}
-                </div>);
-            })
-        }
-        <div ref={pdfRef}>
+        <UserActions 
+            quarter={quarter}
+            pdfRef={pdfRef}
+            statementInfo={statementInfo}
+            users={users}
+            setMessage={setMessage}
+            usage={usage}
+        />
+
+        {/* username tabs */}
+        <div className="w-full flex border-b-2 border-t-2 border-gray-500 my-4">
+            {
+                usage.map(entry => {
+                    return (<div
+                        key={entry._id}
+                        onClick={ () => setActive(entry._id) }
+                        className={ entry._id == active ? 
+                            'bg-white text-sky-500 p-1 m-1 rounded-lg border-2 border-sky-500' :
+                            'text-gray-200 bg-gray-400 p-1 m-1 rounded-lg border-2'
+                        }
+                    >
+                        {entry.name}
+                    </div>);
+                })
+            }
+        </div>
+
+        {/* selected user's statement */}
+        <div ref={pdfRef} className="pb-32">
             {
                 Object.entries(statementInfo).map(([id, readings]) => {
                     return (
@@ -77,13 +94,5 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
                 })
             }
         </div>
-        <UserActions 
-            quarter={quarter}
-            pdfRef={pdfRef}
-            statementInfo={statementInfo}
-            users={users}
-            setMessage={setMessage}
-            usage={usage}
-        />
     </>);
 };
