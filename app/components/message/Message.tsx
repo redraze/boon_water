@@ -14,7 +14,7 @@ export default function Message({ text }: { text: string }) {
     return(<>
         {
             text ? <>
-                <div className={ vis ? "absolute bottom-10 w-screen z-50" : "hidden" }>
+                <div className={ vis ? "fixed bottom-10 w-screen z-50" : "hidden" }>
                     <div className="w-fit m-auto flex justify-center bg-white rounded-lg p-2 border-4 border-sky-500">
                         <span
                             className="flex justify-center px-4 m-auto"

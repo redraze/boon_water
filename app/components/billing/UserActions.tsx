@@ -195,17 +195,18 @@ export default function UserActions(
             <div className="w-full flex justify-between px-10">
                 <button 
                     className="border-2 border-gray-400 p-2 m-2 bg-gray-200 text-gray-400 rounded-lg"
-                    disabled={pdfLoading} 
+                    disabled 
                     onClick={() => download()}
                 >
                     download bills
                 </button>
                 
-                {/* <div className="border-x-2 border-sky-500"></div> */}
-
                 <div>
                     <button 
-                        className="border-2 border-sky-500 p-2 m-2 hover:bg-sky-500 hover:text-white rounded-lg"
+                        className={ emailsLoading || emailsSent ? 
+                            "border-2 border-gray-400 p-2 m-2 bg-gray-200 text-gray-400 rounded-lg" :
+                            "border-2 border-sky-500 p-2 m-2 hover:bg-sky-500 hover:text-white rounded-lg"
+                        }
                         disabled={emailsLoading || emailsSent} 
                         onClick={() => email()}
                     >
@@ -225,10 +226,11 @@ export default function UserActions(
                     />
                 </div>
                 
-                {/* <div className="border-x-2 border-sky-500"></div> */}
-
                 <button 
-                    className="border-2 border-sky-500 p-2 m-2 hover:bg-sky-500 hover:text-white rounded-lg"
+                    className={ paymentsLoading || paymentsPosted ?
+                        "border-2 border-gray-400 p-2 m-2 bg-gray-200 text-gray-400 rounded-lg" :
+                        "border-2 border-sky-500 p-2 m-2 hover:bg-sky-500 hover:text-white rounded-lg"
+                    }
                     disabled={paymentsLoading || paymentsPosted} 
                     onClick={() => postPayments()}
                 >
