@@ -55,13 +55,13 @@ export default function PaymentRow({ id, info, paymentsInfoState, setMessage, re
                     value={payment}
                     onChange={ e => attmeptSetPayment(e.currentTarget.value) }
                     onBlur={ () => {
-                        const draft = paymentsInfo;
-                        paymentsInfo![id] = {
-                            name: info.name,
-                            payment: payment,
-                            balance: newBalance
-                        };
-                        setPaymentsInfo(draft);
+                        setPaymentsInfo({
+                            ...paymentsInfo,
+                            [id]: {
+                                ...info,
+                                payment
+                            }
+                        });
                     } }
                 />
             </td>

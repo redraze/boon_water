@@ -66,13 +66,14 @@ export async function PATCH(req: Request) {
 
         // push balance entries (payments) to users' balance histories
         let collection = await collectionConnect('balances');
+        const timeStamp = new Date().valueOf();
         payments.map(async paymentInfo => {
             if (!paymentInfo) { return };
             const entry: balanceEntryType = {
-                timeStamp: new Date().valueOf(),
+                timeStamp,
                 note: note,
                 balanceChange: paymentInfo.payment * -1,
-                newBalance: paymentInfo.balance
+                newBalance: Math.round((paymentInfo.balance - paymentInfo.payment) * 100) / 100
             };
             const cursor = await collection.updateOne(
                 { _id: new ObjectId(paymentInfo.id) },
@@ -98,7 +99,9 @@ export async function PATCH(req: Request) {
             if (!paymentInfo) { return };
             const cursor = await collection.updateOne(
                 { _id: new ObjectId(paymentInfo.id) },
-                { $set: { 'info.balance': paymentInfo.balance } }
+                { $set: { 
+                    'info.balance': Math.round((paymentInfo.balance - paymentInfo.payment) * 100) / 100 
+                } }
             );
             if (!cursor.modifiedCount) { success = false };
         });

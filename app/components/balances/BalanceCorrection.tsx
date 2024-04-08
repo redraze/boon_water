@@ -5,7 +5,6 @@ import { patchHistory } from "../../lib/balancesFunctions";
 import { balanceHistoryDictType, stateType, voidFunc } from "../../lib/commonTypes";
 import { usePathname, useRouter } from "next/navigation";
 import EntryRow from "./EntryRow";
-import Image from "next/image";
 
 type TransactionModalPropTypes = {
     id: string,

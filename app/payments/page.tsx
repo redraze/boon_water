@@ -109,14 +109,13 @@ export default function Balances() {
                     return;
                 };
 
-                setPaymentsInfo(() => {
-                    const draft: paymentsInfoType = paymentsInfo;
-                    payments.map(info => {
-                        if (!info?.payment) { return };
-                        draft[info?.id] = {
-                            ...draft[info?.id],
+                // update chached data
+                setPaymentsInfo((draft: paymentsInfoType = {}) => {
+                    payments.map(p => {
+                        draft[p.id] = {
+                            name: p.name,
                             payment: 0,
-                            balance: info?.balance
+                            balance: p.balance - p.payment
                         };
                     });
                     return draft;
