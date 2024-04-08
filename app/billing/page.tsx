@@ -13,6 +13,7 @@ import type {
 import Bills from "../components/billing/Bills";
 import Selections from "../components/billing/Selections";
 import Spinner from "../components/spinner/Spinner";
+import { wellHeadId } from "../lib/settings";
 
 export default function Billing() {
     const router = useRouter();
@@ -44,13 +45,22 @@ export default function Billing() {
 
             } else {
                 if (
-                    !ret.data || !ret.data.length 
+                    !ret.data || ret.data.length <= 1
                     || !ret.users || !ret.users.length
                 ) {
                     setMessage('No water usage data available.');
+                    setLoading(false);
                     return;
                 };
-                setUsage(ret.data!);
+
+                // include all water user data except well head readings
+                let usageDraft: waterUsageType[] = [];
+                ret.data?.map(item => {
+                    if (item._id !== wellHeadId) {
+                        usageDraft.push(item);
+                    };
+                });
+                setUsage(usageDraft);
 
                 const tempUsers: usersInfoDictType = {};
                 ret.users.map(user => {

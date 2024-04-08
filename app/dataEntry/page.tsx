@@ -8,6 +8,7 @@ import Message from "../components/message/Message";
 import Spinner from "../components/spinner/Spinner";
 import Selections from "../components/dataEntry/Selections";
 import TableHead from "../components/dataEntry/TableHead";
+import { wellHeadId } from "../lib/settings";
 
 export default function DataEntry() {
     const router = useRouter();
@@ -17,9 +18,11 @@ export default function DataEntry() {
     const [loading, setLoading] = useState(true);
 
     const [usageData, setUsageData] = useState<waterUsageType[] | undefined>(undefined);
-
     const [usageUpdate, setUsageUpdate] = useState<usageUpdateType>({});
     type usageUpdateType = {[id: string]: waterUsageType['data']};
+    
+    const [wellHeadUsage, setWellHeadUsage] = useState<waterUsageType | undefined>(undefined);
+    const [wellHeadUsageUpdate, setWellHeadUsageUpdate] = useState<waterUsageType>();
 
     const fetchData = () => {
         setLoading(true);
@@ -37,15 +40,29 @@ export default function DataEntry() {
                 router.push('/login' + '?loginRequired=true')
 
             } else {
-                setUsageData(ret.data);
                 if (!ret.data) {
                     setMessage('No water usage data available.');
                     return;
                 };
                 
-                let dataMap: usageUpdateType = {};
-                ret.data.map(user => { dataMap![user._id] = structuredClone(user.data) });
-                setUsageUpdate(dataMap);
+                // just water users data
+                let usageDataDraft: waterUsageType[] = [];
+
+                // just well head readings
+                let usageUpdateDraft: usageUpdateType = {};
+
+                ret.data.map(user => { 
+                    if (user._id == wellHeadId) {
+                        setWellHeadUsage(user);
+                        setWellHeadUsageUpdate(user);
+                    } else {
+                        usageUpdateDraft![user._id] = structuredClone(user.data);
+                        usageDataDraft.push(user);
+                    };
+                });
+
+                setUsageData(usageDataDraft);
+                setUsageUpdate(usageUpdateDraft);
             };
         });
         setLoading(false);
@@ -64,10 +81,37 @@ export default function DataEntry() {
         });
     };
 
+    const updateWellHeadUsage = (month: 1 | 2 | 3, val: string) => {
+        if (
+            isNaN(Number(val)) 
+            || wellHeadUsage == undefined
+        ) { 
+            return;
+        };
+
+        setWellHeadUsageUpdate({
+            ...wellHeadUsageUpdate!,
+            data: {
+                ...wellHeadUsageUpdate!.data,
+                [year]: {
+                    ...wellHeadUsageUpdate?.data[year],
+                    [quarter]: {
+                        ...wellHeadUsageUpdate?.data[year][quarter],
+                        [month]: Number(val)
+                    }
+                }
+            }
+        });
+    };
+
     const resetUsage = () => {
-        let dataMap: usageUpdateType = {};
-        usageData?.map(user => { dataMap[user._id] = structuredClone(user.data) });
-        setUsageUpdate(dataMap);
+        let usageUpdateDraft: usageUpdateType = {};
+        usageData?.map(user => {
+            usageUpdateDraft[user._id] = structuredClone(user.data)
+        });
+        setUsageUpdate(usageUpdateDraft);
+
+        setWellHeadUsageUpdate(wellHeadUsage);
     };
 
     const handleSubmit = () => {
@@ -79,6 +123,8 @@ export default function DataEntry() {
         setLoading(true);
 
         const updates: patchDataType[] = [];
+
+        // check for updates in water users' readings
         usageData?.map(user => {
             const before = JSON.stringify(user.data);
             const after = JSON.stringify(usageUpdate[user._id]);
@@ -91,6 +137,14 @@ export default function DataEntry() {
             };
         });
  
+        // check for updates in well head readings
+        if (wellHeadUsage !== wellHeadUsageUpdate) {
+            updates.push({
+                id: wellHeadId,
+                update: wellHeadUsageUpdate?.data!
+            });
+        };
+
         if (updates.length == 0) {
             setMessage('no changes to water usage data found.');
             setLoading(false);
@@ -149,43 +203,70 @@ export default function DataEntry() {
                 <table className="w-full">
                     <TableHead quarter={quarter} />
                     <tbody>
-                        {
-                            usageData?.map((user, idx) => {
-                                return(
-                                    <tr
-                                        className={ 
-                                            idx % 2 ? 
-                                                'bg-gray-300' :
-                                                'bg-gray-100'
-                                        }
-                                        key={user._id}
-                                    >
-                                        <td className="text-xl">{ user.name }</td>
-                                        <td>
-                                            <input
-                                                className="p-1 my-2 rounded-lg"
-                                                onChange={(e) => updateUsage(user._id, 1, e.currentTarget.value)}
-                                                value={usageUpdate[user._id][year][quarter][1]}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                className="p-1 my-2 rounded-lg"
-                                                onChange={(e) => updateUsage(user._id, 2, e.currentTarget.value)}
-                                                value={usageUpdate[user._id][year][quarter][2]}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                className="p-1 my-2 rounded-lg"
-                                                onChange={(e) => updateUsage(user._id, 3, e.currentTarget.value)}
-                                                value={usageUpdate[user._id][year][quarter][3]}
-                                            />
-                                        </td>
-                                    </tr>
-                                );
-                            })
+                        {/* well head readings */}
+                        { wellHeadUsageUpdate == undefined ? <></> : 
+                            <tr className="bg-gray-300">
+                                <td className="text-xl uppercase">well head</td>
+                                <td>
+                                    <input
+                                        className="p-1 my-2 rounded-lg"
+                                        onChange={ (e) => { updateWellHeadUsage(1, e.currentTarget.value) }}
+                                        value={wellHeadUsageUpdate?.data[year][quarter][1]}
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        className="p-1 my-2 rounded-lg"
+                                        onChange={ (e) => { updateWellHeadUsage(2, e.currentTarget.value) }}
+                                        value={wellHeadUsageUpdate?.data[year][quarter][2]}
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        className="p-1 my-2 rounded-lg"
+                                        onChange={ (e) => { updateWellHeadUsage(3, e.currentTarget.value) }}
+                                        value={wellHeadUsageUpdate?.data[year][quarter][3]}
+                                    />
+                                </td>
+                            </tr>
                         }
+
+                        {/* water users readings */}
+                        { usageData?.map((user, idx) => {
+                            return(
+                                <tr
+                                    className={ 
+                                        idx % 2 ? 
+                                            'bg-gray-300' :
+                                            'bg-gray-100'
+                                    }
+                                    key={user._id}
+                                >
+                                    <td className="text-xl">{ user.name }</td>
+                                    <td>
+                                        <input
+                                            className="p-1 my-2 rounded-lg"
+                                            onChange={(e) => updateUsage(user._id, 1, e.currentTarget.value)}
+                                            value={usageUpdate[user._id][year][quarter][1]}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            className="p-1 my-2 rounded-lg"
+                                            onChange={(e) => updateUsage(user._id, 2, e.currentTarget.value)}
+                                            value={usageUpdate[user._id][year][quarter][2]}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            className="p-1 my-2 rounded-lg"
+                                            onChange={(e) => updateUsage(user._id, 3, e.currentTarget.value)}
+                                            value={usageUpdate[user._id][year][quarter][3]}
+                                        />
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
