@@ -3,11 +3,12 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getData, patchData } from "../lib/dataEntryFunctions";
-import { quarterType, waterUsageType, yearType, patchDataType, mDict } from "../lib/commonTypes";
+import { quarterType, waterUsageType, yearType, patchDataType, mDict, voidFunc } from "../lib/commonTypes";
 import Message from "../components/message/Message";
 import Spinner from "../components/spinner/Spinner";
-import { wellHeadId } from "../lib/settings";
+import { backFlushId, wellHeadId } from "../lib/settings";
 import Selections from "../components/Selections";
+import ReadingsRow from "../components/dataEntry/readingsRow";
 
 export default function DataEntry() {
     const router = useRouter();
@@ -16,12 +17,18 @@ export default function DataEntry() {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
 
+    // water users data and updates
     const [usageData, setUsageData] = useState<waterUsageType[] | undefined>(undefined);
     const [usageUpdate, setUsageUpdate] = useState<usageUpdateType>({});
     type usageUpdateType = {[id: string]: waterUsageType['data']};
     
+    // well head data and update
     const [wellHeadUsage, setWellHeadUsage] = useState<waterUsageType | undefined>(undefined);
     const [wellHeadUsageUpdate, setWellHeadUsageUpdate] = useState<waterUsageType>();
+
+    // backflush data and update
+    const [backflushUsage, setBackflushUsage] = useState<waterUsageType | undefined>(undefined);
+    const [backflushUsageUpdate, setBackflushUsageUpdate] = useState<waterUsageType | undefined>(undefined);
 
     const fetchData = () => {
         setLoading(true);
@@ -46,14 +53,15 @@ export default function DataEntry() {
                 
                 // just water users data
                 let usageDataDraft: waterUsageType[] = [];
-
-                // just well head readings
                 let usageUpdateDraft: usageUpdateType = {};
 
                 ret.data.map(user => { 
                     if (user._id == wellHeadId) {
                         setWellHeadUsage(user);
                         setWellHeadUsageUpdate(user);
+                    } else if (user._id == backFlushId) {
+                        setBackflushUsage(user);
+                        setBackflushUsageUpdate(user);
                     } else {
                         usageUpdateDraft![user._id] = structuredClone(user.data);
                         usageDataDraft.push(user);
@@ -71,7 +79,8 @@ export default function DataEntry() {
     const [year, setYear] = useState<yearType>('cur');
     const [quarter, setQuarter] = useState<quarterType>('Q1');
 
-    const updateUsage = (id: string, month: 1 | 2 | 3, val: string) => {
+    // updates water users update data
+    const updateUserUsage = (id: string, month: 1 | 2 | 3, val: string) => {
         if (isNaN(Number(val))) { return };
 
         setUsageUpdate((draft = usageUpdate) => {
@@ -80,37 +89,47 @@ export default function DataEntry() {
         });
     };
 
-    const updateWellHeadUsage = (month: 1 | 2 | 3, val: string) => {
+    // updates well head and backflush data updates
+    const updateOtherUsage = (
+        month: 1 | 2 | 3, 
+        val: string, 
+        setUpdate: voidFunc<waterUsageType>, 
+        prev: waterUsageType
+    ) => {
         if (
             isNaN(Number(val)) 
             || wellHeadUsage == undefined
+            || backflushUsage == undefined
         ) { 
             return;
         };
 
-        setWellHeadUsageUpdate({
-            ...wellHeadUsageUpdate!,
+        setUpdate({
+            ...prev!,
             data: {
-                ...wellHeadUsageUpdate!.data,
+                ...prev!.data,
                 [year]: {
-                    ...wellHeadUsageUpdate?.data[year],
+                    ...prev?.data[year],
                     [quarter]: {
-                        ...wellHeadUsageUpdate?.data[year][quarter],
+                        ...prev?.data[year][quarter],
                         [month]: Number(val)
                     }
-                }
+                    }
             }
         });
     };
 
     const resetUsage = () => {
+        // reset water users usage update
         let usageUpdateDraft: usageUpdateType = {};
         usageData?.map(user => {
             usageUpdateDraft[user._id] = structuredClone(user.data)
         });
         setUsageUpdate(usageUpdateDraft);
 
+        // reset well head and backflush updates
         setWellHeadUsageUpdate(wellHeadUsage);
+        setBackflushUsageUpdate(backflushUsage);
     };
 
     const handleSubmit = () => {
@@ -141,6 +160,14 @@ export default function DataEntry() {
             updates.push({
                 id: wellHeadId,
                 update: wellHeadUsageUpdate?.data!
+            });
+        };
+
+        // check for updates in backflush readings
+        if (backflushUsage !== backflushUsageUpdate) {
+            updates.push({
+                id: backFlushId,
+                update: backflushUsageUpdate?.data!
             });
         };
 
@@ -212,30 +239,32 @@ export default function DataEntry() {
                     <tbody>
                         {/* well head readings */}
                         { wellHeadUsageUpdate == undefined ? <></> : 
-                            <tr className="bg-gray-300">
-                                <td className="text-xl uppercase">well head</td>
-                                <td>
-                                    <input
-                                        className="p-1 my-2 rounded-lg"
-                                        onChange={ (e) => { updateWellHeadUsage(1, e.currentTarget.value) }}
-                                        value={wellHeadUsageUpdate?.data[year][quarter][1]}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        className="p-1 my-2 rounded-lg"
-                                        onChange={ (e) => { updateWellHeadUsage(2, e.currentTarget.value) }}
-                                        value={wellHeadUsageUpdate?.data[year][quarter][2]}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        className="p-1 my-2 rounded-lg"
-                                        onChange={ (e) => { updateWellHeadUsage(3, e.currentTarget.value) }}
-                                        value={wellHeadUsageUpdate?.data[year][quarter][3]}
-                                    />
-                                </td>
-                            </tr>
+                            <ReadingsRow
+                                name={'well head'}
+                                className={"bg-gray-100"}
+                                updateState={{ 
+                                    value: wellHeadUsageUpdate, 
+                                    setValue: setWellHeadUsageUpdate
+                                }}
+                                updateFunc={updateOtherUsage}
+                                year={year}
+                                quarter={quarter}
+                            />
+                        }
+
+                        {/* backflush readings */}
+                        { backflushUsageUpdate == undefined ? <></> : 
+                            <ReadingsRow
+                                name={'backflush'}
+                                className={"bg-gray-300"}
+                                updateState={{ 
+                                    value: backflushUsageUpdate, 
+                                    setValue: setBackflushUsageUpdate
+                                }}
+                                updateFunc={updateOtherUsage}
+                                year={year}
+                                quarter={quarter}
+                            />
                         }
 
                         {/* water users readings */}
@@ -250,27 +279,24 @@ export default function DataEntry() {
                                     key={user._id}
                                 >
                                     <td className="text-xl">{ user.name }</td>
-                                    <td>
-                                        <input
-                                            className="p-1 my-2 rounded-lg"
-                                            onChange={(e) => updateUsage(user._id, 1, e.currentTarget.value)}
-                                            value={usageUpdate[user._id][year][quarter][1]}
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            className="p-1 my-2 rounded-lg"
-                                            onChange={(e) => updateUsage(user._id, 2, e.currentTarget.value)}
-                                            value={usageUpdate[user._id][year][quarter][2]}
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            className="p-1 my-2 rounded-lg"
-                                            onChange={(e) => updateUsage(user._id, 3, e.currentTarget.value)}
-                                            value={usageUpdate[user._id][year][quarter][3]}
-                                        />
-                                    </td>
+                                    { [1, 2, 3].map(q => {
+                                        if (q !== 1 && q !== 2 && q !== 3) { return <></> };
+                                        return (
+                                            <td key={q}>
+                                                <input
+                                                    className="p-1 my-2 rounded-lg"
+                                                    onChange={(e) => {
+                                                        updateUserUsage(
+                                                            user._id, 
+                                                            q, 
+                                                            e.currentTarget.value
+                                                        )
+                                                    }}
+                                                    value={usageUpdate[user._id][year][quarter][1]}
+                                                />
+                                            </td>
+                                        )
+                                    }) }
                                 </tr>
                             );
                         })}

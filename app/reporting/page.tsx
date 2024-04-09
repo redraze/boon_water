@@ -15,8 +15,8 @@ export default function Profile() {
     const pathname = usePathname(), router = useRouter();
   
     const [userData, setUserData] = useState<waterUsageType[] | undefined>(undefined);
-    const [wellData, setWellData] = useState<waterUsageType | undefined>(undefined);
-    const [flushData, setFlushData] = useState<waterUsageType | undefined>(undefined);
+    const [wellHeadData, setWellHeadData] = useState<waterUsageType | undefined>(undefined);
+    const [backFlushData, setBackflushData] = useState<waterUsageType | undefined>(undefined);
 
     useEffect(() => {
         setLoading(true);
@@ -42,9 +42,9 @@ export default function Profile() {
                 setUserData(() => {
                     return ret.data.filter(user => {
                         if (user._id == wellHeadId) {
-                            setWellData(user);
+                            setWellHeadData(user);
                         } else if (user._id == backFlushId) {
-                            setFlushData(user);
+                            setBackflushData(user);
                         } else {
                             return user;
                         };
@@ -113,8 +113,6 @@ export default function Profile() {
                             <td></td>
                             <td></td>
                         </tr>
-
-                        <br/>
 
                         <tr>
                             <td>Total Shrinkage</td>
