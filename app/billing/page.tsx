@@ -13,7 +13,7 @@ import type {
 import Bills from "../components/billing/Bills";
 import Selections from "../components/billing/Selections";
 import Spinner from "../components/spinner/Spinner";
-import { wellHeadId } from "../lib/settings";
+import { backFlushId, wellHeadId } from "../lib/settings";
 
 export default function Billing() {
     const router = useRouter();
@@ -53,20 +53,26 @@ export default function Billing() {
                     return;
                 };
 
-                // include all water user data except well head readings
-                let usageDraft: waterUsageType[] = [];
-                ret.data?.map(item => {
-                    if (item._id !== wellHeadId) {
-                        usageDraft.push(item);
+                setUsage(ret.data.filter(item => {
+                    if (
+                        item._id !== wellHeadId 
+                        && item._id !== backFlushId
+                    ) {
+                        return item;
                     };
-                });
-                setUsage(usageDraft);
+                }));
 
-                const tempUsers: usersInfoDictType = {};
-                ret.users.map(user => {
-                    tempUsers[user._id] = user.info
+                setUsers((draft: usersInfoDictType = {}) => {
+                    ret.users.map(user => {
+                        if (
+                            user._id !== wellHeadId 
+                            && user._id !== backFlushId
+                        ) {
+                            draft[user._id] = user.info;
+                        };
+                    });
+                    return draft;
                 });
-                setUsers(tempUsers);
             };
         });
         setLoading(false);
