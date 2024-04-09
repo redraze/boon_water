@@ -1,6 +1,6 @@
 "use client";
 
-import { quarterType, voidFunc, yearType } from "../../lib/commonTypes";
+import { quarterType, voidFunc, yearType } from "../lib/commonTypes";
 
 type SelectionsProps = {
     setQuarter: voidFunc<quarterType>

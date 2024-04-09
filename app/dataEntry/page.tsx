@@ -3,12 +3,11 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getData, patchData } from "../lib/dataEntryFunctions";
-import { quarterType, waterUsageType, yearType, patchDataType } from "../lib/commonTypes";
+import { quarterType, waterUsageType, yearType, patchDataType, mDict } from "../lib/commonTypes";
 import Message from "../components/message/Message";
 import Spinner from "../components/spinner/Spinner";
-import Selections from "../components/dataEntry/Selections";
-import TableHead from "../components/dataEntry/TableHead";
 import { wellHeadId } from "../lib/settings";
+import Selections from "../components/Selections";
 
 export default function DataEntry() {
     const router = useRouter();
@@ -179,7 +178,7 @@ export default function DataEntry() {
         { loading ? <Spinner /> : <>
             <div className="p-32 h-screen w-full">
                 <div className="flex w-full justify-between mb-10">
-                    <Selections 
+                    <Selections
                         setQuarter={setQuarter}
                         setYear={setYear}
                         resetUsage={resetUsage}
@@ -201,7 +200,15 @@ export default function DataEntry() {
                 </div>
 
                 <table className="w-full">
-                    <TableHead quarter={quarter} />
+                    <thead className="bg-gray-500 text-white uppercase text-xl">
+                        <tr>
+                            <td></td>
+                            <td>{ mDict[1][quarter] }</td>
+                            <td>{ mDict[2][quarter] }</td>
+                            <td>{ mDict[3][quarter] }</td>
+                        </tr>
+                    </thead>
+
                     <tbody>
                         {/* well head readings */}
                         { wellHeadUsageUpdate == undefined ? <></> : 
