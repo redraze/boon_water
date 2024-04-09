@@ -35,8 +35,8 @@ export default function Nav(props: {validity: boolean}) {
     return (<>
         {
             props.validity ? <>
-                <div className="z-10 fixed w-full top-0 flex px-10 py-1 border-b-4 border-indigo-500 bg-white flex justify-between">
-                    <ul className="flex justify-between">
+                <div className="z-10 fixed w-full top-0 flex px-4 py-1 border-b-4 border-indigo-500 bg-white flex justify-between">
+                    <ul className="flex justify-between overflow-auto">
                         <li className="flex">
                             <Link 
                                 href='/' 
@@ -109,6 +109,18 @@ export default function Nav(props: {validity: boolean}) {
                                 </span>
                             </Link>
                         </li>
+                        <li className="flex">
+                            <Link 
+                                href='/reporting' 
+                                className='group rounded-lg hover:bg-sky-500 hover:cursor-pointer px-12 py-2 transition-all m-auto'
+                            >
+                                <span
+                                    className="group-hover:text-white text-lg whitespace-nowrap transition-all"
+                                >
+                                    Reporting
+                                </span>
+                            </Link>
+                        </li>
                     </ul>
                     <div className="flex justify-end flex">
                         <div
@@ -119,7 +131,7 @@ export default function Nav(props: {validity: boolean}) {
                             <div className="py-2 flex hover:cursor-pointer">
                                 <span className="text-lg pr-2 m-auto">Hi { userName }!</span>
                                 <button className="p-2">
-                                    <Image src="/settings.ico" alt="[options]" height={10} width={10} className="h-6 w-6"/>
+                                    <Image src="/settings.ico" alt="[options]" height={25} width={25} className="max-w-none"/>
                                 </button>
                             </div>
                             <ul 

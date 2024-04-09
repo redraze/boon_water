@@ -100,6 +100,7 @@ export default function Session({
             || pathname == '/balances'
             || pathname == '/payments'
             || pathname == '/billing'
+            || pathname == '/reporting'
         ) {
             // verify token on client side only. the associated server side
             // api route will verify the token and reroute if neccessary
