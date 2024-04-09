@@ -8,7 +8,7 @@ import Message from "../components/message/Message";
 import Spinner from "../components/spinner/Spinner";
 import { backFlushId, wellHeadId } from "../lib/settings";
 import Selections from "../components/Selections";
-import ReadingsRow from "../components/dataEntry/readingsRow";
+import ReadingsRow from "../components/dataEntry/ReadingsRow";
 
 export default function DataEntry() {
     const router = useRouter();
