@@ -84,7 +84,7 @@ export default function Billing() {
     return (<>
         <Message text={ message } />
         { loading ? <Spinner /> : <>
-            <div className="p-20 w-full h-screen">
+            <div className="p-20 w-full min-h-screen">
                 <Selections
                     setYear={setYear}
                     quarterState={{ value: quarter, setValue: setQuarter }}

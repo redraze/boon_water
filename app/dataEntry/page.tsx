@@ -205,7 +205,7 @@ export default function DataEntry() {
     return (<>
         <Message text={ message } />
         { loading ? <Spinner /> : <>
-            <div className="p-32 h-screen w-full">
+            <div className="p-32 min-h-screen w-full">
                 <div className="flex w-full justify-between mb-10">
                     <Selections
                         setQuarter={setQuarter}
@@ -292,20 +292,20 @@ export default function DataEntry() {
                                         key={user._id}
                                     >
                                         <td className="text-xl">{ user.name }</td>
-                                        { [1, 2, 3].map(q => {
-                                            if (q !== 1 && q !== 2 && q !== 3) { return <></> };
+                                        { [1, 2, 3].map(month => {
+                                            if (month !== 1 && month !== 2 && month !== 3) { return <></> };
                                             return (
-                                                <td key={q}>
+                                                <td key={month}>
                                                     <input
                                                         className="p-1 my-2 rounded-lg"
                                                         onChange={(e) => {
                                                             updateUserUsage(
                                                                 user._id, 
-                                                                q, 
+                                                                month, 
                                                                 e.currentTarget.value
                                                             )
                                                         }}
-                                                        value={usageUpdate[user._id][year][quarter][1]}
+                                                        value={usageUpdate[user._id][year][quarter][month]}
                                                     />
                                                 </td>
                                             )

@@ -185,7 +185,11 @@ export default function Statement({ id, active, info, readings, date }: Statemen
                             </tr>
                             <tr className="border-t-2 border-black">
                                 <td className="font-bold p-2">
-                                    <span>{ info.balance > 0 ? <>BALANCE DUE:</> : <>CREDIT REM:</> }</span>
+                                    <span>{
+                                        (info.balance + baseCharge + overageCharge) >= 0 ? 
+                                            <>BALANCE DUE:</> :
+                                            <>CREDIT REM:</>
+                                    }</span>
                                 </td>
                                 <td className="font-bold px-2">
                                     { info.comp ? 
@@ -197,7 +201,11 @@ export default function Statement({ id, active, info, readings, date }: Statemen
                         </tbody>
                     </table>
                     <div className="font-bold text-center uppercase flex flex-col">
-                        <span>{ info.balance > 0 ? <>please pay this amount</> : <>NO PAYMENT NEEDED</> }</span>
+                        <span>{ 
+                            info.balance + baseCharge + overageCharge > 0 && !info.comp ? 
+                                <>please pay this amount</> : 
+                                <>no payment needed</> 
+                        }</span>
                         { info.comp ? <span>(user is comp&apos;d)</span> : <></>}
                     </div>
                 </div>

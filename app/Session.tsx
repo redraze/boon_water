@@ -153,6 +153,8 @@ export default function Session({
     return (<>
         <Message text={ message } />
         <Nav validity={ isValid } />
-        { body }
+        {
+            !isValid && pathname !== '/login' ? <></> : body
+        }
     </>)
 };

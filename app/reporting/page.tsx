@@ -81,22 +81,7 @@ export default function Profile() {
         ]);
     }, [year, quarter]);
 
-    const getShrinkagePercentages = () => {
-        if (!year || !quarter) { return };
-
-        const shrinkagePercents: numThruple = [0, 0, 0];
-        shrinkagePercents[0] = shrinkageGals[0] / wellHeadData?.data[year][quarter][1]! * 100;
-        shrinkagePercents[1] = shrinkageGals[1] / wellHeadData?.data[year][quarter][2]! * 100;
-        shrinkagePercents[2] = shrinkageGals[2] / wellHeadData?.data[year][quarter][3]! * 100;
-
-        return(<>
-            <td>{ isNaN(shrinkagePercents[0]) ? <>0%</> : shrinkagePercents[0].toFixed(2) + '%' }</td>
-            <td>{ isNaN(shrinkagePercents[1]) ? <>0%</> : shrinkagePercents[1].toFixed(2) + '%' }</td>
-            <td>{ isNaN(shrinkagePercents[2]) ? <>0%</> : shrinkagePercents[2].toFixed(2) + '%' }</td>
-        </>);
-    };
-
-    const getShrinkageTotals = () => {
+    const shrinkageTotals = () => {
         if (!year || !quarter) { return };
             
         const totalShrinkageGallons = shrinkageGals.reduce((prev, cur) => prev + cur);
@@ -118,66 +103,135 @@ export default function Profile() {
         <Message text={ message } />
         { loading ? <Spinner /> : <>
             <div className="pt-20 w-full h-screen">
-                <div className="w-full m-auto">
-                    <Selections setQuarter={setQuarter} setYear={setYear} />
+                <div className="w-full p-6 flex">
+                    <div className="m-auto">
+                        <Selections setQuarter={setQuarter} setYear={setYear} />
+                    </div>
                 </div>
 
-                {
-                    !year || !quarter ? <></> :
-                        <table>
-                            <thead>
+                { !year || !quarter ? <></> :
+                    <div className="w-2/3 m-auto">
+                        <table className="w-full border-4 border-gray-500 text-xl">
+                            <thead className="bg-gray-500 text-white uppercase text-2xl">
                                 <tr>
                                     <td></td>
-                                    <td>{ mDict[1][quarter] }</td>
-                                    <td>{ mDict[2][quarter] }</td>
-                                    <td>{ mDict[3][quarter] }</td>
+                                    {
+                                        [1, 2, 3].map(num => {
+                                            if (num !== 1 && num !== 2 && num !== 3) { return };
+                                            return(
+                                                <td key={num} className="p-2">
+                                                    { mDict[num][quarter] }
+                                                </td>
+                                            );
+                                        })
+                                    }
                                 </tr>
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td>Well Head</td>
-                                    <td>{ wellHeadData?.data[year][quarter][1] }</td>
-                                    <td>{ wellHeadData?.data[year][quarter][2] }</td>
-                                    <td>{ wellHeadData?.data[year][quarter][3] }</td>
+                                <tr className='bg-gray-100'>
+                                    <td className="p-2">Well Head</td>
+                                    {
+                                        [1, 2, 3].map(month => {
+                                            if (month !== 1 && month !== 2 && month !== 3) { return };
+                                            return(
+                                                <td key={month} className="p-2">
+                                                    { wellHeadData?.data[year][quarter][month] }
+                                                </td>
+                                            );
+                                        })
+                                    }
                                 </tr>
 
-                                <tr>
-                                    <td>Homes</td>
-                                    <td>{ homeSums[0] }</td>
-                                    <td>{ homeSums[1] }</td>
-                                    <td>{ homeSums[2] }</td>
+                                <tr className='bg-gray-300'>
+                                    <td className="p-2">Homes</td>
+                                    {
+                                        [0, 1, 2].map(idx => {
+                                            if (idx !== 0 && idx !== 1 && idx !== 2) { return };
+                                            return(
+                                                <td key={idx} className="p-2">
+                                                    { homeSums[idx] }
+                                                </td>
+                                            );
+                                        })
+                                    }
                                 </tr>
 
-                                <tr>
-                                    <td>Backflush</td>
-                                    <td>{ backFlushData?.data[year][quarter][1] }</td>
-                                    <td>{ backFlushData?.data[year][quarter][2] }</td>
-                                    <td>{ backFlushData?.data[year][quarter][3] }</td>
+                                <tr className='bg-gray-100'>
+                                    <td className="p-2">Backflush</td>
+                                    {
+                                        [1, 2, 3].map(month => {
+                                            if (month !== 1 && month !== 2 && month !== 3) { return };
+                                            return(
+                                                <td key={month} className="p-2">
+                                                    { backFlushData?.data[year][quarter][month] }
+                                                </td>
+                                            );
+                                        })
+                                    }
                                 </tr>
 
                                 {/* shrinkage in gallons */}
-                                <tr>
-                                    <td>Shrinkage</td>
-                                    <td>{ shrinkageGals[0] ? shrinkageGals[0] : 0 }</td>
-                                    <td>{ shrinkageGals[1] ? shrinkageGals[1] : 0 }</td>
-                                    <td>{ shrinkageGals[2] ? shrinkageGals[2] : 0 }</td>
+                                <tr className='bg-gray-300 border-t-8 border-gray-500'>
+                                    <td className="p-2">Shrinkage</td>
+                                    {
+                                        shrinkageGals.map((gals, idx) => {
+                                            return (
+                                                <td 
+                                                    key={idx}
+                                                    className={ (gals && gals < 0) ? 
+                                                        "p-2 text-red-600 font-bold bg-yellow-500" : 
+                                                        "p-2"
+                                                    }
+                                                >
+                                                    { gals ? gals + ' gallons' : 0 }
+                                                </td>
+                                            )
+                                        })
+                                    }
                                 </tr>
 
                                 {/* percent shrinkage */}
-                                <tr>
+                                <tr className='bg-gray-300'>
                                     <td></td>
-                                    { getShrinkagePercentages() }
+                                    {
+                                        shrinkageGals.map((shrinkageGals, index) => {
+                                            // narrow index type
+                                            const idx = index + 1;
+                                            if (idx !== 1 && idx !== 2 && idx !== 3) { return };
+
+                                            const wellHeadGals = wellHeadData?.data[year][quarter][idx];
+
+                                            if (!shrinkageGals || !wellHeadGals) {
+                                                return(<td key={idx} className="p-2">0%</td>);
+                                            };
+
+                                            const shrinkagePercent = shrinkageGals / wellHeadGals * 100;
+                                            return(
+                                                <td 
+                                                    key={idx}
+                                                    className={
+                                                        shrinkagePercent < 0 ? 
+                                                            "p-2 text-red-600 font-bold bg-yellow-500" :
+                                                            "p-2"
+                                                    }
+                                                >
+                                                    { shrinkagePercent.toFixed(2) + '%' }
+                                                </td>
+                                            );
+                                        })
+                                    }
                                 </tr>
 
-                                <tr>
-                                    <td>Total Shrinkage</td>
+                                <tr className='bg-gray-100 border-t-8 border-gray-500 font-bold'>
+                                    <td className="p-2">Total Shrinkage</td>
                                     <td></td>
-                                    { getShrinkageTotals() }
+                                    { shrinkageTotals() }
                                 </tr>
                             </tbody>
                         </table>
-                    }
+                    </div>
+                }
             </div>
         </>}
     </>);

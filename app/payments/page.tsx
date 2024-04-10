@@ -133,7 +133,7 @@ export default function Balances() {
         <Message text={ message } />
         {
             loading || !paymentsInfo ? <Spinner /> : <>
-                <div className="p-32 w-full h-screen">
+                <div className="p-32 w-full min-h-screen">
                     <table className="table-fixed w-full">
                         <thead className="bg-gray-500 text-white uppercase text-xl">
                             <tr>

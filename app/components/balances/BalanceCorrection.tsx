@@ -182,7 +182,7 @@ export default function BalanceCorrection(
             
             <td className="bg-white">
                 <button 
-                    className="bg-white border-2 border-sky-500 hover:text-white hover:bg-sky-500 rounded-lg p-2 text-xl"
+                    className="w-max bg-white border-2 border-sky-500 hover:text-white hover:bg-sky-500 rounded-lg p-2 text-xl"
                     onClick={() => handleSubmit()}
                 >
                     Post Entry

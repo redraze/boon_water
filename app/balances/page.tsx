@@ -63,7 +63,9 @@ export default function Balances() {
                 });
 
                 setHistory(historyDraft);
-                setOptions(optionsDraft);
+                // sort users by first letter
+                // TODO: write a better sorting algo
+                setOptions(optionsDraft.sort((a, b) => a.props['children'].charCodeAt(0) - b.props['children'].charCodeAt(0)));
                 setId(ret.data[0]._id);
             };
         });

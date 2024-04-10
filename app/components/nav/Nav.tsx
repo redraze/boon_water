@@ -34,7 +34,7 @@ export default function Nav(props: {validity: boolean}) {
 
     return (<>
         {
-            props.validity ? <>
+            !props.validity ? <></> : <>
                 <div className="z-10 fixed w-full top-0 flex px-4 py-1 border-b-4 border-indigo-500 bg-white flex justify-between">
                     <ul className="flex justify-between overflow-auto">
                         <li className="flex">
@@ -129,7 +129,7 @@ export default function Nav(props: {validity: boolean}) {
                             className="relative"
                         >
                             <div className="py-2 flex hover:cursor-pointer">
-                                <span className="text-lg pr-2 m-auto">Hi { userName }!</span>
+                                <span className="text-lg px-4 m-auto">Hi { userName }!</span>
                                 <button className="p-2">
                                     <Image src="/settings.ico" alt="[options]" height={25} width={25} className="max-w-none"/>
                                 </button>
@@ -154,8 +154,7 @@ export default function Nav(props: {validity: boolean}) {
                         </div>
                     </div>
                 </div>
-            </> :
-            <></>
+            </>
         }
     </>);
 };

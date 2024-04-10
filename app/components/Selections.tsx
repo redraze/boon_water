@@ -14,7 +14,7 @@ export default function Selections({ setQuarter, setYear, resetUsage }: Selectio
             className="p-2 bg-gray-300 w-fit rounded-lg border-2 border-sky-500"
         >
             <select 
-                className="mx-2 p-1 rounded-lg border-2 focus:border-sky-500"
+                className="mx-2 p-1 rounded-lg border-2 focus:border-sky-500 text-xl"
                 defaultValue={'Select Quarter'}
                 onChange={ (e) => {
                     const q = e.currentTarget.value;
@@ -34,7 +34,7 @@ export default function Selections({ setQuarter, setYear, resetUsage }: Selectio
             </select>
 
             <select
-                className="mx-2 p-1 rounded-lg border-2 focus:border-sky-500"
+                className="mx-2 p-1 rounded-lg border-2 focus:border-sky-500 text-xl"
                 defaultValue={'Select Year'}
                 onChange={ (e) => {
                     const y = e.currentTarget.value;

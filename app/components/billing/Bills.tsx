@@ -60,16 +60,15 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
         />
 
         {/* username tabs */}
-        <div className="fixed flex bottom-0 left-0 w-full bg-white border-t-4 border-sky-500 text-l">
-        {/* TODO: make this div horizontally scrollable (using inline-block ?) */}
+        <div className="fixed flex bottom-0 left-0 w-full bg-white border-t-4 border-sky-500 text-l overflow-auto">
             {
                 usage.map(entry => {
                     return (<div
                         key={entry._id}
                         onClick={ () => setActive(entry._id) }
                         className={ entry._id == active ? 
-                            'hover:cursor-pointer bg-white text-sky-500 p-1 m-1 rounded-lg border-2 border-sky-500' :
-                            'hover:cursor-pointer text-gray-200 bg-gray-400 p-1 m-1 rounded-lg border-2'
+                            'hover:cursor-pointer bg-white text-sky-500 p-1 m-1 rounded-lg border-4 border-sky-500 font-bold transition-all' :
+                            'hover:cursor-pointer text-gray-200 bg-gray-400 hover:bg-gray-300 hover:text-black p-1 m-1 rounded-lg border-4 border-gray-400 font-bold hover:border-sky-500 transition-all'
                         }
                     >
                         {entry.name}
