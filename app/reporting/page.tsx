@@ -55,73 +55,129 @@ export default function Profile() {
         setLoading(false);
     }, []);
 
-    const [quarter, setQuarter] = useState<quarterType>('Q1');
-    const [year, setYear] = useState<yearType>('cur');
+    const [quarter, setQuarter] = useState<quarterType | undefined>(undefined);
+    const [year, setYear] = useState<yearType | undefined>(undefined);
 
-    const resetUsage = () => {
+    type numThruple = [number, number, number];
+    const [homeSums, setHomeSums] = useState<numThruple>([0, 0, 0]);
 
+    const [shrinkageGals, setShrinkageGals] = useState<numThruple>([0, 0, 0]);
+
+    useEffect(() => {
+        if (!year || !quarter) { return };
+
+        let homeSumsDraft: numThruple = [0, 0, 0];
+        userData?.map(user => {
+            homeSumsDraft[0] += user.data[year!][quarter!][1];
+            homeSumsDraft[1] += user.data[year!][quarter!][2];
+            homeSumsDraft[2] += user.data[year!][quarter!][3];
+        });
+        setHomeSums(homeSumsDraft);
+
+        setShrinkageGals([
+            wellHeadData?.data[year][quarter][1]! - (homeSumsDraft[0] + backFlushData?.data[year][quarter][1]!),
+            wellHeadData?.data[year][quarter][2]! - (homeSumsDraft[1] + backFlushData?.data[year][quarter][2]!),
+            wellHeadData?.data[year][quarter][3]! - (homeSumsDraft[2] + backFlushData?.data[year][quarter][3]!)
+        ]);
+    }, [year, quarter]);
+
+    const getShrinkagePercentages = () => {
+        if (!year || !quarter) { return };
+
+        const shrinkagePercents: numThruple = [0, 0, 0];
+        shrinkagePercents[0] = shrinkageGals[0] / wellHeadData?.data[year][quarter][1]! * 100;
+        shrinkagePercents[1] = shrinkageGals[1] / wellHeadData?.data[year][quarter][2]! * 100;
+        shrinkagePercents[2] = shrinkageGals[2] / wellHeadData?.data[year][quarter][3]! * 100;
+
+        return(<>
+            <td>{ isNaN(shrinkagePercents[0]) ? <>0%</> : shrinkagePercents[0].toFixed(2) + '%' }</td>
+            <td>{ isNaN(shrinkagePercents[1]) ? <>0%</> : shrinkagePercents[1].toFixed(2) + '%' }</td>
+            <td>{ isNaN(shrinkagePercents[2]) ? <>0%</> : shrinkagePercents[2].toFixed(2) + '%' }</td>
+        </>);
+    };
+
+    const getShrinkageTotals = () => {
+        if (!year || !quarter) { return };
+            
+        const totalShrinkageGallons = shrinkageGals.reduce((prev, cur) => prev + cur);
+
+        const totalWellheadGallons = 
+            wellHeadData?.data[year][quarter][1]! 
+            + wellHeadData?.data[year][quarter][2]! 
+            + wellHeadData?.data[year][quarter][3]!;
+
+        const totalShrinkagePercent = totalShrinkageGallons / totalWellheadGallons * 100;
+
+        return(<>
+            <td>{ totalShrinkageGallons + 'gal' }</td>
+            <td>{ isNaN(totalShrinkagePercent) ? '0%' : totalShrinkagePercent.toFixed(2) + '%' }</td>
+        </>);
     };
 
     return (<>
         <Message text={ message } />
         { loading ? <Spinner /> : <>
-            <div className="pt-20">
-                <Selections setQuarter={setQuarter} setYear={setYear} resetUsage={resetUsage} />
+            <div className="pt-20 w-full h-screen">
+                <div className="w-full m-auto">
+                    <Selections setQuarter={setQuarter} setYear={setYear} />
+                </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <td></td>
-                            <td>{quarter ? mDict[1][quarter] : ''}</td>
-                            <td>{quarter ? mDict[2][quarter] : ''}</td>
-                            <td>{quarter ? mDict[3][quarter] : ''}</td>
-                        </tr>
-                    </thead>
+                {
+                    !year || !quarter ? <></> :
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>{ mDict[1][quarter] }</td>
+                                    <td>{ mDict[2][quarter] }</td>
+                                    <td>{ mDict[3][quarter] }</td>
+                                </tr>
+                            </thead>
 
-                    <tbody>
-                        <tr>
-                            <td>Individual Users (sum)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                            <tbody>
+                                <tr>
+                                    <td>Well Head</td>
+                                    <td>{ wellHeadData?.data[year][quarter][1] }</td>
+                                    <td>{ wellHeadData?.data[year][quarter][2] }</td>
+                                    <td>{ wellHeadData?.data[year][quarter][3] }</td>
+                                </tr>
 
-                        <tr>
-                            <td>Well Head Reading</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                                <tr>
+                                    <td>Homes</td>
+                                    <td>{ homeSums[0] }</td>
+                                    <td>{ homeSums[1] }</td>
+                                    <td>{ homeSums[2] }</td>
+                                </tr>
 
-                        <tr>
-                            <td>Backflush Reading</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                                <tr>
+                                    <td>Backflush</td>
+                                    <td>{ backFlushData?.data[year][quarter][1] }</td>
+                                    <td>{ backFlushData?.data[year][quarter][2] }</td>
+                                    <td>{ backFlushData?.data[year][quarter][3] }</td>
+                                </tr>
 
-                        <tr>
-                            <td>Shrinkage (gallons)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                                {/* shrinkage in gallons */}
+                                <tr>
+                                    <td>Shrinkage</td>
+                                    <td>{ shrinkageGals[0] ? shrinkageGals[0] : 0 }</td>
+                                    <td>{ shrinkageGals[1] ? shrinkageGals[1] : 0 }</td>
+                                    <td>{ shrinkageGals[2] ? shrinkageGals[2] : 0 }</td>
+                                </tr>
 
-                        <tr>
-                            <td>Shrinkage (percent)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                                {/* percent shrinkage */}
+                                <tr>
+                                    <td></td>
+                                    { getShrinkagePercentages() }
+                                </tr>
 
-                        <tr>
-                            <td>Total Shrinkage</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                                <tr>
+                                    <td>Total Shrinkage</td>
+                                    <td></td>
+                                    { getShrinkageTotals() }
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
             </div>
         </>}
     </>);

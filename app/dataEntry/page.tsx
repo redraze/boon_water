@@ -76,12 +76,12 @@ export default function DataEntry() {
     };
     useEffect(() => { fetchData() }, []);
 
-    const [year, setYear] = useState<yearType>('cur');
-    const [quarter, setQuarter] = useState<quarterType>('Q1');
+    const [year, setYear] = useState<yearType | undefined>(undefined);
+    const [quarter, setQuarter] = useState<quarterType | undefined>(undefined);
 
     // updates water users update data
     const updateUserUsage = (id: string, month: 1 | 2 | 3, val: string) => {
-        if (isNaN(Number(val))) { return };
+        if (isNaN(Number(val)) || !year || !quarter) { return };
 
         setUsageUpdate((draft = usageUpdate) => {
             draft[id][year][quarter][month] = Number(val)
@@ -98,6 +98,8 @@ export default function DataEntry() {
     ) => {
         if (
             isNaN(Number(val)) 
+            || !year
+            || !quarter
             || wellHeadUsage == undefined
             || backflushUsage == undefined
         ) { 
@@ -212,96 +214,108 @@ export default function DataEntry() {
                     />
 
                     <button
-                        className="bg-gray-200 border-2 border-sky-500 hover:bg-sky-500 hover:text-white rounded-lg p-2 text-l uppercase"
+                        className={ !year || !quarter ?
+                            "border-2 border-gray-400 p-2 bg-gray-200 rounded-lg text-l uppercase text-gray-400" :
+                            "border-2 border-sky-500 p-2 bg-gray-200 rounded-lg text-l uppercase hover:bg-sky-500 hover:text-white"
+                        }
                         onClick={ () => resetUsage() }
+                        disabled={ !year || !quarter }
                     >
                         clear changes
                     </button>
 
                     <button 
-                        className="bg-gray-200 border-2 border-sky-500 hover:bg-sky-500 hover:text-white rounded-lg p-2 text-l uppercase"
+                        className={ !year || !quarter ? 
+                            "border-2 border-gray-400 p-2 bg-gray-200 text-gray-400 rounded-lg text-l uppercase" :
+                            "bg-gray-200 border-2 border-sky-500 hover:bg-sky-500 hover:text-white rounded-lg p-2 text-l uppercase"
+                        }
                         onClick={ () => handleSubmit() }
+                        disabled={ !year || !quarter }
                     >
-                        Submit changes for <b>{ quarter }, { year == 'cur' ? 'current year' : 'previous year'}</b>
+                        Submit changes { !year || !quarter ? <></> : 
+                            <>for <b>{ quarter }, { year == 'cur' ? 'current year' : 'previous year'}</b></>
+                        }
                     </button>
                 </div>
 
-                <table className="w-full">
-                    <thead className="bg-gray-500 text-white uppercase text-xl">
-                        <tr>
-                            <td></td>
-                            <td>{ mDict[1][quarter] }</td>
-                            <td>{ mDict[2][quarter] }</td>
-                            <td>{ mDict[3][quarter] }</td>
-                        </tr>
-                    </thead>
+                { !year || !quarter ? <></> : <>
+                    <table className="w-full">
+                        <thead className="bg-gray-500 text-white uppercase text-xl">
+                            <tr>
+                                <td></td>
+                                <td>{ mDict[1][quarter] }</td>
+                                <td>{ mDict[2][quarter] }</td>
+                                <td>{ mDict[3][quarter] }</td>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {/* well head readings */}
-                        { wellHeadUsageUpdate == undefined ? <></> : 
-                            <ReadingsRow
-                                name={'well head'}
-                                className={"bg-gray-100"}
-                                updateState={{ 
-                                    value: wellHeadUsageUpdate, 
-                                    setValue: setWellHeadUsageUpdate
-                                }}
-                                updateFunc={updateOtherUsage}
-                                year={year}
-                                quarter={quarter}
-                            />
-                        }
+                        <tbody>
+                            {/* well head readings */}
+                            { wellHeadUsageUpdate == undefined ? <></> : 
+                                <ReadingsRow
+                                    name={'well head'}
+                                    className={"bg-gray-100"}
+                                    updateState={{ 
+                                        value: wellHeadUsageUpdate, 
+                                        setValue: setWellHeadUsageUpdate
+                                    }}
+                                    updateFunc={updateOtherUsage}
+                                    year={year}
+                                    quarter={quarter}
+                                />
+                            }
 
-                        {/* backflush readings */}
-                        { backflushUsageUpdate == undefined ? <></> : 
-                            <ReadingsRow
-                                name={'backflush'}
-                                className={"bg-gray-300"}
-                                updateState={{ 
-                                    value: backflushUsageUpdate, 
-                                    setValue: setBackflushUsageUpdate
-                                }}
-                                updateFunc={updateOtherUsage}
-                                year={year}
-                                quarter={quarter}
-                            />
-                        }
+                            {/* backflush readings */}
+                            { backflushUsageUpdate == undefined ? <></> : 
+                                <ReadingsRow
+                                    name={'backflush'}
+                                    className={"bg-gray-300"}
+                                    updateState={{ 
+                                        value: backflushUsageUpdate, 
+                                        setValue: setBackflushUsageUpdate
+                                    }}
+                                    updateFunc={updateOtherUsage}
+                                    year={year}
+                                    quarter={quarter}
+                                />
+                            }
 
-                        {/* water users readings */}
-                        { usageData?.map((user, idx) => {
-                            return(
-                                <tr
-                                    className={ 
-                                        idx % 2 ? 
-                                            'bg-gray-300' :
-                                            'bg-gray-100'
-                                    }
-                                    key={user._id}
-                                >
-                                    <td className="text-xl">{ user.name }</td>
-                                    { [1, 2, 3].map(q => {
-                                        if (q !== 1 && q !== 2 && q !== 3) { return <></> };
-                                        return (
-                                            <td key={q}>
-                                                <input
-                                                    className="p-1 my-2 rounded-lg"
-                                                    onChange={(e) => {
-                                                        updateUserUsage(
-                                                            user._id, 
-                                                            q, 
-                                                            e.currentTarget.value
-                                                        )
-                                                    }}
-                                                    value={usageUpdate[user._id][year][quarter][1]}
-                                                />
-                                            </td>
-                                        )
-                                    }) }
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                            {/* water users readings */}
+                            { usageData?.map((user, idx) => {
+                                return(
+                                    <tr
+                                        className={ 
+                                            idx % 2 ? 
+                                                'bg-gray-300' :
+                                                'bg-gray-100'
+                                        }
+                                        key={user._id}
+                                    >
+                                        <td className="text-xl">{ user.name }</td>
+                                        { [1, 2, 3].map(q => {
+                                            if (q !== 1 && q !== 2 && q !== 3) { return <></> };
+                                            return (
+                                                <td key={q}>
+                                                    <input
+                                                        className="p-1 my-2 rounded-lg"
+                                                        onChange={(e) => {
+                                                            updateUserUsage(
+                                                                user._id, 
+                                                                q, 
+                                                                e.currentTarget.value
+                                                            )
+                                                        }}
+                                                        value={usageUpdate[user._id][year][quarter][1]}
+                                                    />
+                                                </td>
+                                            )
+                                        }) }
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </>}
             </div>
         </> }
     </>);
