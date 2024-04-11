@@ -35,6 +35,9 @@ export const getData = async (pathname: string) => {
 };
 
 
+/**
+ * @returns various data for the usages and shrinkage tables
+ */
 export const getReportingData = (
     quarter: quarterType | undefined, 
     year: yearType | undefined, 
