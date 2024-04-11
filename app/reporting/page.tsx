@@ -81,7 +81,7 @@ export default function Profile() {
     }, [year, quarter]);
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         { loading ? <Spinner /> : <>
             <div className="pt-16 pb-12 w-full min-h-screen">
                 <div className="w-full p-6 flex">

@@ -130,7 +130,7 @@ export default function Balances() {
     };
     
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         {
             loading || !paymentsInfo ? <Spinner /> : <>
                 <div className="p-32 w-full min-h-screen">

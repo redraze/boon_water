@@ -76,7 +76,7 @@ export default function Balances() {
     const [year, setYear] = useState('cur');
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         {
             loading ? <Spinner /> : <>
                 <div className="p-32">

@@ -25,26 +25,12 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [email, setEmail] = useState('');
-    const [balance, setBalance] = useState(0);
     const [comp, setComp] = useState(false);
-
-    const attemptBalanceUpdate = (num: string) => {
-        // TODO: improve this balance input sanitizer/state handler routine
-        // (its kinda janky currently)
-        if (!num) {
-            setBalance(0);
-            setMessage('');
-        } else if (Number(num)) {
-            setBalance(Number(num));
-            setMessage('');
-        } else { setMessage('Only numbers are allowed in the balance box.') };
-    };
 
     const resetInfo = () => {
         setName('');
         setAddress('');
         setEmail('');
-        setBalance(0);
         setComp(false);
     };
 
@@ -61,7 +47,7 @@ export default function AddUserModal({ usersState, setMessage, updatingState }: 
             name,
             address,
             email,
-            balance: comp ? 0 : balance,
+            balance: 0,
             comp
         };
         

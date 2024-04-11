@@ -26,8 +26,8 @@ export default function Billing() {
     const [users, setUsers] = useState<usersInfoDictType>({});
 
     useEffect(() => {
-        // prevent data re-fetching during dev env hot reloads 
-        if (usage.length) { return };
+        // prevent data from re-fetching after a hot reload 
+        if (process.env.NODE_ENV !== 'production' && usage.length) { return };
 
         setLoading(true);
         getUserData(pathname).then(ret => {
@@ -60,7 +60,7 @@ export default function Billing() {
                     ) {
                         return item;
                     };
-                }));
+                }).sort((a, b) => a.name.charCodeAt(0) - b.name.charCodeAt(0)));
 
                 setUsers((draft: usersInfoDictType = {}) => {
                     ret.users.map(user => {
@@ -82,7 +82,7 @@ export default function Billing() {
     const [year, setYear] = useState<yearType>();
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         { loading ? <Spinner /> : <>
             <div className="p-20 w-full min-h-screen">
                 <Selections

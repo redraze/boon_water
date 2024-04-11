@@ -151,7 +151,7 @@ export default function Session({
     }, [pathname]);
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         <Nav validity={ isValid } />
         {
             !isValid && pathname !== '/login' ? <></> : body

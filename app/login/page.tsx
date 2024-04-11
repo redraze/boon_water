@@ -30,7 +30,7 @@ export default function LoginPage() {
   };
 
   return (<>
-    <Message text={ message } />
+    <Message messageState={{ value: message, setValue: setMessage }} />
 
     { loading ? <Spinner /> :
       <div className="flex h-screen">

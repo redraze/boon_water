@@ -81,7 +81,11 @@ export default function DataEntry() {
 
     // updates water users update data
     const updateUserUsage = (id: string, month: 1 | 2 | 3, val: string) => {
-        if (isNaN(Number(val)) || !year || !quarter) { return };
+        if (isNaN(Number(val)) || !year || !quarter) { 
+            setMessage('Only numbers are allowed in data boxes.')
+            return;
+        };
+        setMessage('');
 
         setUsageUpdate((draft = usageUpdate) => {
             draft[id][year][quarter][month] = Number(val)
@@ -96,15 +100,13 @@ export default function DataEntry() {
         setUpdate: voidFunc<waterUsageType>, 
         prev: waterUsageType
     ) => {
-        if (
-            isNaN(Number(val)) 
-            || !year
-            || !quarter
-            || wellHeadUsage == undefined
-            || backflushUsage == undefined
-        ) { 
+        if (!year || !quarter || wellHeadUsage == undefined || backflushUsage == undefined) { return };
+
+        if (isNaN(Number(val))) { 
+            setMessage('Only numbers are allowed in data boxes.')
             return;
         };
+        setMessage('');
 
         setUpdate({
             ...prev!,
@@ -116,7 +118,7 @@ export default function DataEntry() {
                         ...prev?.data[year][quarter],
                         [month]: Number(val)
                     }
-                    }
+                }
             }
         });
     };
@@ -203,7 +205,7 @@ export default function DataEntry() {
     };
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         { loading ? <Spinner /> : <>
             <div className="p-32 min-h-screen w-full">
                 <div className="flex w-full justify-between mb-10">
