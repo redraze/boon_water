@@ -240,12 +240,12 @@ export default function DataEntry() {
 
                 { !year || !quarter ? <></> : <>
                     <table className="w-full">
-                        <thead className="bg-gray-500 text-white uppercase text-xl">
+                        <thead className="bg-gray-500 text-white uppercase text-2xl font-bold">
                             <tr>
                                 <td></td>
-                                <td>{ mDict[1][quarter] }</td>
-                                <td>{ mDict[2][quarter] }</td>
-                                <td>{ mDict[3][quarter] }</td>
+                                <td className="p-2">{ mDict[1][quarter] }</td>
+                                <td className="p-2">{ mDict[2][quarter] }</td>
+                                <td className="p-2">{ mDict[3][quarter] }</td>
                             </tr>
                         </thead>
 
@@ -291,7 +291,7 @@ export default function DataEntry() {
                                         }
                                         key={user._id}
                                     >
-                                        <td className="text-xl">{ user.name }</td>
+                                        <td className="text-xl p-2">{ user.name }</td>
                                         { [1, 2, 3].map(month => {
                                             if (month !== 1 && month !== 2 && month !== 3) { return <></> };
                                             return (

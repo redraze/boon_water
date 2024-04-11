@@ -71,3 +71,7 @@ export const mDict = {
   2: { Q1: 'February', Q2: 'May', Q3: 'August', Q4: 'November' },
   3: { Q1: 'March', Q2: 'June', Q3: 'September', Q4: 'December' }
 };
+
+// reporting types
+export type triple<T> = [T, T, T];
+export type shrinkageObject = { gallons: number, percent: number };

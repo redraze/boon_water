@@ -24,7 +24,7 @@ export default function ReadingsRow(
     return(<>
         { val == undefined ? <></> : 
             <tr className={className}>
-                <td className="text-xl uppercase">{name}</td>
+                <td className="text-xl uppercase p-2">{name}</td>
                 { [1, 2, 3].map(q => {
                     if (q !== 1 && q !== 2 && q !== 3) { return <></> };
                     return(
