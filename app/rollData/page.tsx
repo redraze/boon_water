@@ -52,17 +52,17 @@ export default function RollData() {
                 </div>
             </> : <>
                 <form
-                    className="min-h-screen w-full px-32 py-24"
+                    className="min-h-screen w-full px-32 pt-24 pb-16"
                     onSubmit={ (e) => { e.preventDefault(); handleSubmit(); } }
                 >
-                    <div className="w-4/5 flex flex-row mx-auto my-8 border-4 border-red-500 p-4 rounded-lg text-gray-200 text-xl font-bold bg-red-800">
+                    <div className="w-3/4 flex flex-row mx-auto my-8 border-4 border-red-500 p-4 rounded-lg text-gray-200 text-xl font-bold bg-red-800">
                         <div className="uppercase text-yellow-300 text-4xl font-bold bg-red-500 w-min p-4 my-auto mx-8 border-4 border-yellow-400">
                             caution!!!
                         </div>
 
                         <div className="flex flex-col m-2">
                             <span className="pb-4">This action will move the current year's data into the previous year's data table, and create a new, empty set for the current year data.</span>
-                            <span>This will <span className="uppercase text-yellow-300">PERMENANTLY DELETE</span> all of the previous year's data.</span>
+                            <span>This will <span className="uppercase text-yellow-300">PERMENANTLY DELETE</span> all of the previous year's data, including <span className="text-yellow-300">water usage data</span> and <span className="text-yellow-300">balance history data</span>.</span>
                         </div>
                     </div>
 

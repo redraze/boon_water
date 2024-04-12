@@ -24,7 +24,7 @@ export default function EntryRow({ entry, n }: { entry: balanceEntryType, n: num
             <td className="p-2">{ timeFormatter.format(entry.timeStamp) }</td>
             <td className="p-2">{ moneyFormatter.format(entry.balanceChange) }</td>
             <td className="p-2">{ moneyFormatter.format(entry.newBalance) }</td>
-            <td className="p-2">{ entry.note }</td>
+            <td className="p-2 max-w-60"><div className="overflow-auto">{ entry.note }</div></td>
         </tr>
     </>);
 };

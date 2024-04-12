@@ -175,7 +175,7 @@ export default function DataEntry() {
                     />
                 </div>
 
-                { !year || !quarter || !Object.keys(homesData).length ? <></> : <>
+                { !year || !quarter ? <></> : <>
                     <table className="w-full">
                         <thead className="bg-gray-500 text-white uppercase text-2xl font-bold">
                             <tr>
@@ -200,15 +200,19 @@ export default function DataEntry() {
                             />
 
                             {/* water users readings */}
-                            <HomesReadingsRows 
-                                year={year}
-                                quarter={quarter}
-                                state={{
-                                    value: homesDataUpdate, 
-                                    setValue: setHomesDataUpdate 
-                                }}
-                                setMessage={setMessage}
-                            />
+                            {
+                                !Object.keys(homesData).length ? <></> : <>
+                                    <HomesReadingsRows 
+                                        year={year}
+                                        quarter={quarter}
+                                        state={{
+                                            value: homesDataUpdate, 
+                                            setValue: setHomesDataUpdate 
+                                        }}
+                                        setMessage={setMessage}
+                                    />
+                                </>
+                            }
 
                         </tbody>
                     </table>
