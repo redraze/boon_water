@@ -1,7 +1,6 @@
 import Cookies from "js-cookie";
 import { clientSideLoggingEnabled } from "./settings";
 import type { userInfo } from "./commonTypes";
-import type { paymentsInfoType } from "../payments/page";
 
 /**
  * Attempts to fetch all water users' data.

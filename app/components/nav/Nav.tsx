@@ -139,6 +139,12 @@ export default function Nav(props: {validity: boolean}) {
                                 style={ profileDrop ? {display: "block"} : {display: "none"} }
                             >
                                 <li 
+                                    onClick={ () => router.push('/rollData') }
+                                    className="group hover:bg-sky-500 flex transition-all py-2 px-4 hover:cursor-pointer"
+                                >
+                                    <span className="group-hover:text-white whitespace-nowrap transition-all">Roll Data</span>
+                                </li>
+                                <li 
                                     onClick={ () => router.push('/profile') }
                                     className="group hover:bg-sky-500 flex transition-all py-2 px-4 hover:cursor-pointer"
                                 >
