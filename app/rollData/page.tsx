@@ -61,8 +61,8 @@ export default function RollData() {
                         </div>
 
                         <div className="flex flex-col m-2">
-                            <span className="pb-4">This action will move the current year's data into the previous year's data table, and create a new, empty set for the current year data.</span>
-                            <span>This will <span className="uppercase text-yellow-300">PERMENANTLY DELETE</span> all of the previous year's data, including <span className="text-yellow-300">water usage data</span> and <span className="text-yellow-300">balance history data</span>.</span>
+                            <span className="pb-4">This action will move the current year&apos;s data into the previous year&apos;s data table, and create a new, empty set for the current year data.</span>
+                            <span>This will <span className="uppercase text-yellow-300">PERMENANTLY DELETE</span> all of the previous year&apos;s data, including <span className="text-yellow-300">water usage data</span> and <span className="text-yellow-300">balance history data</span>.</span>
                         </div>
                     </div>
 
@@ -72,7 +72,7 @@ export default function RollData() {
                             </> : <>
                                 <div className="w-max m-auto text-xl">
                                     <div className="flex flex-col pb-4 mb-4 text-center border-b-4 border-yellow-500">
-                                        <span className="w-fit m-auto text-gray-700 font-bold">Type 'CONFIRM' to proceed:</span>
+                                        <span className="w-fit m-auto text-gray-700 font-bold">Type &apos;CONFIRM&apos; to proceed:</span>
                                         <input
                                             className="w-1/2 mx-auto mt-2 p-2 rounded-lg border-2 border-gray-400"
                                             type="text"
