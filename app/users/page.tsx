@@ -42,8 +42,8 @@ export default function Users() {
     }, []);
     
     return (<>
-        <Message text={message} />
-        <div className="h-screen w-full flex p-32">
+        <Message messageState={{ value: message, setValue: setMessage }} />
+        <div className="min-h-screen w-full flex p-32">
             <div className="flex flex-col w-full mx-auto">
                 <UsersTable 
                     usersState={{ value: users, setValue: setUsers }}

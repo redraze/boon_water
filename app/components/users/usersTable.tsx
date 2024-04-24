@@ -134,25 +134,32 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
             <table className="mx-auto w-full text-left table-auto">
                 {
                     users ? <>
-                        <thead className="uppercase">
+                        <thead className="bg-gray-500 text-white uppercase text-xl">
                             <tr>
-                                <th className="bg-sky-400 p-2 border-black border-2">name</th>
-                                <th className="bg-sky-400 p-2 border-black border-2">address</th>
-                                <th className="bg-sky-400 p-2 border-black border-2">email</th>
-                                <th className="bg-sky-400 p-2 border-black border-2">balance</th>
-                                <th className="bg-sky-400 p-2 border-black border-2">comp</th>
-                                <th className=""></th>
-                                <th className=""></th>
+                                <th className="p-2">name</th>
+                                <th className="p-2">address</th>
+                                <th className="p-2">email</th>
+                                <th className="p-2">balance</th>
+                                <th className="p-2">comp</th>
+                                <th className="bg-white"></th>
+                                <th className="bg-white"></th>
                             </tr>
                         </thead>
                         <tbody className="">
                             { 
-                                users?.map((user: userInfo) => {
+                                users?.map((user, idx) => {
                                     return(prevInfo?._id == user._id ?
-                                        <tr key={ user._id }>
+                                        <tr 
+                                            className={ 
+                                                idx % 2 ? 
+                                                    'bg-gray-300' :
+                                                    'bg-gray-100'
+                                            }
+                                            key={ user._id }
+                                        >
                                             <td>
                                                 <input
-                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                     type="text"
                                                     value={ nameUpdate }
                                                     onChange={(e) => setNameUpdate(e.target.value) }
@@ -160,7 +167,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                             </td>
                                             <td>
                                                 <input
-                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                     type="text"
                                                     value={ addressUpdate }
                                                     onChange={(e) => setAddressUpdate(e.target.value) }
@@ -168,7 +175,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                             </td>
                                             <td>
                                                 <input
-                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="block w-full p-2 m-auto text-gray-900 border border-gray-300 rounded-lg text-base focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                     type="text"
                                                     value={ emailUpdate }
                                                     onChange={(e) => setEmailUpdate(e.target.value) }
@@ -183,7 +190,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                     onChange={e => setComp(e.currentTarget.checked)}
                                                 />
                                             </td>
-                                            <td>
+                                            <td className="bg-white pl-4">
                                                 <button onClick={ () => resetInfo() }>
                                                 <Image
                                                     src="/back.ico"
@@ -193,7 +200,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                 /> 
                                                 </button>
                                             </td>
-                                            <td>
+                                            <td className="bg-white pl-4">
                                                 <button onClick={ () => updateUser() }>
                                                     <Image
                                                         src="/save.ico"
@@ -203,10 +210,16 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                     /> 
                                                 </button>
                                             </td>
-                                            <td></td>
                                         </tr> :
-                                        <tr key={ user._id }>
-                                            <td>{ user.info.name }</td>
+                                        <tr 
+                                        className={ 
+                                                idx % 2 ? 
+                                                    'bg-gray-300' :
+                                                    'bg-gray-100'
+                                            }
+                                            key={ user._id }
+                                        >
+                                            <td className="p-2">{ user.info.name }</td>
                                             <td>{ user.info.address }</td>
                                             <td>{ user.info.email }</td>
                                             <td>{ formatter.format(user.info.balance) }</td>
@@ -226,7 +239,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                     width={30}
                                                 />
                                             }</td>
-                                            <td>
+                                            <td className="bg-white pl-4">
                                                 <button onClick={ () => setUpdateInfo(user) }>
                                                     <Image
                                                         src="/edit.ico"
@@ -236,7 +249,7 @@ export default function UsersTable({ usersState, setMessage, updatingState }: us
                                                     />
                                                 </button>
                                             </td>
-                                            <td>
+                                            <td className="bg-white">
                                                 <button onClick={() => {
                                                     setActive(true);
                                                     setDelUserInfo({

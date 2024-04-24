@@ -13,6 +13,7 @@ import type {
 import Bills from "../components/billing/Bills";
 import Selections from "../components/billing/Selections";
 import Spinner from "../components/spinner/Spinner";
+import { backFlushId, wellHeadId } from "../lib/settings";
 
 export default function Billing() {
     const router = useRouter();
@@ -25,8 +26,8 @@ export default function Billing() {
     const [users, setUsers] = useState<usersInfoDictType>({});
 
     useEffect(() => {
-        // prevent data re-fetching during dev env hot reloads 
-        if (usage.length) { return };
+        // prevent data from re-fetching after a hot reload 
+        if (process.env.NODE_ENV !== 'production' && usage.length) { return };
 
         setLoading(true);
         getUserData(pathname).then(ret => {
@@ -44,19 +45,34 @@ export default function Billing() {
 
             } else {
                 if (
-                    !ret.data || !ret.data.length 
+                    !ret.data || ret.data.length <= 1
                     || !ret.users || !ret.users.length
                 ) {
                     setMessage('No water usage data available.');
+                    setLoading(false);
                     return;
                 };
-                setUsage(ret.data!);
 
-                const tempUsers: usersInfoDictType = {};
-                ret.users.map(user => {
-                    tempUsers[user._id] = user.info
+                setUsage(ret.data.filter(item => {
+                    if (
+                        item._id !== wellHeadId 
+                        && item._id !== backFlushId
+                    ) {
+                        return item;
+                    };
+                }).sort((a, b) => a.name.charCodeAt(0) - b.name.charCodeAt(0)));
+
+                setUsers((draft: usersInfoDictType = {}) => {
+                    ret.users.map(user => {
+                        if (
+                            user._id !== wellHeadId 
+                            && user._id !== backFlushId
+                        ) {
+                            draft[user._id] = user.info;
+                        };
+                    });
+                    return draft;
                 });
-                setUsers(tempUsers);
             };
         });
         setLoading(false);
@@ -66,23 +82,25 @@ export default function Billing() {
     const [year, setYear] = useState<yearType>();
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         { loading ? <Spinner /> : <>
-            <Selections
-                setYear={setYear}
-                quarterState={{ value: quarter, setValue: setQuarter }}
-            />
-            {
-                (year && quarter) ? 
-                    <Bills
-                        users={users}
-                        usage={usage}
-                        year={year}
-                        quarter={quarter}
-                        setMessage={setMessage}
-                    />
-                    : <></>
-            }
+            <div className="p-20 w-full min-h-screen">
+                <Selections
+                    setYear={setYear}
+                    quarterState={{ value: quarter, setValue: setQuarter }}
+                />
+                {
+                    (year && quarter) ? 
+                        <Bills
+                            users={users}
+                            usage={usage}
+                            year={year}
+                            quarter={quarter}
+                            setMessage={setMessage}
+                        />
+                        : <></>
+                }
+            </div>
         </>}
     </>);
 };

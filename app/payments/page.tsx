@@ -109,14 +109,13 @@ export default function Balances() {
                     return;
                 };
 
-                setPaymentsInfo(() => {
-                    const draft: paymentsInfoType = paymentsInfo;
-                    payments.map(info => {
-                        if (!info?.payment) { return };
-                        draft[info?.id] = {
-                            ...draft[info?.id],
+                // update chached data
+                setPaymentsInfo((draft: paymentsInfoType = {}) => {
+                    payments.map(p => {
+                        draft[p.id] = {
+                            name: p.name,
                             payment: 0,
-                            balance: info?.balance
+                            balance: p.balance - p.payment
                         };
                     });
                     return draft;
@@ -131,47 +130,60 @@ export default function Balances() {
     };
     
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         {
             loading || !paymentsInfo ? <Spinner /> : <>
-                <table>
-                    <thead>
-                        <tr>
-                            <td></td>
-                            <td>current balance</td>
-                            <td>payment amount</td>
-                            <td>new balance</td>
-                        </tr>
-                    </thead>
+                <div className="p-32 w-full min-h-screen">
+                    <table className="table-fixed w-full">
+                        <thead className="bg-gray-500 text-white uppercase text-xl">
+                            <tr>
+                                <td></td>
+                                <td className="p-2">current balance</td>
+                                <td className="p-2">payment amount</td>
+                                <td className="p-2">new balance</td>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        { paymentsInfo ? 
-                            Object.entries(paymentsInfo).map(([id, info]) => {
-                                return (
-                                    <PaymentRow
-                                        key={id}
-                                        id={id}
-                                        info={info}
-                                        paymentsInfoState={{
-                                            value: paymentsInfo,
-                                            setValue: setPaymentsInfo
-                                        }}
-                                        setMessage={setMessage}
-                                        reset={reset}
-                                    />
-                                );
-                            }) : <></>
-                        }
-                    </tbody>
-                </table>
+                        <tbody>
+                            { paymentsInfo ? 
+                                Object.entries(paymentsInfo).map(([id, info], idx) => {
+                                    return (
+                                        <PaymentRow
+                                            key={id}
+                                            id={id}
+                                            info={info}
+                                            paymentsInfoState={{
+                                                value: paymentsInfo,
+                                                setValue: setPaymentsInfo
+                                            }}
+                                            setMessage={setMessage}
+                                            reset={reset}
+                                            n={idx}
+                                        />
+                                    );
+                                }) : <></>
+                            }
+                        </tbody>
+                    </table>
 
-                <input
-                    value={note}
-                    onChange={ e => setNote(e.currentTarget.value) }
-                    placeholder="ex: 'Q3 payments'"
-                />
-
-                <button onClick={ () => handleSubmit() }>Submit Payments</button>
+                    <div className="pt-10 w-full flex justify-center">
+                        <div className="bg-gray-200 p-4 rounded-lg border-2 border-black">
+                            <span className="text-xl">Note:</span>
+                            <input
+                                className="ml-2 rounded-lg p-2 text-l"
+                                value={note}
+                                onChange={ e => setNote(e.currentTarget.value) }
+                                placeholder="ex: 'Q3 payments'"
+                            />
+                            <button 
+                                className="ml-4 p-4 bg-white text-xl rounded-lg border-2 border-sky-500 hover:bg-sky-500 hover:text-white"
+                                onClick={ () => handleSubmit() }
+                            >
+                                Submit Payments
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </>
         }
     </>);

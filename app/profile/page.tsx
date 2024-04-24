@@ -20,7 +20,7 @@ export default function Profile() {
     }, [selection])
   
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         <div className="h-screen w-full flex">
             <div className="absolute h-screen flex">
                 <SideNav setSelection={setSelection} />

@@ -39,7 +39,7 @@ export default function Session({
 
                         // user was redirected to index page after successful login attempt
                         if (searchParams.get('loginSuccessful') == 'true') {
-                            setMessage('You have been logged in.');
+                            setMessage('Login successful!');
                         };
 
                         // authenticated user attmpted to navigate to the login page
@@ -93,16 +93,13 @@ export default function Session({
         }
             
             
-        // users, data entry, and balances page
+        // pages that only require initial client side token verification. upon initial request,
+        // each of these pages verify the provided token with a server-side api call
         else if (
             pathname == '/users'
-            || pathname == '/dataEntry'
             || pathname == '/balances'
             || pathname == '/payments'
-            || pathname == '/billing'
         ) {
-            // verify token on client side only. the associated server side
-            // api route will verify the token and reroute if neccessary
             if (!clientSideTokenCheck(token)) {
                 setIsValid(false);
                 router.push('/login' + '?loginRequired=true');
@@ -114,8 +111,15 @@ export default function Session({
         }
 
 
-        // logged-in user's profile page
-        else if (pathname == '/profile') {
+        // pages that require full initial token authentication, ie: pages 
+        // that don't have server-side token verification upon initial request
+        else if (
+            pathname == '/profile'
+            || pathname == '/dataEntry'
+            || pathname == '/billing'
+            || pathname == '/reporting'
+            || pathname == '/rollData'
+        ) {
             fullTokenVerification(token, pathname)
                 .then((validity: boolean) => {
                     setIsValid(validity);
@@ -128,12 +132,6 @@ export default function Session({
                     };
             });
         }
-
-
-        // // another page...
-        // else if (pathname = ...) {
-        //     ...
-        // }
 
 
         // undefined endpoints
@@ -150,8 +148,10 @@ export default function Session({
     }, [pathname]);
 
     return (<>
-        <Message text={ message } />
+        <Message messageState={{ value: message, setValue: setMessage }} />
         <Nav validity={ isValid } />
-        { body }
+        {
+            !isValid && pathname !== '/login' ? <></> : body
+        }
     </>)
 };

@@ -1,29 +1,31 @@
 'use client';
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { stateType } from "../../lib/commonTypes";
 
-export default function Message({ text }: { text: string }) {
-    const [vis, setVis] = useState(Boolean(text));
+export default function Message({ messageState }: { messageState: stateType<string> }) {
+    const {value: message, setValue: setMessage} = messageState;
+
     useEffect(() => { 
-        if (text) {
-            setVis(Boolean(text));
-            setTimeout(() => { setVis(false) }, 5000);
+        if (message) {
+            setTimeout(() => { setMessage('') }, 5000);
         };
-    }, [text]);
-    return(<>
+    }, [message]);
+
+return(<>
         {
-            text ? <>
-                <div className={ vis ? "absolute bottom-10 w-screen" : "hidden" }>
+            message ? <>
+                <div className={ "fixed bottom-10 w-screen z-50"}>
                     <div className="w-fit m-auto flex justify-center bg-white rounded-lg p-2 border-4 border-sky-500">
                         <span
                             className="flex justify-center px-4 m-auto"
                         >
-                            { text }
+                            { message }
                         </span>
                         <button 
                             className="flex justify-center m-1 rounded-lg"
-                            onClick={ () => {setVis(false)} }
+                            onClick={ () => {setMessage('')} }
                         >
                             <Image src='/close.ico' alt="X" height={50} width={50} />
                         </button>

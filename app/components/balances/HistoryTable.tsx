@@ -10,6 +10,7 @@ type HistoryTablePropTypes = {
     historyState: stateType<balanceHistoryDictType | undefined>,
     setMessage: voidFunc<string>
     setLoading: voidFunc<boolean>
+    year: string
 };
 
 export default function HistoryTable(
@@ -17,7 +18,8 @@ export default function HistoryTable(
         id,
         historyState,
         setMessage,
-        setLoading
+        setLoading,
+        year
     }: HistoryTablePropTypes
 ) {
     const { value: history } = historyState;
@@ -35,16 +37,28 @@ export default function HistoryTable(
         
         setInnerCur(() => {
             let draft: JSX.Element[] = [];
-            history[id].cur.map(entry => {
-                draft.push( <EntryRow key={entry.timeStamp} entry={ entry } /> );
+            history[id].cur.map((entry, idx) => {
+                draft.push(
+                    <EntryRow
+                        key={entry.timeStamp}
+                        entry={ entry }
+                        n={idx}
+                    />
+                );
             });
             return draft;
         });
         
         setInnerPrev(() => {
             let draft: JSX.Element[] = [];
-            history[id].prev.map(entry => {
-                draft.push( <EntryRow key={entry.timeStamp} entry={ entry } /> );
+            history[id].prev.map((entry, idx) => {
+                draft.push(
+                    <EntryRow
+                        key={entry.timeStamp}
+                        entry={entry}
+                        n={idx}
+                    />
+                );
             });
             return draft;
         });
@@ -52,22 +66,15 @@ export default function HistoryTable(
         setLoading(false);
     }, [id]);
 
-    const [year, setYear] = useState('cur');
-
     return(<>
-        <select onChange={(e) => setYear(e.currentTarget.value)}>
-            <option value='cur'>Current Year</option>
-            <option value='prev'>Previous Year</option>
-        </select>
-
-        <table>
-            <thead>
+        <table className="w-full">
+            <thead className="bg-gray-600 uppercase text-xl text-white">
                 <tr>
-                    <td>Date</td>
-                    <td>Time</td>
-                    <td>Balance Entry</td>
-                    <td>New Balance</td>
-                    <td>Description</td>
+                    <td className="p-4">Date</td>
+                    <td className="p-4">Time</td>
+                    <td className="p-4">Balance Entry</td>
+                    <td className="p-4">New Balance</td>
+                    <td className="p-4">Description</td>
                 </tr>
             </thead>
             <tbody>

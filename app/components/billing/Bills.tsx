@@ -50,18 +50,35 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
     const pdfRef = useRef(null);
 
     return(<>
-        {
-            usage.map(entry => {
-                return (<div
-                    key={entry._id}
-                    className={ entry._id == active ? 'tab_active' : 'tab_inactive' }
-                    onClick={ () => setActive(entry._id) }
-                >
-                    {entry.name}
-                </div>);
-            })
-        }
-        <div ref={pdfRef}>
+        <UserActions 
+            quarter={quarter}
+            pdfRef={pdfRef}
+            statementInfo={statementInfo}
+            users={users}
+            setMessage={setMessage}
+            usage={usage}
+        />
+
+        {/* username tabs */}
+        <div className="fixed flex bottom-0 left-0 w-full bg-white border-t-4 border-sky-500 text-l overflow-auto">
+            {
+                usage.map(entry => {
+                    return (<div
+                        key={entry._id}
+                        onClick={ () => setActive(entry._id) }
+                        className={ entry._id == active ? 
+                            'hover:cursor-pointer bg-white text-sky-500 p-1 m-1 rounded-lg border-4 border-sky-500 font-bold transition-all' :
+                            'hover:cursor-pointer text-gray-200 bg-gray-400 hover:bg-gray-300 hover:text-black p-1 m-1 rounded-lg border-4 border-gray-400 font-bold hover:border-sky-500 transition-all'
+                        }
+                    >
+                        {entry.name}
+                    </div>);
+                })
+            }
+        </div>
+
+        {/* selected user's statement */}
+        <div ref={pdfRef} className="pb-10">
             {
                 Object.entries(statementInfo).map(([id, readings]) => {
                     return (
@@ -77,13 +94,5 @@ export default function Bills({ users, usage, year, quarter, setMessage }: bills
                 })
             }
         </div>
-        <UserActions 
-            quarter={quarter}
-            pdfRef={pdfRef}
-            statementInfo={statementInfo}
-            users={users}
-            setMessage={setMessage}
-            usage={usage}
-        />
     </>);
 };

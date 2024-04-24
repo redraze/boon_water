@@ -2,7 +2,7 @@
 
 import { balanceEntryType } from "../../lib/commonTypes";
 
-export default function EntryRow({ entry }: { entry: balanceEntryType }) {
+export default function EntryRow({ entry, n }: { entry: balanceEntryType, n: number }) {
     const moneyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -19,12 +19,12 @@ export default function EntryRow({ entry }: { entry: balanceEntryType }) {
     });
 
     return(<>
-        <tr>
-            <td>{ dateFormatter.format(entry.timeStamp) }</td>
-            <td>{ timeFormatter.format(entry.timeStamp) }</td>
-            <td>{ moneyFormatter.format(entry.balanceChange) }</td>
-            <td>{ moneyFormatter.format(entry.newBalance) }</td>
-            <td>{ entry.note }</td>
+        <tr className={ n % 2 ? 'bg-gray-300' : 'bg-gray-200' }>
+            <td className="p-2">{ dateFormatter.format(entry.timeStamp) }</td>
+            <td className="p-2">{ timeFormatter.format(entry.timeStamp) }</td>
+            <td className="p-2">{ moneyFormatter.format(entry.balanceChange) }</td>
+            <td className="p-2">{ moneyFormatter.format(entry.newBalance) }</td>
+            <td className="p-2 max-w-60"><div className="overflow-auto">{ entry.note }</div></td>
         </tr>
     </>);
 };

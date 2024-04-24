@@ -10,9 +10,10 @@ type PaymentRowPropsType = {
     paymentsInfoState: stateType<paymentsInfoType | undefined>
     setMessage: voidFunc<string>,
     reset: boolean
+    n: number
 };
 
-export default function PaymentRow({ id, info, paymentsInfoState, setMessage, reset }: PaymentRowPropsType) {
+export default function PaymentRow({ id, info, paymentsInfoState, setMessage, reset, n }: PaymentRowPropsType) {
     const { value: paymentsInfo, setValue: setPaymentsInfo } = paymentsInfoState
     
     const [payment, setPayment] = useState<number>(0);
@@ -43,23 +44,28 @@ export default function PaymentRow({ id, info, paymentsInfoState, setMessage, re
     });
 
     return(
-        <tr>
-            <td>{info.name}</td>
-            <td>{formatter.format(info.balance)}</td>
-            <td><input
-                value={payment}
-                onChange={ e => attmeptSetPayment(e.currentTarget.value) }
-                onBlur={ () => {
-                    const draft = paymentsInfo;
-                    paymentsInfo![id] = {
-                        name: info.name,
-                        payment: payment,
-                        balance: newBalance
-                    };
-                    setPaymentsInfo(draft);
-                } }
-            /></td>
-            <td>{formatter.format(newBalance)}</td>
+        <tr className={
+            n % 2 ? 'bg-gray-300' : 'bg-gray-200'
+        }>
+            <td className="pl-4 py-2">{info.name}</td>
+            <td className="pl-4 py-2">{formatter.format(info.balance)}</td>
+            <td className="w-full h-full">
+                <input
+                    className="rounded-lg px-4 py-1"
+                    value={payment}
+                    onChange={ e => attmeptSetPayment(e.currentTarget.value) }
+                    onBlur={ () => {
+                        setPaymentsInfo({
+                            ...paymentsInfo,
+                            [id]: {
+                                ...info,
+                                payment
+                            }
+                        });
+                    } }
+                />
+            </td>
+            <td className="pl-4 py-2">{formatter.format(newBalance)}</td>
         </tr>
     );
 };
