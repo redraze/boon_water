@@ -125,9 +125,8 @@ export default function BalanceCorrection(
                             const num = formatVal(e.currentTarget.value);
                             if (isNaN(num)) { return };
                             
-                            const diff = currentBalance + num;
                             setBalanceChange(num);
-                            setNewBalance(diff);
+                            setNewBalance(currentBalance + num);
                         } }
                     />
                 </span>
@@ -148,8 +147,7 @@ export default function BalanceCorrection(
                             const num = formatVal(e.currentTarget.value);
                             if (isNaN(num)) { return };
                     
-                            const diff = num - currentBalance;
-                            setBalanceChange(diff);
+                            setBalanceChange(num - currentBalance);
                             setNewBalance(num);
                         } }
                     />
