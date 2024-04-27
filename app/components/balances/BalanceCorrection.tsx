@@ -5,6 +5,7 @@ import { patchHistory } from "../../lib/balancesFunctions";
 import { balanceHistoryDictType, stateType, voidFunc } from "../../lib/commonTypes";
 import { usePathname, useRouter } from "next/navigation";
 import EntryRow from "./EntryRow";
+import { formatVal } from "../../lib/commonFunctions";
 
 type TransactionModalPropTypes = {
     id: string,
@@ -104,64 +105,55 @@ export default function BalanceCorrection(
     const [newBalance, setNewBalance] = useState(0);
     const [description, setDescription] = useState('');
 
-    const balanceChangeCalc = (val: string) => {
-        if (!val) {
-            setBalanceChange(0);
-            setNewBalance(currentBalance);
-            setMessage('');
-            return;
-        };
-
-        let num = Number(val)
-        if (num) {
-            num = Math.round(num * 100) / 100
-            const diff = Math.round((currentBalance + num) * 100) / 100
-            setBalanceChange(num);
-            setNewBalance(diff);
-            setMessage('');
-        
-        } else { setMessage('Only numbers are allowed in balance boxes.') };
-    };
-
-    const newBalanceCalc = (val: string) => {
-        if (!val) {
-            setBalanceChange(currentBalance * -1);
-            setNewBalance(0);
-            setMessage('');
-            return;
-        };
-        
-        let num = Number(val)
-        if (num) {
-            num = Math.round(num * 100) / 100
-            const diff = Math.round((num - currentBalance) * 100) / 100
-            setBalanceChange(diff);
-            setNewBalance(num);
-            setMessage('');
-        
-        } else { setMessage('Only numbers are allowed in balance boxes.') };
-    };
-
     return (<>
         <tr className="bg-gray-100">
             <td></td>
             <td></td>
 
             <td>
-                <input 
-                    className="m-2 rounded-lg p-2 text-l"
-                    value={balanceChange} 
-                    onChange={ (e) => balanceChangeCalc(e.currentTarget.value) }
-                />
+                <span>$
+                    <input
+                        className="m-2 rounded-lg p-2 text-l"
+                        value={ balanceChange.toFixed(2) }
+                        onKeyDown={ e => {
+                            if (e.key !== '-') { return };
+                            const num = Number(e.currentTarget.value) * -1;
+                            setBalanceChange(num);
+                            setNewBalance(currentBalance + num);
+                        } }
+                        onChange={ (e) => {
+                            const num = formatVal(e.currentTarget.value);
+                            if (isNaN(num)) { return };
+                            
+                            setBalanceChange(num);
+                            setNewBalance(currentBalance + num);
+                        } }
+                    />
+                </span>
             </td>
 
             <td>
-                <input
-                    className="m-2 rounded-lg p-2 text-l"
-                    value={newBalance}
-                    onChange={ (e) => newBalanceCalc(e.currentTarget.value) }
-                />
+                <span>$
+                    <input
+                        className="m-2 rounded-lg p-2 text-l"
+                        value={ newBalance.toFixed(2) }
+                        onKeyDown={ e => {
+                            if (e.key !== '-') { return };
+                            const num = Number(e.currentTarget.value) * -1;
+                            setBalanceChange(num - currentBalance);
+                            setNewBalance(num);
+                        } }
+                        onChange={ e => {
+                            const num = formatVal(e.currentTarget.value);
+                            if (isNaN(num)) { return };
+                    
+                            setBalanceChange(num - currentBalance);
+                            setNewBalance(num);
+                        } }
+                    />
+                </span>
             </td>
+
             <td>
                 <input 
                     className="m-2 rounded-lg p-2 text-l"
