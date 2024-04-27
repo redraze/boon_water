@@ -111,33 +111,37 @@ export default function BalanceCorrection(
             <td></td>
 
             <td>
-                <input 
-                    className="m-2 rounded-lg p-2 text-l"
-                    value={ balanceChange.toFixed(2) }
-                    onChange={ (e) => {
-                        const num = formatVal(e.currentTarget.value);
-                        if (isNaN(num)) { return };
-                
-                        const diff = currentBalance + num;
-                        setBalanceChange(num);
-                        setNewBalance(diff);
-                    } }
-                />
+                <span>$
+                    <input
+                        className="m-2 rounded-lg p-2 text-l"
+                        value={ balanceChange.toFixed(2) }
+                        onChange={ (e) => {
+                            const num = formatVal(e.currentTarget.value);
+                            if (isNaN(num)) { return };
+                            
+                            const diff = currentBalance + num;
+                            setBalanceChange(num);
+                            setNewBalance(diff);
+                        } }
+                    />
+                </span>
             </td>
 
             <td>
-                <input
-                    className="m-2 rounded-lg p-2 text-l"
-                    value={ newBalance.toFixed(2) }
-                    onChange={ e => {
-                        const num = formatVal(e.currentTarget.value);
-                        if (isNaN(num)) { return };
-                
-                        const diff = num - currentBalance;
-                        setBalanceChange(diff);
-                        setNewBalance(num);
-                    } }
-                />
+                <span>$
+                    <input
+                        className="m-2 rounded-lg p-2 text-l"
+                        value={ newBalance.toFixed(2) }
+                        onChange={ e => {
+                            const num = formatVal(e.currentTarget.value);
+                            if (isNaN(num)) { return };
+                    
+                            const diff = num - currentBalance;
+                            setBalanceChange(diff);
+                            setNewBalance(num);
+                        } }
+                    />
+                </span>
             </td>
 
             <td>
