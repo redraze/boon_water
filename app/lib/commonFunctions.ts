@@ -1,7 +1,6 @@
 export const formatVal = (val: string) => {
-    if (isNaN(Number(val))) {
-        return NaN;
-    };
+    if (val == '') { return 0 };
+    if (isNaN(Number(val))) { return NaN };
 
     let vals = val.toString().split('.');
 
