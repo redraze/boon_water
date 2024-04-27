@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { stateType, voidFunc } from "../../lib/commonTypes";
 import { paymentsInfoType } from "../../payments/page";
+import { formatVal } from "../../lib/commonFunctions";
 
 type PaymentRowPropsType = {
     id: string,
@@ -21,23 +22,6 @@ export default function PaymentRow({ id, info, paymentsInfoState, setMessage, re
     
     useEffect(() => { setPayment(0) }, [reset])
     
-    const attmeptSetPayment = (val: string) => {
-        if (!val) {
-            setPayment(0);
-            setNewBalance(info.balance);
-            setMessage('');
-            return;
-        };
-        
-        let num = Number(val);
-        if (num) {
-            num = Math.round(num * 100) / 100;
-            setPayment(num);
-            setNewBalance(info.balance - num);
-            setMessage('');
-        } else { setMessage('Only numbers are allowed in balance boxes.') };
-    };
-
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -52,8 +36,14 @@ export default function PaymentRow({ id, info, paymentsInfoState, setMessage, re
             <td className="w-full h-full">
                 <input
                     className="rounded-lg px-4 py-1"
-                    value={payment}
-                    onChange={ e => attmeptSetPayment(e.currentTarget.value) }
+                    value={ payment.toFixed(2) }
+                    onChange={ e => {
+                        const num = formatVal(e.currentTarget.value);
+                        if (isNaN(num)) { return };
+                
+                        setPayment(num);
+                        setNewBalance(info.balance - num);
+                    } }
                     onBlur={ () => {
                         setPaymentsInfo({
                             ...paymentsInfo,
