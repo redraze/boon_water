@@ -38,6 +38,12 @@ export default function PaymentRow({ id, info, paymentsInfoState, setMessage, re
                     <input
                         className="rounded-lg px-4 py-1 ml-2"
                         value={ payment.toFixed(2) }
+                        onKeyDown={ e => {
+                            if (e.key !== '-') { return };
+                            const num = Number(e.currentTarget.value) * -1;
+                            setPayment(num);
+                            setNewBalance(info.balance - num);
+                        } }
                         onChange={ e => {
                             const num = formatVal(e.currentTarget.value);
                             if (isNaN(num)) { return };

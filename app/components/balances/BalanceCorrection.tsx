@@ -115,6 +115,12 @@ export default function BalanceCorrection(
                     <input
                         className="m-2 rounded-lg p-2 text-l"
                         value={ balanceChange.toFixed(2) }
+                        onKeyDown={ e => {
+                            if (e.key !== '-') { return };
+                            const num = Number(e.currentTarget.value) * -1;
+                            setBalanceChange(num);
+                            setNewBalance(currentBalance + num);
+                        } }
                         onChange={ (e) => {
                             const num = formatVal(e.currentTarget.value);
                             if (isNaN(num)) { return };
@@ -132,6 +138,12 @@ export default function BalanceCorrection(
                     <input
                         className="m-2 rounded-lg p-2 text-l"
                         value={ newBalance.toFixed(2) }
+                        onKeyDown={ e => {
+                            if (e.key !== '-') { return };
+                            const num = Number(e.currentTarget.value) * -1;
+                            setBalanceChange(num - currentBalance);
+                            setNewBalance(num);
+                        } }
                         onChange={ e => {
                             const num = formatVal(e.currentTarget.value);
                             if (isNaN(num)) { return };
