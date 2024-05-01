@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { balanceHistoryDictType } from "../lib/commonTypes";
+import { balanceHistoryDictType, yearType } from "../lib/commonTypes";
 import { getHistory } from "../lib/balancesFunctions";
 import { usePathname, useRouter } from "next/navigation";
 import Message from "../components/message/Message";
@@ -63,17 +63,17 @@ export default function Balances() {
                 });
 
                 setHistory(historyDraft);
-                // sort users by first letter
-                // TODO: write a better sorting algo
-                setOptions(optionsDraft.sort((a, b) => a.props['children'].charCodeAt(0) - b.props['children'].charCodeAt(0)));
-                setId(ret.data[0]._id);
+                setOptions(optionsDraft.sort((a, b) => {
+                    return a.props['children'].charCodeAt(0) - b.props['children'].charCodeAt(0)
+                } ));
+                // setId(ret.data[0]._id);
             };
         });
 
         setLoading(false);
     }, []);
 
-    const [year, setYear] = useState('cur');
+    const [year, setYear] = useState<yearType>('cur');
 
     return (<>
         <Message messageState={{ value: message, setValue: setMessage }} />
@@ -84,12 +84,18 @@ export default function Balances() {
                         <select 
                             className="border-gray-300 focus:border-sky-500 border-2 p-2 m-2 rounded-lg text-xl"
                             onChange={e => setId(e.currentTarget.value) }
+                            defaultValue={'Select User'}
                         >
+                            <option disabled hidden>Select User</option>
                             { options }
                         </select>
                         <select 
                             className="border-gray-300 focus:border-sky-500 border-2 p-2 m-2 rounded-lg text-xl"
-                            onChange={(e) => setYear(e.currentTarget.value)}
+                            onChange={ (e) => {
+                                const val = e.currentTarget.value;
+                                if (val !== 'cur' && val !== 'prev') { return };
+                                setYear(val);
+                            } }
                         >
                             <option value='cur'>Current Year</option>
                             <option value='prev'>Previous Year</option>
