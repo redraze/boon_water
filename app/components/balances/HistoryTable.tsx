@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { balanceHistoryDictType, stateType, voidFunc } from "../../lib/commonTypes";
+import { balanceHistoryDictType, stateType, voidFunc, yearType } from "../../lib/commonTypes";
 import EntryRow from "./EntryRow";
 import BalanceCorrection from "./BalanceCorrection";
 
@@ -10,7 +10,7 @@ type HistoryTablePropTypes = {
     historyState: stateType<balanceHistoryDictType | undefined>,
     setMessage: voidFunc<string>
     setLoading: voidFunc<boolean>
-    year: string
+    year: yearType
 };
 
 export default function HistoryTable(
@@ -29,7 +29,7 @@ export default function HistoryTable(
     const [currentBalance, setCurrentBalance] = useState(0);
 
     useEffect(() => {
-        if (!history) { return };
+        if (!history || !id) { return };
         
         setLoading(true);
         
@@ -79,7 +79,7 @@ export default function HistoryTable(
             </thead>
             <tbody>
                 {
-                    year == 'cur' ?
+                    year == 'cur' && id ?
                         <BalanceCorrection
                             id={id}
                             year={year}

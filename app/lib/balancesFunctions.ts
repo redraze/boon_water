@@ -52,7 +52,6 @@ export const patchHistory = async (
     newBalance: number,
     note: string
 ) => {
-    
     try {
         if (!pathname) {
             return { success: false, entry: undefined, validity: false }
