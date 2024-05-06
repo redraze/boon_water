@@ -14,6 +14,7 @@ import Bills from "../components/billing/Bills";
 import Selections from "../components/billing/Selections";
 import Spinner from "../components/spinner/Spinner";
 import { backFlushId, wellHeadId } from "../lib/settings";
+import { nameSort } from "../lib/commonFunctions";
 
 export default function Billing() {
     const router = useRouter();
@@ -60,7 +61,7 @@ export default function Billing() {
                     ) {
                         return item;
                     };
-                }).sort((a, b) => a.name.charCodeAt(0) - b.name.charCodeAt(0)));
+                }).sort((a, b) => nameSort(a.name, b.name)));
 
                 setUsers((draft: usersInfoDictType = {}) => {
                     ret.users.map(user => {

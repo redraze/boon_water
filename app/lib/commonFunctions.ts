@@ -28,3 +28,16 @@ export const formatVal = (val: string) => {
 
     return Number(whole + '.' + decimal);
 };
+
+
+/**
+ * assistive function for sorting words alphatecially
+ * @param left string
+ * @param right string
+ * @returns 0, 1, or -1 based on string comparison
+ */
+export const nameSort = (left: string, right: string) => {
+    if (left < right) { return -1 }
+    else if (left > right) { return 1}
+    else { return 0 };
+};
