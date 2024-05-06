@@ -41,7 +41,7 @@ export const formatVal = (val: string) => {
  * @param right string
  * @returns 0, 1, or -1 based on string comparison
  */
-export const nameSort = (left: string, right: string) => {
+export const stringCompare = (left: string, right: string) => {
     if (left < right) { return -1 }
     else if (left > right) { return 1}
     else { return 0 };

@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Message from "../components/message/Message";
 import HistoryTable from "../components/balances/HistoryTable";
 import Spinner from "../components/spinner/Spinner";
-import { nameSort } from "../lib/commonFunctions";
+import { stringCompare } from "../lib/commonFunctions";
 
 export default function Balances() {
     const pathname = usePathname();
@@ -64,7 +64,7 @@ export default function Balances() {
                 });
 
                 setHistory(historyDraft);
-                setOptions(optionsDraft.sort((a, b) => nameSort(
+                setOptions(optionsDraft.sort((a, b) => stringCompare(
                     a.props['children'], 
                     b.props['children'] 
                 )));
