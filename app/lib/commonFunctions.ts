@@ -1,3 +1,8 @@
+/**
+ * Formats numbers based on the following: 1) may contain any number of leading digits before the decimal 2) may only contain two decimal places (will default to .00)
+ * @param val string
+ * @returns a number in the form of a float
+ */
 export const formatVal = (val: string) => {
     if (val == '') { return 0 };
     if (isNaN(Number(val))) { return NaN };
@@ -14,13 +19,13 @@ export const formatVal = (val: string) => {
 
     let whole = vals[0], decimal = vals[1];
 
-    // decimal place was removed
+    // not enough decimal places
     if (decimal.length == 1) {
         decimal = whole[whole.length - 1] + decimal[0];
         whole = whole.slice(0, whole.length - 1);
     }
 
-    // decimal place was added
+    // too many decimal places
     else if (decimal.length == 3) {
         whole = whole + decimal[0];
         decimal = decimal.slice(1, decimal.length);
