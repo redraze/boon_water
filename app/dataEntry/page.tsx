@@ -188,17 +188,6 @@ export default function DataEntry() {
 
                         <tbody>
 
-                            {/* well head and backflush readings */}
-                            <OtherReadingsRow
-                                quarter={quarter}
-                                year={year}
-                                states={[
-                                    { value: wellHeadDataUpdate, setValue: setWellHeadDataUpdate }, 
-                                    { value: backflushDataUpdate, setValue: setBackflushDataUpdate }
-                                ]}
-                                setMessage={setMessage}
-                            />
-
                             {/* water users readings */}
                             {
                                 !Object.keys(homesData).length ? <></> : <>
@@ -213,6 +202,17 @@ export default function DataEntry() {
                                     />
                                 </>
                             }
+
+                            {/* well head and backflush readings */}
+                            <OtherReadingsRow
+                                quarter={quarter}
+                                year={year}
+                                states={[
+                                    { value: wellHeadDataUpdate, setValue: setWellHeadDataUpdate }, 
+                                    { value: backflushDataUpdate, setValue: setBackflushDataUpdate }
+                                ]}
+                                setMessage={setMessage}
+                            />
 
                         </tbody>
                     </table>
