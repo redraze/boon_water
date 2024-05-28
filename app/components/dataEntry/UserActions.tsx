@@ -1,4 +1,6 @@
 import { quarterType, voidFunc, yearType } from "../../lib/commonTypes";
+import domtoimage from 'dom-to-image';
+import jsPDF from "jspdf";
 
 type UserActionsPropsType = {
     year?: yearType,
@@ -16,7 +18,27 @@ export default function UserActions(
     }: UserActionsPropsType
 ) {
     const handlePrint = () => {
-        console.log('TODO');
+        const dataTable = document.getElementById('dataTable');
+        if (!dataTable) { return };
+
+        domtoimage
+            .toJpeg(dataTable)
+            .then(dataUrl => {
+                const pdf = new jsPDF({
+                    orientation: "landscape"
+                });
+
+                const img = new Image();
+                img.src = dataUrl;
+                // @ts-expect-error
+                pdf.addImage(img, 'JPEG', 0, 0);
+
+                const year = new Date().getFullYear();
+                pdf.save(`${quarter} ${year}.pdf`);
+            })
+            .catch(error => {
+                console.log('error', error);
+            });
     };
 
     return(<>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getData, patchData } from "../lib/dataEntryFunctions";
 import { 
     quarterType, 
@@ -176,7 +176,7 @@ export default function DataEntry() {
                 </div>
 
                 { !year || !quarter ? <></> : <>
-                    <table className="w-full">
+                    <table className="w-full" id="dataTable">
                         <thead className="bg-gray-500 text-white uppercase text-2xl font-bold">
                             <tr>
                                 <td></td>
