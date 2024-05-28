@@ -28,7 +28,7 @@ export default function UserActions({ year, quarter, resetUsage, handleSubmit }:
             onClick={ () => handleSubmit() }
             disabled={ !year || !quarter }
         >
-            Submit changes { !year || !quarter ? <></> : 
+            Save changes { !year || !quarter ? <></> : 
                 <>for <b>{ quarter }, { year == 'cur' ? 'current year' : 'previous year'}</b></>
             }
         </button>
