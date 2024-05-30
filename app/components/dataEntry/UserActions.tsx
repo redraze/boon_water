@@ -21,8 +21,22 @@ export default function UserActions(
         const dataTable = document.getElementById('dataTable');
         if (!dataTable) { return };
 
+        const tableCopy = dataTable.cloneNode(true);
+        const tBody = tableCopy.childNodes[1];
+        const userRows = tBody.childNodes;
+
+        userRows.forEach(row => {
+            row.childNodes.forEach((_child, key) => {
+                if (key == 0) { return };
+                const emptyCell = document.createElement('td');
+                emptyCell.appendChild(document.createElement('input'));
+                row.replaceChild(emptyCell, row.childNodes[key]);
+            });
+        });
+
+        document.body.appendChild(tableCopy);
         domtoimage
-            .toJpeg(dataTable)
+            .toJpeg(tableCopy)
             .then(dataUrl => {
                 const pdf = new jsPDF({
                     orientation: "landscape"
@@ -38,6 +52,10 @@ export default function UserActions(
             })
             .catch(error => {
                 console.log('error', error);
+                document.body.removeChild(tableCopy);
+            })
+            .finally(() => {
+                document.body.removeChild(tableCopy);
             });
     };
 
