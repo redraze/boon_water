@@ -53,7 +53,6 @@ export default function UserActions(
             })
             .catch(error => {
                 console.log('error', error);
-                document.body.removeChild(tableCopy);
             })
             .finally(() => {
                 document.body.removeChild(tableCopy);
