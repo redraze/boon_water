@@ -176,7 +176,7 @@ export default function DataEntry() {
                 </div>
 
                 { !year || !quarter ? <></> : <>
-                    <table className="w-full">
+                    <table className="w-full" id="dataTable">
                         <thead className="bg-gray-500 text-white uppercase text-2xl font-bold">
                             <tr>
                                 <td></td>
@@ -202,6 +202,8 @@ export default function DataEntry() {
                                     />
                                 </>
                             }
+
+                            <tr className="bg-gray-500 border-b-8 border-gray-500"></tr>
 
                             {/* well head and backflush readings */}
                             <OtherReadingsRow
