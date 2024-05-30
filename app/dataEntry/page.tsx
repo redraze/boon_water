@@ -203,6 +203,8 @@ export default function DataEntry() {
                                 </>
                             }
 
+                            <tr className="bg-gray-500 border-b-8 border-gray-500"></tr>
+
                             {/* well head and backflush readings */}
                             <OtherReadingsRow
                                 quarter={quarter}
