@@ -44,8 +44,9 @@ export default function UserActions(
 
                 const img = new Image();
                 img.src = dataUrl;
-                // @ts-expect-error
-                pdf.addImage(img, 'JPEG', 0, 0);
+
+                const width = pdf.internal.pageSize.getWidth() * .95;
+                pdf.addImage(img, 'JPEG', 10, 10, width, 0);
 
                 const year = new Date().getFullYear();
                 pdf.save(`${quarter} ${year}.pdf`);
