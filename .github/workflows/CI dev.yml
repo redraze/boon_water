@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      BRANCH_OF_FORK:
+        description: 'branch name, on which this pipeline should run'
+        required: true
+
+jobs:
+  test_build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile
