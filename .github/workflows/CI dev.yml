@@ -1,11 +1,11 @@
 name: CI
 
 on:
+  push:
+    branches: [ "!main" ]
+  pull_request:
+    branches: [ "!main" ]
   workflow_dispatch:
-    inputs:
-      BRANCH_OF_FORK:
-        description: 'branch name, on which this pipeline should run'
-        required: true
 
 jobs:
   test_build:
