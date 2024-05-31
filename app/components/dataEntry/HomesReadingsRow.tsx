@@ -62,32 +62,30 @@ export default function HomesReadingsRows(
         
         const activeElement = document.activeElement
         if (!activeElement) { return };
+
         // @ts-expect-error
         const idx = activeElement.tabIndex;
         if (idx <= 0) { return };
 
+        let newFocus = focus;
+
         if (key.key == 'Enter' && !shift) {
             if (focus == maxIdx) { return };
-            
-            let newFocus = focus + 3;
+            newFocus = focus + 3;
             if (newFocus > maxIdx) {
                 newFocus = newFocus % 3 + 1;
             };
 
-            document.getElementById(`tabIDX=${newFocus}`)?.focus();
-            setFocus(newFocus);
-
         } else if (key.key == 'Enter' && shift) {
             if (focus == 1) { return };
-            
-            let newFocus = focus - 3;
+            newFocus = focus - 3;
             if (newFocus < 1) {
                 newFocus = newFocus + maxIdx - 1
             };
-
-            document.getElementById(`tabIDX=${newFocus}`)?.focus();
-            setFocus(newFocus);
         };
+
+        document.getElementById(`tabIDX=${newFocus}`)?.focus();
+        setFocus(newFocus);
     };
 
     return entries.map(([userId, userInfo], idx) => {
