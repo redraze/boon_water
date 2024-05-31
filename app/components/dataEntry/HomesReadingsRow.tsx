@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { dataDictType } from "../../dataEntry/page";
 import { quarterType, stateType, voidFunc, yearType } from "../../lib/commonTypes"
 
@@ -47,7 +48,47 @@ export default function HomesReadingsRows(
         });
     };
 
-    return Object.entries(state.value).map(([userId, userInfo], idx) => {
+    const entries = Object.entries(state.value);
+    const maxIdx = 3 * entries.length;
+    const [focus, setFocus] = useState(0);
+
+    const [shift, setShift] = useState(false);
+    document.onkeyup = (key) => {
+        if (key.key == 'Shift') { setShift(false) };
+    };
+
+    document.onkeydown = (key) => {
+        if (key.key == 'Shift') { setShift(true); return };
+        
+        const activeElement = document.activeElement
+        if (!activeElement) { return };
+
+        // @ts-expect-error
+        const idx = activeElement.tabIndex;
+        if (idx <= 0) { return };
+
+        let newFocus = focus;
+
+        if (key.key == 'Enter' && !shift) {
+            if (focus == maxIdx) { return };
+            newFocus = focus + 3;
+            if (newFocus > maxIdx) {
+                newFocus = newFocus % 3 + 1;
+            };
+
+        } else if (key.key == 'Enter' && shift) {
+            if (focus == 1) { return };
+            newFocus = focus - 3;
+            if (newFocus < 1) {
+                newFocus = newFocus + maxIdx - 1
+            };
+        };
+
+        document.getElementById(`tabIDX=${newFocus}`)?.focus();
+        setFocus(newFocus);
+    };
+
+    return entries.map(([userId, userInfo], idx) => {
         return(
             <tr
                 key={userId}
@@ -73,6 +114,9 @@ export default function HomesReadingsRows(
                                         )
                                     }}
                                     value={state.value[userId].data[year][quarter][month]}
+                                    id={ `tabIDX=${(idx * 3) + month}` }
+                                    tabIndex={ (idx * 3) + month }
+                                    onFocus={ e => setFocus(e.target.tabIndex) }
                                 />
                             </td>
                         );
