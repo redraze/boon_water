@@ -54,14 +54,12 @@ export default function HomesReadingsRows(
 
     const [shift, setShift] = useState(false);
     document.onkeyup = (key) => {
-        // TODO
-        // detect for shift key release, and update shift state accordingly
+        if (key.key == 'Shift') { setShift(false) };
     };
 
     document.onkeydown = (key) => {
-        // TODO
-        // detect for shift key press, and update shift state accordingly
-
+        if (key.key == 'Shift') { setShift(true); return };
+        
         const activeElement = document.activeElement
         if (!activeElement) { return };
         // @ts-expect-error
@@ -78,9 +76,17 @@ export default function HomesReadingsRows(
 
             document.getElementById(`tabIDX=${newFocus}`)?.focus();
             setFocus(newFocus);
+
         } else if (key.key == 'Enter' && shift) {
-            // TODO
-            // move focus accordingly, if possible
+            if (focus == 1) { return };
+            
+            let newFocus = focus - 3;
+            if (newFocus < 1) {
+                newFocus = newFocus + maxIdx - 1
+            };
+
+            document.getElementById(`tabIDX=${newFocus}`)?.focus();
+            setFocus(newFocus);
         };
     };
 
