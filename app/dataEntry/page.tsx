@@ -156,6 +156,46 @@ export default function DataEntry() {
         setLoading(false);
     };
 
+    const [maxIdx, setMaxIdx] = useState<undefined | number>();
+    const [focus, setFocus] = useState(0);
+    const [shift, setShift] = useState(false);
+
+    document.onkeyup = (key) => {
+        if (key.key == 'Shift') { setShift(false) };
+    };
+
+    document.onkeydown = (key) => {
+        if (!maxIdx) { return };
+        if (key.key == 'Shift') { setShift(true); return };
+        
+        const activeElement = document.activeElement
+        if (!activeElement) { return };
+
+        // @ts-expect-error
+        const idx = activeElement.tabIndex;
+        if (idx <= 0) { return };
+
+        let newFocus = focus;
+
+        if (key.key == 'Enter' && !shift) {
+            if (focus == maxIdx) { return };
+            newFocus = focus + 3;
+            if (newFocus > maxIdx) {
+                newFocus = newFocus % 3 + 1;
+            };
+
+        } else if (key.key == 'Enter' && shift) {
+            if (focus == 1) { return };
+            newFocus = focus - 3;
+            if (newFocus < 1) {
+                newFocus = newFocus + maxIdx - 1
+            };
+        };
+
+        document.getElementById(`tabIDX=${newFocus}`)?.focus();
+        setFocus(newFocus);
+    };
+
     return (<>
         <Message messageState={{ value: message, setValue: setMessage }} />
         { loading ? <Spinner /> : <>
@@ -199,6 +239,8 @@ export default function DataEntry() {
                                             setValue: setHomesDataUpdate 
                                         }}
                                         setMessage={setMessage}
+                                        setFocus={setFocus}
+                                        setMaxIdx={setMaxIdx}
                                     />
                                 </>
                             }
@@ -214,6 +256,8 @@ export default function DataEntry() {
                                     { value: backflushDataUpdate, setValue: setBackflushDataUpdate }
                                 ]}
                                 setMessage={setMessage}
+                                setFocus={setFocus}
+                                maxIdx={maxIdx}
                             />
 
                         </tbody>

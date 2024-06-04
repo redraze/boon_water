@@ -5,6 +5,8 @@ type OtherReadingsRowType = {
     year: yearType
     states: stateType<waterUsageType | undefined>[]
     setMessage: voidFunc<string>
+    setFocus: voidFunc<number>
+    maxIdx: undefined | number
 };
 
 export default function OtherReadingsRow(
@@ -12,7 +14,9 @@ export default function OtherReadingsRow(
         quarter,
         year, 
         states,
-        setMessage
+        setMessage,
+        setFocus,
+        maxIdx
     }: OtherReadingsRowType
 ) {
     const updateOtherDataUpdate = (input: {
@@ -45,6 +49,7 @@ export default function OtherReadingsRow(
         });
     };
 
+    if (!maxIdx) { return <></> };
     return states.map((state, idx) => {
         const { value, setValue } = state;
         if (!value || !setValue) { return };
