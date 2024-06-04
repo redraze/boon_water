@@ -2,9 +2,10 @@ name: CI main
 
 on:
   push:
-    branches: [ "main" ]
+    branches: "main"
   pull_request:
-    branches: [ "main" ]
+    types: closed
+    branches: "main"
   workflow_dispatch:
 
 env:
@@ -13,6 +14,7 @@ env:
 
 jobs:
   build_and_push:
+    if: github.event_name == 'push' || github.event.pull_request.merged
     name: build and push Docker image to ghcr
     
     runs-on: ubuntu-latest
