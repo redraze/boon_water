@@ -5,6 +5,8 @@ type OtherReadingsRowType = {
     year: yearType
     states: stateType<waterUsageType | undefined>[]
     setMessage: voidFunc<string>
+    setFocus: voidFunc<number>
+    maxIdx: undefined | number
 };
 
 export default function OtherReadingsRow(
@@ -12,7 +14,9 @@ export default function OtherReadingsRow(
         quarter,
         year, 
         states,
-        setMessage
+        setMessage,
+        setFocus,
+        maxIdx
     }: OtherReadingsRowType
 ) {
     const updateOtherDataUpdate = (input: {
@@ -45,6 +49,7 @@ export default function OtherReadingsRow(
         });
     };
 
+    if (!maxIdx) { return <></> };
     return states.map((state, idx) => {
         const { value, setValue } = state;
         if (!value || !setValue) { return };
@@ -61,6 +66,7 @@ export default function OtherReadingsRow(
                 <td className="text-xl uppercase p-2">{value.name}</td>
                 { [1, 2, 3].map(month => {
                     if (month !== 1 && month !== 2 && month !== 3) { return <></> };
+                    const cellIdx = (maxIdx - 6) + (idx * 3) + month;
                     return(
                         <td key={month}>
                             <input
@@ -72,6 +78,9 @@ export default function OtherReadingsRow(
                                     })
                                 }
                                 value={value.data[year][quarter][month]}
+                                id={ `tabIDX=${cellIdx}` }
+                                tabIndex={cellIdx}
+                                onFocus={ e => setFocus(e.target.tabIndex) }
                             />
                         </td>
                     )

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { dataDictType } from "../../dataEntry/page";
 import { quarterType, stateType, voidFunc, yearType } from "../../lib/commonTypes"
 
@@ -7,6 +7,8 @@ type HomesReadingsRowsType = {
     quarter: quarterType
     state: stateType<dataDictType>
     setMessage: voidFunc<string>
+    setFocus: voidFunc<number>
+    setMaxIdx: voidFunc<number>
 };
 
 export default function HomesReadingsRows(
@@ -14,7 +16,9 @@ export default function HomesReadingsRows(
         year,
         quarter,
         state,
-        setMessage
+        setMessage,
+        setFocus,
+        setMaxIdx
     }: HomesReadingsRowsType
 ) {
     const updateHomesDataUpdate = (
@@ -49,44 +53,8 @@ export default function HomesReadingsRows(
     };
 
     const entries = Object.entries(state.value);
-    const maxIdx = 3 * entries.length;
-    const [focus, setFocus] = useState(0);
-
-    const [shift, setShift] = useState(false);
-    document.onkeyup = (key) => {
-        if (key.key == 'Shift') { setShift(false) };
-    };
-
-    document.onkeydown = (key) => {
-        if (key.key == 'Shift') { setShift(true); return };
-        
-        const activeElement = document.activeElement
-        if (!activeElement) { return };
-
-        // @ts-expect-error
-        const idx = activeElement.tabIndex;
-        if (idx <= 0) { return };
-
-        let newFocus = focus;
-
-        if (key.key == 'Enter' && !shift) {
-            if (focus == maxIdx) { return };
-            newFocus = focus + 3;
-            if (newFocus > maxIdx) {
-                newFocus = newFocus % 3 + 1;
-            };
-
-        } else if (key.key == 'Enter' && shift) {
-            if (focus == 1) { return };
-            newFocus = focus - 3;
-            if (newFocus < 1) {
-                newFocus = newFocus + maxIdx - 1
-            };
-        };
-
-        document.getElementById(`tabIDX=${newFocus}`)?.focus();
-        setFocus(newFocus);
-    };
+    // six is added to this value because there are two more rows, well head and back flush
+    useEffect(() => { setMaxIdx(entries.length * 3 + 6) }, []);
 
     return entries.map(([userId, userInfo], idx) => {
         return(
@@ -102,6 +70,7 @@ export default function HomesReadingsRows(
                 { 
                     [1, 2, 3].map(month => {
                         if (month !== 1 && month !== 2 && month !== 3) { return <></> };
+                        const cellIdx = (idx * 3) + month;
                         return (
                             <td key={month}>
                                 <input
@@ -114,8 +83,8 @@ export default function HomesReadingsRows(
                                         )
                                     }}
                                     value={state.value[userId].data[year][quarter][month]}
-                                    id={ `tabIDX=${(idx * 3) + month}` }
-                                    tabIndex={ (idx * 3) + month }
+                                    id={ `tabIDX=${cellIdx}` }
+                                    tabIndex={cellIdx}
                                     onFocus={ e => setFocus(e.target.tabIndex) }
                                 />
                             </td>
