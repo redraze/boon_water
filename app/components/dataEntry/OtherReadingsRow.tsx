@@ -66,6 +66,7 @@ export default function OtherReadingsRow(
                 <td className="text-xl uppercase p-2">{value.name}</td>
                 { [1, 2, 3].map(month => {
                     if (month !== 1 && month !== 2 && month !== 3) { return <></> };
+                    const cellIdx = (maxIdx - 6) + (idx * 3) + month;
                     return(
                         <td key={month}>
                             <input
@@ -77,6 +78,9 @@ export default function OtherReadingsRow(
                                     })
                                 }
                                 value={value.data[year][quarter][month]}
+                                id={ `tabIDX=${cellIdx}` }
+                                tabIndex={cellIdx}
+                                onFocus={ e => setFocus(e.target.tabIndex) }
                             />
                         </td>
                     )

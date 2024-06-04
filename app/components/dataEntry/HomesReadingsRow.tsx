@@ -53,7 +53,8 @@ export default function HomesReadingsRows(
     };
 
     const entries = Object.entries(state.value);
-    useEffect(() => { setMaxIdx(entries.length * 3) }, []);
+    // six is added to this value because there are two more rows, well head and back flush
+    useEffect(() => { setMaxIdx(entries.length * 3 + 6) }, []);
 
     return entries.map(([userId, userInfo], idx) => {
         return(
@@ -69,6 +70,7 @@ export default function HomesReadingsRows(
                 { 
                     [1, 2, 3].map(month => {
                         if (month !== 1 && month !== 2 && month !== 3) { return <></> };
+                        const cellIdx = (idx * 3) + month;
                         return (
                             <td key={month}>
                                 <input
@@ -81,8 +83,8 @@ export default function HomesReadingsRows(
                                         )
                                     }}
                                     value={state.value[userId].data[year][quarter][month]}
-                                    id={ `tabIDX=${(idx * 3) + month}` }
-                                    tabIndex={ (idx * 3) + month }
+                                    id={ `tabIDX=${cellIdx}` }
+                                    tabIndex={cellIdx}
                                     onFocus={ e => setFocus(e.target.tabIndex) }
                                 />
                             </td>
