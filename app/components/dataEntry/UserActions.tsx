@@ -22,9 +22,9 @@ export default function UserActions(
         if (!dataTable) { return };
 
         const tableCopy = dataTable.cloneNode(true);
-        const tBody = tableCopy.childNodes[1];
-        const userRows = tBody.childNodes;
-
+        
+        // empty all the cells in water user rows of table copy
+        const userRows = tableCopy.childNodes[1].childNodes;
         userRows.forEach(row => {
             row.childNodes.forEach((_child, key) => {
                 if (key == 0) { return };
@@ -38,15 +38,20 @@ export default function UserActions(
         domtoimage
             .toJpeg(tableCopy)
             .then(dataUrl => {
-                const pdf = new jsPDF({
-                    orientation: "landscape"
-                });
-
                 const img = new Image();
                 img.src = dataUrl;
-
-                const width = pdf.internal.pageSize.getWidth() * .95;
-                pdf.addImage(img, 'JPEG', 10, 10, width, 0);
+                
+                const pdf = new jsPDF({
+                    orientation: "landscape",
+                    unit: "px",
+                    format: [img.width, img.height]
+                });
+                
+                const xBuffer = img.width * 0.05 - 1;
+                const yBuffer = img.height * 0.05 - 1;
+                const width = img.width * 0.9;
+                const height = img.height * 0.9;
+                pdf.addImage(img, 'JPEG', xBuffer, yBuffer, width, height);
 
                 const year = new Date().getFullYear();
                 pdf.save(`${quarter} ${year}.pdf`);
