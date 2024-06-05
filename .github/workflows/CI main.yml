@@ -3,9 +3,17 @@ name: CI main
 on:
   push:
     branches: "main"
-  pull_request:
-    types: closed
-    branches: "main"
+
+  # since a closed pull request results in a push, having both the 
+  # following code and the above code uncommented will cause 
+  # this workflow to run twice. only either the above code, on push 
+  # to main, or the below code, on closed PR to main, should be used
+  # (if using the below code, uncomment the conditional statement below)
+
+  # pull_request:
+  #   types: closed
+  #   branches: "main"
+
   workflow_dispatch:
 
 env:
@@ -14,7 +22,7 @@ env:
 
 jobs:
   build_and_push:
-    if: github.event_name == 'push' || github.event.pull_request.merged
+    # if: github.event_name == 'push' || github.event.pull_request.merged
     name: build and push Docker image to ghcr
     
     runs-on: ubuntu-latest
