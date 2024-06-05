@@ -47,6 +47,8 @@ export default function UserActions(
                     format: [img.width, img.height]
                 });
                 
+                // these buffer values have 1 subtracted from them 
+                // to prevent the image from overflowing the pdf page
                 const xBuffer = img.width * 0.05 - 1;
                 const yBuffer = img.height * 0.05 - 1;
                 const width = img.width * 0.9;
